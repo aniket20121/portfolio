@@ -1,136 +1,175 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pulse — Music Player</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0710">
+<title>Pulse — 3D Music</title>
 <style>
+@property --conic-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 :root {
   color-scheme: dark;
   --pink: #ff0055;
+  --cyan: #6ee7ed;
+  --purple: #7145d0;
   --muted: #b7b7c8;
   --border: #ffffff18;
+  --bass: 0;
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
   margin: 0;
-  background: radial-gradient(ellipse at top right, #311027, #090910 60%);
+  background: radial-gradient(ellipse at 20% -5%, #311027, #0a0710 55%), #0a0710;
   color: #fff;
   font: 16px/1.6 system-ui, sans-serif;
-  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: clip;
 }
 button, input { font: inherit; }
-button, .upload { cursor: pointer; }
-button, .upload, .source {
-  padding: 11px 17px;
-  background: #242431;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  color: #fff;
-}
-button:hover, .upload:hover { background: #363648; }
+button { cursor: pointer; touch-action: manipulation; border: 1px solid var(--border);
+  background: #242431; border-radius: 14px; color: #fff; }
+button:active { transform: scale(.94); }
 button:disabled { opacity: .45; cursor: not-allowed; }
-:focus-visible { outline: 3px solid #6ee7ed; outline-offset: 4px; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 4px; }
 a { color: #ff9cbe; }
-main { max-width: 1050px; margin: auto; padding: 28px 20px 50px; }
-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-.brand { font-size: 30px; font-weight: 900; letter-spacing: -1px; }
-.brand span, h1 span { color: var(--pink); }
-.small { font-size: 13px; color: var(--muted); }
-.hero { padding: 55px 0 30px; }
-.eyebrow { color: #ff92b6; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; }
-h1 { font-size: clamp(38px, 7vw, 70px); line-height: 1.1; letter-spacing: -2px; margin: 18px 0; }
-.hero p { color: var(--muted); max-width: 580px; }
-.layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; align-items: start; }
-.panel {
-  background: #15151fe8;
-  border: 1px solid var(--border);
+main { max-width: 540px; margin: auto; padding: 18px 18px calc(34px + env(safe-area-inset-bottom, 0px)); }
+header { display: flex; justify-content: space-between; align-items: center; padding-top: env(safe-area-inset-top, 0px); }
+.brand { font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+.brand span { color: var(--pink); }
+.small { font-size: 12.5px; color: var(--muted); }
+.fx-btn { font-size: .72rem; padding: 8px 12px; }
+
+/* ---------- Stage: 3D visualizer + vinyl ---------- */
+.stage {
+  --gx: 0deg; --gy: 0deg;
+  position: relative;
+  height: 340px;
+  margin: 18px auto 6px;
   border-radius: 24px;
-  padding: 25px;
-}
-h2 { font-size: 21px; margin: 0 0 18px; }
-.search {
-  width: 100%;
-  padding: 13px 16px;
+  background: radial-gradient(circle at 50% 40%, #2a0f22, #14101f 72%);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: #090910;
-  color: white;
-  margin-bottom: 18px;
-}
-ul { padding: 0; margin: 0; list-style: none; max-height: 420px; overflow-y: auto; }
-.song {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  text-align: left;
-  gap: 14px;
-  padding: 14px 12px;
-  margin-bottom: 9px;
-}
-.song[aria-current="true"] { background: #ff00551a; border-color: #ff005577; }
-.icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
+  overflow: hidden;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #ff0055, #7145d0);
-  font-size: 22px;
+  transform: rotateX(var(--gx)) rotateY(var(--gy));
+  transition: transform .25s ease-out;
 }
-.song-info { min-width: 0; }
-.song-title { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.song-subtitle { display: block; font-size: 12px; color: var(--muted); }
-.cover {
-  height: 230px;
-  display: grid;
-  place-items: center;
-  border-radius: 17px;
-  background: radial-gradient(circle, #671638, #1a1424 70%);
-  margin-bottom: 24px;
-  perspective: 700px;
+#viz { position: absolute; inset: 0; width: 100%; height: 100%; }
+.disc-wrap {
+  position: relative;
+  transform: scale(calc(1 + var(--bass) * 0.06));
 }
 .disc {
-  width: 170px;
-  height: 170px;
+  width: 158px; height: 158px;
   border-radius: 50%;
   border: 1px solid #ffffff25;
   background:
-    radial-gradient(circle, #111 0 6%, #ff0055 7% 25%, transparent 26%),
+    radial-gradient(circle, #111 0 6%, var(--pink) 7% 24%, transparent 25%),
     repeating-radial-gradient(circle, #11111a 0 3px, #30303d 4px 5px);
-  box-shadow: 12px 20px 35px #0008;
-  transform: rotateX(20deg);
+  box-shadow: 0 0 calc(26px + var(--bass) * 70px) #ff005566, 10px 16px 30px #0008;
+  transform: rotateX(18deg);
 }
-.disc.playing { animation: spin 10s linear infinite; }
+.disc.playing { animation: spin 9s linear infinite; }
 @keyframes spin {
-  from { transform: rotateX(20deg) rotateZ(0); }
-  to { transform: rotateX(20deg) rotateZ(360deg); }
+  from { transform: rotateX(18deg) rotateZ(0); }
+  to   { transform: rotateX(18deg) rotateZ(360deg); }
 }
-#now-title { margin-bottom: 4px; overflow-wrap: anywhere; }
-#now-artist { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
-audio { width: 100%; display: block; }
-.controls { display: flex; gap: 9px; margin-top: 18px; flex-wrap: wrap; }
-#play { background: var(--pink); flex: 1; }
-#repeat[aria-pressed="true"] { border-color: var(--pink); background: #ff00552b; }
-#status { font-size: 13px; color: #ffe0ae; min-height: 22px; }
-.source { display: inline-block; font-size: 12px; text-decoration: none; padding: 7px 12px; }
-.import { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--border); }
+/* Animated conic ring appears around the stage while playing */
+.stage::after {
+  content: ""; position: absolute; inset: 0; border-radius: 24px;
+  padding: 1.5px;
+  background: conic-gradient(from var(--conic-angle), var(--pink), var(--cyan), var(--purple), var(--pink));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0; transition: opacity .4s; pointer-events: none;
+}
+.stage.playing::after { opacity: .9; animation: conic-spin 4s linear infinite; }
+@keyframes conic-spin { to { --conic-angle: 360deg; } }
+
+/* ---------- Now playing ---------- */
+#now-title { margin: 14px 0 2px; font-size: 1.35rem; letter-spacing: -.02em; overflow-wrap: anywhere; }
+#now-artist { margin: 0 0 16px; color: var(--muted); font-size: .9rem; }
+.times { display: flex; justify-content: space-between; font-size: .72rem; color: var(--muted); }
+#seek {
+  width: 100%; appearance: none; -webkit-appearance: none;
+  height: 26px; background: transparent; margin: 0;
+}
+#seek::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--pink) var(--fill, 0%), #2c2c3a var(--fill, 0%));
+}
+#seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; margin-top: -6px;
+  box-shadow: 0 0 12px #ff0055aa;
+}
+#seek::-moz-range-track { height: 6px; border-radius: 3px; background: #2c2c3a; }
+#seek::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--pink); }
+#seek::-moz-range-thumb { width: 18px; height: 18px; border: none; border-radius: 50%; background: #fff; }
+
+.controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
+.controls button { width: 52px; height: 52px; font-size: 1.15rem; border-radius: 16px; }
+#play {
+  width: 74px; height: 74px; border: none; border-radius: 50%;
+  background: var(--pink); font-size: 1.7rem;
+  box-shadow: 0 8px 26px #ff005555, 0 0 calc(10px + var(--bass) * 46px) #ff005588;
+}
+#repeat[aria-pressed="true"], #shuffle[aria-pressed="true"] {
+  border-color: var(--pink); background: #ff00552b; color: #ff9cbe;
+}
+#status { font-size: .8rem; color: #ffe0ae; min-height: 22px; margin: 12px 0 0; text-align: center; }
+.source { display: none; font-size: .75rem; }
+.source.show { display: inline-block; margin-top: 8px; }
+
+/* ---------- Playlist ---------- */
+.panel {
+  background: #15151fe8;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 20px;
+  margin-top: 22px;
+}
+.panel h2 { font-size: 1.05rem; margin: 0 0 14px; }
+.search {
+  width: 100%; font-size: 16px;
+  padding: 12px 15px; margin-bottom: 14px;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: #090910; color: white;
+}
+ul { padding: 0; margin: 0; list-style: none; max-height: 340px; overflow-y: auto; }
+.song {
+  width: 100%; display: flex; align-items: center; text-align: left;
+  gap: 13px; padding: 12px; margin-bottom: 8px;
+  background: #1b1b26; border-radius: 15px;
+}
+.song[aria-current="true"] { background: #ff00551f; border-color: #ff005577; }
+.icon {
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: grid; place-items: center; border-radius: 12px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  font-size: 20px;
+}
+.song.playing-now .icon { animation: bob 1s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-4px) scale(1.08); } }
+.song-info { min-width: 0; }
+.song-title { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .92rem; }
+.song-subtitle { display: block; font-size: .72rem; color: var(--muted); }
+.import { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
 .file-input { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
-.file-input:focus-visible + label { outline: 3px solid #6ee7ed; outline-offset: 4px; }
-.upload { display: inline-block; font-size: 13px; }
-footer { margin-top: 30px; text-align: center; color: var(--muted); font-size: 12px; }
+.file-input:focus-visible + .upload { outline: 3px solid var(--cyan); outline-offset: 4px; }
+.upload { display: inline-block; padding: 11px 16px; background: #242431;
+  border: 1px solid var(--border); border-radius: 12px; font-size: .85rem; cursor: pointer; }
+footer { margin-top: 26px; text-align: center; color: var(--muted); font-size: .72rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
-@media (max-width: 720px) {
-  .layout { grid-template-columns: 1fr; }
-  .hero { padding-top: 35px; }
-  .panel { padding: 20px; }
-  .player { grid-row: 1; }
+
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation: none !important; transition: none !important;
 }
+html[data-motion="off"] .stage { transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  .disc.playing { animation: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .stage { transform: none !important; }
 }
 </style>
 </head>
@@ -138,104 +177,95 @@ footer { margin-top: 30px; text-align: center; color: var(--muted); font-size: 1
 <main>
   <header>
     <div class="brand">pulse<span>.</span></div>
-    <span class="small">Music by Aniket</span>
+    <button class="fx-btn" id="fx" type="button" aria-pressed="false">⏸ FX</button>
   </header>
 
-  <section class="hero">
-    <div class="eyebrow">Press play. Find your rhythm.</div>
-    <h1>Your music.<br><span>Ready to play.</span></h1>
-    <p>Start with online SoundHelix demo tracks, or add songs from your device. Online tracks require an internet connection.</p>
+  <section aria-label="Now playing">
+    <div class="stage" id="stage" aria-hidden="true">
+      <canvas id="viz"></canvas>
+      <div class="disc-wrap"><div class="disc" id="disc"></div></div>
+    </div>
+
+    <h1 id="now-title">SoundHelix Song 1</h1>
+    <p id="now-artist">SoundHelix · Online demo</p>
+
+    <span class="times"><span id="t-cur">0:00</span><span id="t-dur">0:00</span></span>
+    <input id="seek" type="range" min="0" max="1000" value="0" step="1"
+           aria-label="Seek position">
+
+    <div class="controls">
+      <button id="shuffle" type="button" aria-pressed="false" aria-label="Shuffle">🔀</button>
+      <button id="previous" type="button" aria-label="Previous song">⏮</button>
+      <button id="play" type="button" aria-label="Play or pause">▶</button>
+      <button id="next" type="button" aria-label="Next song">⏭</button>
+      <button id="repeat" type="button" aria-pressed="false" aria-label="Repeat">🔁</button>
+    </div>
+
+    <p id="status" role="status" aria-live="polite">Ready. Tap play to start.</p>
+    <a id="direct" class="source" target="_blank" rel="noopener noreferrer">Open audio directly ↗</a>
+
+    <audio id="audio" playsinline preload="metadata"></audio>
   </section>
 
-  <div class="layout">
-    <section class="panel" aria-labelledby="library-heading">
-      <h2 id="library-heading">Choose a song</h2>
-      <label class="sr-only" for="search">Search songs</label>
-      <input id="search" class="search" type="search" placeholder="Search songs…">
-      <ul id="songs"></ul>
-      <p id="empty" class="small" hidden>No songs match your search.</p>
+  <section class="panel" aria-labelledby="lib-h">
+    <h2 id="lib-h">My playlist</h2>
+    <label class="sr-only" for="search">Search songs</label>
+    <input id="search" class="search" type="search" placeholder="Search songs…">
+    <ul id="songs"></ul>
+    <p id="empty" class="small" hidden>No songs match your search.</p>
 
-      <div class="import">
-        <input id="files" class="file-input" type="file" accept="audio/*" multiple>
-        <label for="files" class="upload">＋ Add your own music</label>
-        <p class="small">Local files stay on your device. Add them again after reloading.</p>
-      </div>
-    </section>
-
-    <section class="panel player" aria-label="Audio player">
-      <div class="cover" aria-hidden="true">
-        <div class="disc" id="disc"></div>
-      </div>
-
-      <h2 id="now-title">SoundHelix Song 1</h2>
-      <p id="now-artist">SoundHelix · Online demo</p>
-
-      <!-- Native controls provide accessible playback, seeking, and volume. -->
-      <audio id="audio" controls preload="none">
-        Your browser does not support HTML audio.
-      </audio>
-
-      <div class="controls">
-        <button id="previous" type="button" aria-label="Previous song">⏮</button>
-        <button id="play" type="button">▶ Play</button>
-        <button id="next" type="button" aria-label="Next song">⏭</button>
-        <button id="repeat" type="button" aria-pressed="false">Repeat</button>
-      </div>
-
-      <p id="status" role="status" aria-live="polite">Ready. Click Play to start.</p>
-
-      <a id="direct" class="source" target="_blank" rel="noopener noreferrer">
-        Open audio directly ↗
-      </a>
-
-      <p class="small">If streaming fails, try the direct audio link or add a local MP3. Availability depends on the external audio host.</p>
-    </section>
-  </div>
+    <div class="import">
+      <input id="files" class="file-input" type="file" accept="audio/*" multiple>
+      <label for="files" class="upload">＋ Add songs from my phone</label>
+      <p class="small" style="margin-top:10px">
+        Tip: to bake songs into the app forever, edit the
+        <b>🎵 YOUR PLAYLIST</b> block at the top of the script in this file.
+        Local files play with the full 3D visualizer.
+      </p>
+    </div>
+  </section>
 
   <footer>
-    Demo audio:
-    <a href="https://www.soundhelix.com/audio-examples" target="_blank" rel="noopener noreferrer">SoundHelix audio examples</a>.
-    This is not a commercial music catalog or live chart service.
+    Demo audio: <a href="https://www.soundhelix.com/audio-examples" target="_blank" rel="noopener noreferrer">SoundHelix</a>.
+    Made with <span style="color:var(--pink)">♥</span> by Aniket.
   </footer>
 </main>
 
 <script>
 "use strict";
 
+/* ════════════════════════════════════════════════════════════
+   🎵 YOUR PLAYLIST — EDIT HERE 🎵
+   Copy a line, paste YOUR song's direct URL (ends in .mp3/.m4a/…).
+   Host files on GitHub, your own server, or any direct-link host:
+   { title: "Song name", artist: "Who made it", url: "https://…/song.mp3" },
+   (Local files added with ＋ always work too.)
+   ════════════════════════════════════════════════════════════ */
+const PLAYLIST = [
+  { title: "SoundHelix Song 1", artist: "SoundHelix · Online demo", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { title: "SoundHelix Song 2", artist: "SoundHelix · Online demo", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+  { title: "SoundHelix Song 3", artist: "SoundHelix · Online demo", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+];
+/* ════════════════ end of your playlist block ════════════════ */
+
 const $ = id => document.getElementById(id);
 const audio = $("audio");
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let fxPaused = false;
 
-const tracks = [
-  {
-    title: "SoundHelix Song 1",
-    artist: "SoundHelix · Online demo",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-  },
-  {
-    title: "SoundHelix Song 2",
-    artist: "SoundHelix · Online demo",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-  },
-  {
-    title: "SoundHelix Song 3",
-    artist: "SoundHelix · Online demo",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-  }
-];
-
+const tracks = [...PLAYLIST];
 let current = 0;
 let version = 0;
+let shuffle = false;
+let wantPlay = false;
+let seeking = false;
 const localKeys = new Set();
 
-function status(message) {
-  $("status").textContent = message;
-}
+const status = m => { $("status").textContent = m; };
+const fmt = s => Number.isFinite(s)
+  ? Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0") : "0:00";
 
-function syncControls() {
-  $("play").textContent = audio.paused ? "▶ Play" : "Ⅱ Pause";
-  $("disc").classList.toggle("playing", !audio.paused && !audio.ended);
-}
-
+/* ---------- Playlist UI ---------- */
 function renderLibrary() {
   const query = $("search").value.trim().toLowerCase();
   const list = $("songs");
@@ -250,25 +280,23 @@ function renderLibrary() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "song";
+    if (track.url.startsWith("blob:")) button.classList.add("song"); // local
     button.setAttribute("aria-label", "Play " + track.title);
     if (index === current) button.setAttribute("aria-current", "true");
 
     const icon = document.createElement("span");
     icon.className = "icon";
-    icon.textContent = "♫";
+    icon.textContent = index === current && !audio.paused ? "❚❚" : "♫";
     icon.setAttribute("aria-hidden", "true");
 
     const info = document.createElement("span");
     info.className = "song-info";
-
     const title = document.createElement("span");
     title.className = "song-title";
     title.textContent = track.title;
-
     const artist = document.createElement("span");
     artist.className = "song-subtitle";
     artist.textContent = track.artist;
-
     info.append(title, artist);
     button.append(icon, info);
     button.addEventListener("click", () => selectTrack(index, true));
@@ -279,8 +307,153 @@ function renderLibrary() {
   $("empty").hidden = matches !== 0;
 }
 
+/* ---------- 3D audio-reactive visualizer ---------- */
+const canvas = $("viz");
+const ctx2d = canvas.getContext("2d");
+const stage = $("stage");
+let W = 0, H = 0, actx = null, analyser = null, graphBuilt = false, vizAllowed = false;
+const data = new Uint8Array(128);
+let rot = 0;
+
+function sizeCanvas() {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const r = canvas.getBoundingClientRect();
+  W = r.width; H = r.height;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+addEventListener("resize", sizeCanvas, { passive: true });
+sizeCanvas();
+
+function ensureCtx() {
+  if (actx) { actx.resume?.(); return; }
+  try {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch {}
+}
+
+function buildGraph() {
+  if (graphBuilt || !actx || !vizAllowed) return;
+  try {
+    const src = actx.createMediaElementSource(audio);
+    analyser = actx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.82;
+    src.connect(analyser);
+    analyser.connect(actx.destination);
+    graphBuilt = true;
+  } catch { analyser = null; }
+}
+
+function fakeV(i, t) {
+  return (0.30 + 0.28 * Math.sin(t * 0.0021 + i * 0.37) +
+          0.22 * Math.sin(t * 0.0037 + i * 0.93) +
+          0.18 * Math.sin(t * 0.0012 + i * 1.71)) * (wantPlay ? 1 : 0.25);
+}
+
+function drawScene(t) {
+  ctx2d.clearRect(0, 0, W, H);
+  if (analyser) analyser.getByteFrequencyData(data);
+
+  const N = 64, F = 340, cx = W / 2, cy = H / 2 + 12, R = Math.min(W, H) * 0.30;
+  rot += wantPlay ? 0.0045 : 0.0012;
+  const bars = [];
+  let bassSum = 0;
+
+  for (let i = 0; i < N; i++) {
+    const bin = Math.min(data.length - 1, Math.floor(Math.pow(i / N, 1.35) * data.length * 0.9));
+    const v = Math.max(0, analyser ? data[bin] / 255 : fakeV(i, t));
+    if (i < 10) bassSum += v;
+
+    const th = (i / N) * Math.PI * 2 + rot;
+    const x3 = Math.cos(th) * R, z3 = Math.sin(th) * R;
+    const s = F / (F + z3);
+    const h = 5 + v * v * 74 * s;
+    bars.push({ x: cx + x3 * s, y: cy + z3 * s * 0.42, h, s, v, z: z3 });
+  }
+
+  bars.sort((a, b) => a.z - b.z); // far → near for depth
+  for (const b of bars) {
+    const alpha = 0.28 + 0.72 * ((b.z + R) / (2 * R));
+    ctx2d.strokeStyle = `hsla(${340 - b.v * 170}, 100%, ${58 + b.v * 12}%, ${alpha})`;
+    ctx2d.lineWidth = 3.2 * b.s;
+    ctx2d.lineCap = "round";
+    ctx2d.beginPath();
+    ctx2d.moveTo(b.x, b.y);
+    ctx2d.lineTo(b.x, b.y - b.h);
+    ctx2d.stroke();
+  }
+
+  const bass = analyser ? bassSum / 10 : (wantPlay ? (Math.sin(t * 0.006) * .5 + .5) * .5 : 0);
+  document.documentElement.style.setProperty("--bass", bass.toFixed(3));
+}
+
+function loop(t) {
+  if (REDUCED || fxPaused || document.hidden) { requestAnimationFrame(loop); return; }
+  drawScene(t);
+  requestAnimationFrame(loop);
+}
+if (REDUCED) drawScene(1200); else requestAnimationFrame(loop);
+
+/* ---------- Gyro tilt on the stage (where the device allows) ---------- */
+addEventListener("deviceorientation", e => {
+  if (REDUCED || fxPaused || e.gamma == null) return;
+  stage.style.setProperty("--gy", Math.max(-7, Math.min(7, e.gamma * 0.18)) + "deg");
+  stage.style.setProperty("--gx", Math.max(-7, Math.min(7, (e.beta - 45) * 0.12)) + "deg");
+}, { passive: true });
+
+/* ---------- Playback core ---------- */
+function syncControls() {
+  const playing = !audio.paused && !audio.ended;
+  $("play").textContent = playing ? "❚❚" : "▶";
+  $("play").setAttribute("aria-label", playing ? "Pause" : "Play");
+  $("disc").classList.toggle("playing", playing);
+  stage.classList.toggle("playing", playing);
+  renderLibrary();
+}
+
+function loadMedia(track, autoplay) {
+  version++;
+  audio.pause();
+  wantPlay = false;
+
+  // Prefer CORS so the real audio-reactive visualizer works.
+  if (graphBuilt || !track.url.startsWith("blob:")) {
+    audio.setAttribute("crossorigin", "anonymous");
+    vizAllowed = true;
+  } else {
+    vizAllowed = true;
+  }
+  audio.src = track.url;
+  $("now-title").textContent = track.title;
+  $("now-artist").textContent = track.artist;
+  $("direct").href = track.url;
+  $("direct").classList.add("show");
+
+  if ("mediaSession" in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title, artist: track.artist, album: "Pulse Music"
+      });
+    } catch {}
+  }
+
+  syncControls();
+  if (autoplay) startPlayback();
+  else status("Ready. Tap play to start.");
+}
+
+function selectTrack(index, autoplay) {
+  if (!tracks[index]) return;
+  current = index;
+  loadMedia(tracks[index], autoplay);
+}
+
 async function startPlayback() {
   const attempt = version;
+  wantPlay = true;
+  ensureCtx();
+  buildGraph();
   status("Loading audio…");
 
   try {
@@ -288,75 +461,43 @@ async function startPlayback() {
     if (attempt === version) status("");
   } catch (error) {
     if (attempt !== version || error.name === "AbortError") return;
-
+    wantPlay = false;
     if (error.name === "NotAllowedError") {
-      status("Your browser blocked playback. Click the audio player's built-in Play button.");
-    } else if (error.name === "NotSupportedError") {
-      status("The audio couldn't be loaded. Try the direct audio link or a local MP3.");
+      status("Tap play again to allow sound.");
     } else {
-      status("Playback failed. Check your connection, then click Play to retry.");
+      status("Playback failed. Try another song or add a local MP3.");
     }
     syncControls();
   }
 }
 
-function selectTrack(index, autoplay) {
-  if (!tracks[index]) return;
-
-  version++;
-  audio.pause();
-  current = index;
-
-  const track = tracks[current];
-  audio.src = track.url;
-  $("now-title").textContent = track.title;
-  $("now-artist").textContent = track.artist;
-  $("direct").href = track.url;
-
-  // Update selection without rebuilding the list or losing keyboard focus.
-  document.querySelectorAll("#songs .song").forEach(button => {
-    button.removeAttribute("aria-current");
-  });
-
-  const query = $("search").value.trim().toLowerCase();
-  const visible = tracks
-    .map((entry, originalIndex) => ({ entry, originalIndex }))
-    .filter(({ entry }) => (entry.title + " " + entry.artist).toLowerCase().includes(query));
-  const visibleIndex = visible.findIndex(item => item.originalIndex === current);
-  const buttons = document.querySelectorAll("#songs .song");
-  if (visibleIndex >= 0 && buttons[visibleIndex]) {
-    buttons[visibleIndex].setAttribute("aria-current", "true");
-  }
-
-  syncControls();
-  if (autoplay) startPlayback();
-  else status("Ready. Click Play to start.");
-}
-
 $("play").addEventListener("click", () => {
-  if (!audio.paused) {
-    audio.pause();
-    return;
-  }
-
-  // Reload a failed source when the user retries.
-  if (audio.error) {
-    version++;
-    audio.load();
-  }
+  if (!audio.paused) { audio.pause(); return; }
+  if (audio.error) { version++; audio.load(); }
   startPlayback();
 });
 
 $("previous").addEventListener("click", () => {
-  if (audio.currentTime > 3 && !audio.error) {
-    audio.currentTime = 0;
-  } else {
-    selectTrack((current - 1 + tracks.length) % tracks.length, true);
-  }
+  if (audio.currentTime > 3 && !audio.error) audio.currentTime = 0;
+  else selectTrack((current - 1 + tracks.length) % tracks.length, true);
 });
 
 $("next").addEventListener("click", () => {
-  selectTrack((current + 1) % tracks.length, true);
+  selectTrack(shuffle
+    ? randomIndex()
+    : (current + 1) % tracks.length, true);
+});
+
+function randomIndex() {
+  if (tracks.length < 2) return current;
+  let n;
+  do { n = Math.floor(Math.random() * tracks.length); } while (n === current);
+  return n;
+}
+
+$("shuffle").addEventListener("click", () => {
+  shuffle = !shuffle;
+  $("shuffle").setAttribute("aria-pressed", String(shuffle));
 });
 
 $("repeat").addEventListener("click", () => {
@@ -364,11 +505,96 @@ $("repeat").addEventListener("click", () => {
   $("repeat").setAttribute("aria-pressed", String(audio.loop));
 });
 
-$("search").addEventListener("input", renderLibrary);
+$("fx").addEventListener("click", () => {
+  fxPaused = !fxPaused;
+  document.documentElement.toggleAttribute("data-motion", fxPaused);
+  $("fx").setAttribute("aria-pressed", String(fxPaused));
+  $("fx").textContent = fxPaused ? "▶ FX" : "⏸ FX";
+  if (!fxPaused && !REDUCED) requestAnimationFrame(loop);
+});
 
+/* ---------- Seek bar ---------- */
+const seek = $("seek");
+audio.addEventListener("timeupdate", () => {
+  $("t-cur").textContent = fmt(audio.currentTime);
+  $("t-dur").textContent = fmt(audio.duration);
+  if (seeking || !Number.isFinite(audio.duration)) return;
+  seek.value = Math.round(audio.currentTime / audio.duration * 1000) || 0;
+  seek.style.setProperty("--fill", (seek.value / 10) + "%");
+});
+seek.addEventListener("input", () => {
+  seeking = true;
+  seek.style.setProperty("--fill", (seek.value / 10) + "%");
+  $("t-cur").textContent = fmt(seek.value / 1000 * audio.duration);
+});
+seek.addEventListener("change", () => {
+  if (Number.isFinite(audio.duration)) {
+    audio.currentTime = seek.value / 1000 * audio.duration;
+  }
+  seeking = false;
+});
+
+/* ---------- Audio events ---------- */
+audio.addEventListener("playing", () => {
+  // CORS-clean load confirmed → safe to hook the real visualizer.
+  if (audio.crossOrigin === "anonymous" && !graphBuilt && !tracks[current].url.startsWith("blob:") === false) {}
+  if (audio.crossOrigin === "anonymous" && !graphBuilt) {
+    vizAllowed = true;
+    buildGraph();
+  }
+  status("");
+  syncControls();
+});
+audio.addEventListener("pause", () => { wantPlay = false; syncControls(); });
+audio.addEventListener("waiting", () => { if (!audio.paused) status("Buffering…"); });
+audio.addEventListener("ended", () => {
+  selectTrack(shuffle ? randomIndex() : (current + 1) % tracks.length, true);
+});
+audio.addEventListener("error", () => {
+  const t = tracks[current];
+  if (!audio.error) return;
+
+  // Cross-origin visualizer mode blocked by the host → retry plainly.
+  if (audio.crossOrigin === "anonymous" && !graphBuilt &&
+      !t.url.startsWith("blob:")) {
+    vizAllowed = false;
+    version++;
+    audio.removeAttribute("crossorigin");
+    audio.src = t.url;
+    audio.load();
+    status("Retrying in compatibility mode…");
+    if (wantPlay) startPlayback();
+    return;
+  }
+
+  const messages = {
+    1: "Loading was interrupted. Tap play to retry.",
+    2: "Network error. Check your connection.",
+    3: "This audio can't be decoded on your phone.",
+    4: "Source unavailable. Try the direct link or add a local file."
+  };
+  status(messages[audio.error.code] || "Audio failed to load.");
+  syncControls();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && !fxPaused && !REDUCED) requestAnimationFrame(loop);
+});
+
+/* Lock-screen / notification controls */
+if ("mediaSession" in navigator) {
+  const safe = (name, fn) => {
+    try { navigator.mediaSession.setActionHandler(name, fn); } catch {}
+  };
+  safe("play", startPlayback);
+  safe("pause", () => audio.pause());
+  safe("previoustrack", () => $("previous").click());
+  safe("nexttrack", () => $("next").click());
+}
+
+/* ---------- Add local songs ---------- */
 $("files").addEventListener("change", event => {
-  let added = 0;
-  let firstAdded = -1;
+  let added = 0, firstAdded = -1;
 
   for (const file of event.target.files) {
     if (!file.type.startsWith("audio/") &&
@@ -377,12 +603,11 @@ $("files").addEventListener("change", event => {
     const key = JSON.stringify([file.name, file.size, file.lastModified]);
     if (localKeys.has(key)) continue;
     localKeys.add(key);
-
     if (firstAdded === -1) firstAdded = tracks.length;
 
     tracks.push({
       title: file.name.replace(/\.[^.]+$/, ""),
-      artist: "Your device · Local audio",
+      artist: "My phone · Local",
       url: URL.createObjectURL(file)
     });
     added++;
@@ -390,48 +615,19 @@ $("files").addEventListener("change", event => {
 
   $("search").value = "";
   renderLibrary();
-
   if (added && audio.paused) {
     selectTrack(firstAdded, false);
-    status(`${added} song(s) added. Click Play to listen.`);
+    status(`${added} song(s) added. Tap play.`);
   } else {
-    status(added ? `${added} song(s) added to your library.` : "No new audio files added.");
+    status(added ? `${added} song(s) added.` : "No new audio files added.");
   }
-
   event.target.value = "";
 });
 
-audio.addEventListener("play", syncControls);
-audio.addEventListener("pause", syncControls);
-audio.addEventListener("playing", () => {
-  status("");
-  syncControls();
-});
-audio.addEventListener("waiting", () => {
-  if (!audio.paused) status("Buffering…");
-});
-audio.addEventListener("ended", () => {
-  selectTrack((current + 1) % tracks.length, true);
-});
-audio.addEventListener("error", () => {
-  const messages = {
-    1: "Audio loading was interrupted. Click Play to retry.",
-    2: "Network error. Check your connection or try the direct audio link.",
-    3: "Your browser couldn't decode this audio. Try another song or a local MP3.",
-    4: "The audio source is unavailable or unsupported. Try the direct link or a local MP3."
-  };
-  status(messages[audio.error?.code] || "Audio failed to load. Try another song.");
-  $("disc").classList.remove("playing");
-  syncControls();
-});
-
-document.addEventListener("visibilitychange", () => {
-  $("disc").style.animationPlayState = document.hidden ? "paused" : "running";
-});
+$("search").addEventListener("input", renderLibrary);
 
 renderLibrary();
-selectTrack(0, false);
+loadMedia(tracks[0], false);
 </script>
 </body>
 </html>
-```
