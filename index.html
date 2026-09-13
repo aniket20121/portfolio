@@ -1,17 +1,18 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080808">
-  <meta name="description" content="Aniket Bhati — Front-End Developer crafting responsive websites and engaging digital experiences.">
-  <title>Aniket Bhati | 3D Portfolio</title>
+  <meta name="description" content="Aniket Bhati — Front-End Developer. Mobile portfolio with 3D depth and touch interactions.">
+  <title>Aniket Bhati | Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    @property --conic-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
     :root {
       color-scheme: dark;
       --bg: #080808;
@@ -21,164 +22,219 @@
       --pink: #ff004f;
       --cyan: #67e8f9;
       --border: rgba(255,255,255,.13);
-      --radius: 24px;
+      --radius: 20px;
+      --nav-h: 64px;
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; scroll-padding-top: 95px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(70px + var(--sat)); -webkit-text-size-adjust: 100%; }
     body {
       background: var(--bg);
       color: var(--text);
       font-family: "Poppins", sans-serif;
-      line-height: 1.7;
+      line-height: 1.65;
       overflow-x: clip;
+      min-height: 100svh;
     }
 
     body::before {
       content: "";
       position: fixed;
       inset: 0;
-      z-index: -1;
+      z-index: -2;
       pointer-events: none;
       background:
-        radial-gradient(ellipse at 10% 15%, #ff004f18, transparent 45%),
-        radial-gradient(ellipse at 95% 55%, #6750ff18, transparent 45%);
+        radial-gradient(ellipse at 15% 8%, #ff004f1e, transparent 45%),
+        radial-gradient(ellipse at 90% 60%, #6750ff18, transparent 45%);
     }
 
     a { color: inherit; text-decoration: none; }
+    a, button { touch-action: manipulation; }
     button, input, textarea { font: inherit; }
     button { cursor: pointer; }
     img { max-width: 100%; display: block; }
-    :focus-visible { outline: 3px solid var(--cyan); outline-offset: 6px; }
+    :focus-visible { outline: 3px solid var(--cyan); outline-offset: 4px; }
     ::selection { background: var(--pink); color: white; }
 
-    .container { width: min(1180px, 90%); margin-inline: auto; }
-    section { padding: 100px 0; }
+    .container { width: min(540px, 92%); margin-inline: auto; }
+    section { padding: 64px 0; }
+
     .eyebrow {
       color: var(--cyan);
       text-transform: uppercase;
       letter-spacing: .22em;
-      font-size: .76rem;
+      font-size: .72rem;
       font-weight: 600;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .section-title {
-      font-size: clamp(2rem, 5vw, 3.7rem);
-      letter-spacing: -.05em;
+      font-size: clamp(1.9rem, 8.5vw, 2.6rem);
+      letter-spacing: -.04em;
       line-height: 1.15;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
     }
     .muted { color: var(--muted); }
     .accent { color: var(--pink); }
-    .section-heading { margin-bottom: 45px; max-width: 650px; }
-    .skip-link {
-      position: fixed;
-      top: -100px;
-      left: 16px;
-      background: white;
-      color: black;
-      padding: 12px 20px;
-      z-index: 100;
-    }
-    .skip-link:focus { top: 12px; }
+    .section-heading { margin-bottom: 34px; }
 
-    /* Navigation */
+    /* ---------- Living background (lightened for phones) ---------- */
+    .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+    .stars {
+      position: absolute; inset: -50% 0;
+      background-image:
+        radial-gradient(1px 1px at 25px 45px, #ffffffaa, transparent),
+        radial-gradient(1.5px 1.5px at 160px 90px, #ffb3d1aa, transparent),
+        radial-gradient(1px 1px at 300px 200px, #b3f0f4aa, transparent),
+        radial-gradient(2px 2px at 90px 310px, #ffffff88, transparent);
+      background-size: 420px 420px;
+      animation: drift 100s linear infinite;
+    }
+    @keyframes drift { to { transform: translateY(420px); } }
+
+    .cube-field { position: absolute; inset: 0; perspective: 900px; }
+    .bg-cube { position: absolute; animation: floaty var(--dur, 14s) ease-in-out infinite alternate; opacity: .75; }
+    .mini-cube {
+      width: var(--s, 34px); aspect-ratio: 1;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: spin-cube var(--spin, 22s) linear infinite;
+    }
+    .mini-cube i {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #ff004f22, #6750ff33);
+      border: 1px solid #ff004f44;
+    }
+    .mini-cube i:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s, 34px) / 2)); }
+    .mini-cube i:nth-child(3) { transform: rotateX(90deg) translateZ(calc(var(--s, 34px) / 2)); }
+    .mini-cube i:first-child  { transform: translateZ(calc(var(--s, 34px) / 2)); }
+    @keyframes floaty { from { transform: translateY(0); } to { transform: translateY(-55px); } }
+    @keyframes spin-cube { from { transform: rotateX(0) rotateY(0); } to { transform: rotateX(360deg) rotateY(360deg); } }
+
+    /* ---------- Scroll reveal ---------- */
+    .js .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .js .reveal.in { opacity: 1; transform: none; }
+
+    /* ---------- Top bar ---------- */
     .site-header {
       position: sticky;
       top: 0;
       z-index: 50;
       border-bottom: 1px solid var(--border);
-      background: rgba(8,8,8,.88);
-      backdrop-filter: blur(20px);
+      background: rgba(8,8,8,.9);
+      backdrop-filter: blur(16px);
+      padding-top: var(--sat);
     }
-    nav {
-      min-height: 78px;
+    .topbar {
+      min-height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
     }
-    .brand { font-weight: 800; font-size: 1.6rem; letter-spacing: -.07em; }
+    .brand { font-weight: 800; font-size: 1.4rem; letter-spacing: -.06em; }
     .brand span { color: var(--pink); }
-    .nav-links { display: flex; list-style: none; gap: 28px; }
-    .nav-links a { color: var(--muted); font-size: .85rem; transition: color .2s; }
-    .nav-links a:hover { color: white; }
-    .menu-toggle {
-      display: none;
-      color: white;
+    .icon-btn {
       border: 1px solid var(--border);
+      border-radius: 12px;
       background: var(--panel);
-      border-radius: 10px;
-      padding: 8px 14px;
+      color: white;
+      font-size: .72rem;
+      padding: 9px 13px;
     }
+    .icon-btn[aria-pressed="true"] { border-color: var(--pink); background: #ff004f22; }
 
-    /* Hero */
+    /* ---------- Hero ---------- */
     .hero {
-      min-height: calc(100svh - 78px);
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      align-items: center;
-      gap: 40px;
-      padding-block: 70px;
+      min-height: calc(100svh - 56px - var(--sat));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      padding-block: 40px 30px;
     }
     .hero h1 {
-      font-size: clamp(3rem, 6.5vw, 5.6rem);
-      line-height: 1.08;
-      letter-spacing: -.065em;
-      margin: 22px 0;
+      font-size: clamp(2.6rem, 12vw, 4rem);
+      line-height: 1.1;
+      letter-spacing: -.05em;
+      margin: 16px 0;
     }
     .gradient-text {
-      background: linear-gradient(100deg, #ff004f, #ff83b0, #a99cff);
+      background: linear-gradient(100deg, #ff004f, #ff83b0, #a99cff, #ff004f);
+      background-size: 220% auto;
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
+      animation: hue-slide 7s linear infinite;
     }
-    .hero-description { max-width: 480px; color: var(--muted); }
-    .location { margin-top: 18px; font-size: .85rem; color: var(--muted); }
-    .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+    @keyframes hue-slide { to { background-position: 220% center; } }
+    .hero-description { color: var(--muted); }
+    .location { margin-top: 12px; font-size: .82rem; color: var(--muted); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
     .btn {
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
-      padding: 13px 24px;
-      border-radius: 12px;
+      gap: 10px;
+      padding: 13px 22px;
+      border-radius: 13px;
       border: 1px solid var(--border);
       color: white;
       background: rgba(255,255,255,.04);
       font-weight: 500;
-      transition: transform .2s, box-shadow .2s, border-color .2s;
-    }
-    .btn:hover { transform: translateY(-3px); border-color: var(--pink); }
-    .btn-primary { background: var(--pink); border-color: var(--pink); }
-    .btn-primary:hover { box-shadow: 0 12px 36px #ff004f40; }
-
-    /* Real CSS 3D geometry */
-    .scene {
-      --size: clamp(135px, 19vw, 225px);
-      --half: calc(var(--size) / 2);
+      font-size: .9rem;
       position: relative;
-      height: 470px;
+      overflow: hidden;
+      transition: transform .15s, box-shadow .2s, border-color .2s;
+    }
+    .btn:active { transform: scale(.96); }
+    .btn-primary { background: var(--pink); border-color: var(--pink); }
+    .btn-primary:active { box-shadow: 0 10px 30px #ff004f45; }
+
+    /* Ripple (touch feedback) */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff55, #ffffff22 40%, transparent 70%);
+      transform: scale(0);
+      animation: ripple .55s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple { to { transform: scale(1); opacity: 0; } }
+
+    /* ---------- Hero cube — gyro-reactive ---------- */
+    .scene {
+      --size: clamp(115px, 38vw, 165px);
+      --half: calc(var(--size) / 2);
+      --sx: 0deg; --sy: 0deg;
+      position: relative;
+      height: 330px;
       display: grid;
       place-items: center;
-      perspective: 900px;
-      isolation: isolate;
+      perspective: 800px;
+      margin-top: 10px;
+      transform: rotateY(var(--sx)) rotateX(var(--sy));
+      transition: transform .25s ease-out;
     }
     .scene::before {
       content: "";
       position: absolute;
-      width: 85%;
+      width: 82%;
       aspect-ratio: 1;
       border-radius: 50%;
-      background: radial-gradient(circle, #ff004f24, #6750ff12 45%, transparent 70%);
-      z-index: -1;
+      background: radial-gradient(circle, #ff004f26, #6750ff14 45%, transparent 70%);
     }
     .cube {
       width: var(--size);
       height: var(--size);
       position: relative;
       transform-style: preserve-3d;
-      animation: rotate-cube 22s linear infinite;
+      animation: rotate-cube 20s linear infinite;
     }
     .face {
       position: absolute;
@@ -187,12 +243,12 @@
       place-items: center;
       border: 1px solid #ff75a099;
       background: linear-gradient(135deg, #ff004f28, #131322eb);
-      box-shadow: inset 0 0 40px #ff004f15;
+      box-shadow: inset 0 0 34px #ff004f15;
       backface-visibility: hidden;
-      font-size: 2.6rem;
+      font-size: 2rem;
       font-weight: 700;
       color: #ffd6e5;
-      text-shadow: 0 0 24px #ff004f80;
+      text-shadow: 0 0 22px #ff004f80;
     }
     .face-front  { transform: translateZ(var(--half)); }
     .face-back   { transform: rotateY(180deg) translateZ(var(--half)); }
@@ -203,160 +259,235 @@
 
     .orbit {
       position: absolute;
-      width: 90%;
+      width: 92%;
       aspect-ratio: 1;
-      border: 1px solid #ff004f55;
+      border: 1px solid #ff004f50;
       border-radius: 50%;
       transform: rotateX(68deg) rotateZ(-25deg);
       pointer-events: none;
+      animation: orbit-spin 16s linear infinite;
     }
     .orbit-two {
-      width: 105%;
+      width: 106%;
       border-color: #67e8f933;
       transform: rotateX(65deg) rotateY(25deg) rotateZ(35deg);
+      animation-name: orbit-spin-two;
+      animation-duration: 24s;
+      animation-direction: reverse;
     }
+    @keyframes orbit-spin { to { transform: rotateX(68deg) rotateZ(335deg); } }
+    @keyframes orbit-spin-two { to { transform: rotateX(65deg) rotateY(25deg) rotateZ(-325deg); } }
+
     .floating-label {
       position: absolute;
-      padding: 10px 16px;
+      padding: 8px 13px;
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 11px;
       background: #15151ee8;
-      box-shadow: 0 16px 40px #0006;
-      font-size: .78rem;
+      box-shadow: 0 12px 30px #0006;
+      font-size: .7rem;
       animation: float 5s ease-in-out infinite;
     }
-    .label-one { top: 14%; left: 2%; }
-    .label-two { bottom: 13%; right: 0; animation-delay: -2s; color: var(--cyan); }
-    .scene-caption {
-      position: absolute;
-      bottom: 0;
-      font-size: .65rem;
-      letter-spacing: .25em;
-      color: var(--muted);
-    }
+    .label-one { top: 10%; left: 0; }
+    .label-two { bottom: 12%; right: 0; animation-delay: -2s; color: var(--cyan); }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
     @keyframes rotate-cube {
       from { transform: rotateX(-18deg) rotateY(0deg); }
       to { transform: rotateX(-18deg) rotateY(360deg); }
     }
-    @keyframes float {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-14px); }
+    .scene-caption {
+      position: absolute;
+      bottom: 0;
+      font-size: .6rem;
+      letter-spacing: .25em;
+      color: var(--muted);
     }
 
-    /* Layered cards */
-    .tilt {
-      --rx: 0deg;
-      --ry: 0deg;
-      transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry));
-      transition: transform .18s ease-out, border-color .25s, box-shadow .25s;
+    /* Gyro enable chip */
+    .tilt-chip {
+      display: none;
+      margin: 14px auto 0;
+      border: 1px solid #ff004f55;
+      background: #ff004f14;
+      color: #ffb3c8;
+      border-radius: 30px;
+      padding: 10px 18px;
+      font-size: .78rem;
     }
-    .tilt:hover {
-      border-color: #ff004f66;
-      box-shadow: 0 24px 60px #0005;
-    }
+    .tilt-chip.show { display: inline-block; }
+
+    /* ---------- Cards: TAP glow instead of hover ---------- */
     .panel {
+      position: relative;
       background: linear-gradient(145deg, #1c1c27, #101016);
       border: 1px solid var(--border);
       border-radius: var(--radius);
     }
+    .tilt { position: relative; transition: transform .15s, border-color .25s, box-shadow .25s; }
+    .tilt:active { transform: scale(.985); }
+    .tilt::before {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      background: conic-gradient(from var(--conic-angle),
+        var(--pink), var(--cyan), #a99cff, var(--pink));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity .35s;
+      pointer-events: none;
+    }
+    .tilt::after {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(240px circle at 50% 30%, #ffffff10, transparent 70%);
+      opacity: 0;
+      transition: opacity .35s;
+      pointer-events: none;
+    }
+    /* Tap-activated "insane glow" */
+    .tilt.touch-glow { border-color: transparent; box-shadow: 0 18px 44px #0006, 0 0 40px #ff004f26; }
+    .tilt.touch-glow::before { opacity: 1; animation: conic-spin 3s linear infinite; }
+    .tilt.touch-glow::after { opacity: 1; }
+    @keyframes conic-spin { to { --conic-angle: 360deg; } }
 
     /* About */
-    .about-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 65px; align-items: center; }
-    .portrait-card { padding: 16px; transform-style: preserve-3d; }
+    .portrait-card { padding: 14px; margin-bottom: 26px; max-width: 380px; margin-inline: auto; }
     .portrait-card img {
       width: 100%;
       aspect-ratio: 4/5;
       object-fit: cover;
-      border-radius: 16px;
+      border-radius: 14px;
       background: #252532;
     }
-    .portrait-caption { padding: 22px 10px 8px; transform: translateZ(25px); }
-    .portrait-caption strong { display: block; font-size: 1.3rem; }
-    .portrait-caption span { color: var(--muted); font-size: .85rem; }
+    .portrait-caption { padding: 18px 8px 6px; }
+    .portrait-caption strong { display: block; font-size: 1.2rem; }
+    .portrait-caption span { color: var(--muted); font-size: .82rem; }
 
-    .tab-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 28px 0 22px; }
+    .tab-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0 18px; }
     .tab {
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 17px;
+      padding: 10px 16px;
       background: transparent;
       color: var(--muted);
+      font-size: .88rem;
+      position: relative;
+      overflow: hidden;
     }
+    .tab:active { transform: scale(.95); }
     .tab[aria-selected="true"] { color: white; background: #ff004f20; border-color: var(--pink); }
-    .tab-panel ul { list-style: none; display: grid; gap: 18px; }
-    .tab-panel li { border-left: 2px solid var(--pink); padding-left: 16px; color: var(--muted); }
+    .tab-panel ul { list-style: none; display: grid; gap: 16px; }
+    .tab-panel li { border-left: 2px solid var(--pink); padding-left: 14px; color: var(--muted); font-size: .9rem; }
     .tab-panel strong { display: block; color: white; font-weight: 500; }
 
-    /* Services */
-    .cards-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 24px; }
-    .service-card { padding: 32px; transform-style: preserve-3d; }
+    /* Services + Work */
+    .cards-grid { display: grid; gap: 18px; }
+    .service-card { padding: 26px; }
     .service-icon {
       display: grid;
       place-items: center;
-      width: 62px;
-      height: 62px;
+      width: 56px;
+      height: 56px;
       background: #ff004f18;
       border: 1px solid #ff004f44;
-      border-radius: 17px;
+      border-radius: 15px;
       color: #ff77a1;
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 700;
-      margin-bottom: 30px;
-      transform: translateZ(35px);
+      margin-bottom: 22px;
     }
-    .service-card h3 { font-size: 1.35rem; margin-bottom: 14px; transform: translateZ(20px); }
-    .service-card p { color: var(--muted); font-size: .9rem; }
-    .text-link { display: inline-block; margin-top: 26px; color: #ff83aa; font-size: .85rem; }
+    .service-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+    .service-card p { color: var(--muted); font-size: .88rem; }
+    .text-link { display: inline-block; margin-top: 20px; color: #ff83aa; font-size: .85rem; }
 
-    /* Portfolio */
     .work-card { overflow: hidden; }
     .work-image { overflow: hidden; background: #242432; }
     .work-image img {
       width: 100%;
       aspect-ratio: 4/3;
       object-fit: cover;
-      transition: transform .5s;
+      transition: transform .5s, filter .5s;
     }
-    .work-card:hover img { transform: scale(1.06); }
-    .work-content { padding: 26px; }
-    .work-content h3 { font-size: 1.15rem; margin: 10px 0; }
+    .work-card.touch-glow .work-image img { transform: scale(1.05); filter: brightness(1.12); }
+    .work-content { padding: 22px; }
+    .work-content h3 { font-size: 1.1rem; margin: 8px 0; }
     .work-content p { color: var(--muted); font-size: .85rem; }
-    .tag { color: var(--cyan); font-size: .65rem; text-transform: uppercase; letter-spacing: .13em; }
-    .center { text-align: center; margin-top: 36px; }
+    .work-content .btn { margin-top: 16px; }
+    .tag { color: var(--cyan); font-size: .62rem; text-transform: uppercase; letter-spacing: .13em; }
+    .center { text-align: center; margin-top: 30px; }
 
     /* Contact */
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 55px; }
-    .contact-links { display: grid; gap: 15px; margin: 30px 0; }
-    .contact-links a { overflow-wrap: anywhere; color: var(--muted); }
-    .contact-links a:hover { color: var(--cyan); }
-    form { padding: 30px; }
-    label { display: block; margin-bottom: 7px; font-size: .8rem; }
+    .contact-links { display: grid; gap: 14px; margin: 24px 0; }
+    .contact-links a { color: var(--muted); font-size: .92rem; overflow-wrap: anywhere; }
+    .contact-links a:active { color: var(--cyan); }
+    form { padding: 24px; }
+    label { display: block; margin-bottom: 7px; font-size: .78rem; }
     input, textarea {
       width: 100%;
+      font-size: 16px; /* prevents iOS zoom-on-focus */
       padding: 13px 15px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       background: #09090f;
       border: 1px solid var(--border);
       border-radius: 10px;
       color: white;
     }
-    textarea { resize: vertical; min-height: 140px; }
-    input:focus, textarea:focus { border-color: var(--pink); }
-    .form-note, .form-status { color: var(--muted); font-size: .75rem; margin-top: 16px; }
-    footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: center; color: var(--muted); font-size: .8rem; }
-
-    .motion-toggle {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      z-index: 60;
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      background: #15151f;
-      color: white;
-      font-size: .72rem;
-      padding: 10px 16px;
+    textarea { resize: vertical; min-height: 130px; }
+    input:focus, textarea:focus { border-color: var(--pink); outline: none; }
+    .form-note, .form-status { color: var(--muted); font-size: .72rem; margin-top: 14px; }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 26px 0 calc(24px + var(--nav-h) + var(--sab));
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
     }
+
+    /* ---------- Bottom app-style navigation ---------- */
+    .tabbar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 60;
+      display: flex;
+      height: calc(var(--nav-h) + var(--sab));
+      padding-bottom: var(--sab);
+      background: rgba(10,10,14,.92);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border);
+      transition: transform .25s ease;
+    }
+    body.kb .tabbar { transform: translateY(130%); } /* hides when keyboard opens */
+    .tabbar a {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: .62rem;
+      letter-spacing: .04em;
+      position: relative;
+      overflow: hidden;
+      transition: color .2s;
+    }
+    .tabbar a b { font-size: 1.15rem; font-weight: 500; }
+    .tabbar a[aria-current="true"] { color: white; text-shadow: 0 0 14px #ff004f90; }
+    .tabbar a[aria-current="true"]::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 34px;
+      height: 3px;
+      border-radius: 0 0 4px 4px;
+      background: linear-gradient(90deg, var(--pink), var(--cyan));
+      box-shadow: 0 4px 14px #ff004f80;
+    }
+    .tabbar a:active { transform: scale(.94); }
 
     html[data-motion="off"] { scroll-behavior: auto; }
     html[data-motion="off"] *,
@@ -366,59 +497,39 @@
       transition: none !important;
     }
     html[data-motion="off"] .cube { transform: rotateX(-18deg) rotateY(30deg); }
-    html[data-motion="off"] .tilt { transform: none; }
-
-    @media (max-width: 950px) {
-      .hero { grid-template-columns: 1fr 1fr; gap: 15px; }
-      .scene { height: 380px; }
-      .cards-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .about-grid { gap: 35px; }
-    }
-
-    @media (max-width: 700px) {
-      section { padding: 65px 0; }
-      .hero, .about-grid, .contact-grid { grid-template-columns: 1fr; }
-      .hero { padding-block: 50px; }
-      .hero h1 { font-size: clamp(2.8rem, 11vw, 4.5rem); }
-      .scene { --size: 160px; height: 350px; width: min(100%, 390px); margin: 20px auto 0; }
-      .portrait-card { max-width: 380px; margin-inline: auto; }
-      .cards-grid { grid-template-columns: 1fr; }
-      .menu-toggle { display: block; }
-      nav { flex-wrap: wrap; padding-block: 14px; min-height: 72px; }
-      .nav-links { width: 100%; flex-wrap: wrap; gap: 15px 24px; padding-bottom: 10px; }
-      .nav-links[hidden] { display: none; }
-      .contact-grid { gap: 35px; }
-      form { padding: 22px; }
-      footer { padding-bottom: 85px; }
-    }
+    html[data-motion="off"] .scene { transform: none; }
+    html[data-motion="off"] .reveal { opacity: 1; transform: none; }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after { animation: none !important; transition: none !important; }
       .cube { transform: rotateX(-18deg) rotateY(30deg); }
-      .tilt { transform: none !important; }
+      .scene { transform: none !important; }
+      .js .reveal { opacity: 1; transform: none; }
+      .tilt-chip { display: none !important; }
     }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="bg" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="cube-field">
+      <div class="bg-cube" style="left:8%;  top:14%; --s:40px; --dur:13s; --spin:26s;"><div class="mini-cube"><i></i><i></i><i></i></div></div>
+      <div class="bg-cube" style="left:84%; top:34%; --s:28px; --dur:16s; --spin:19s;"><div class="mini-cube"><i></i><i></i><i></i></div></div>
+      <div class="bg-cube" style="left:14%; top:70%; --s:48px; --dur:11s; --spin:31s;"><div class="mini-cube"><i></i><i></i><i></i></div></div>
+      <div class="bg-cube" style="left:78%; top:84%; --s:24px; --dur:18s; --spin:23s;"><div class="mini-cube"><i></i><i></i><i></i></div></div>
+    </div>
+  </div>
 
   <header class="site-header">
-    <nav class="container" aria-label="Main navigation">
-      <a href="#header" class="brand" aria-label="Aniket Bhati home">AB<span>.</span></a>
-      <button class="menu-toggle" type="button" aria-expanded="true" aria-controls="navigation">Menu</button>
-      <ul class="nav-links" id="navigation">
-        <li><a href="#header">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#portfolio">Portfolio</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="container topbar">
+      <a href="#home" class="brand" aria-label="Aniket Bhati home">AB<span>.</span></a>
+      <button class="icon-btn" id="motion-btn" type="button" aria-pressed="false">⏸ Motion</button>
+    </div>
   </header>
 
-  <main id="main">
-    <section id="header" class="container hero">
+  <main>
+    <section id="home" class="container hero">
       <div>
         <p class="eyebrow">Front-End Developer</p>
         <h1>Hi, I'm<br><span class="gradient-text">Aniket Bhati.</span></h1>
@@ -428,12 +539,12 @@
         </p>
         <p class="location">Based in India · Building for the web</p>
         <div class="actions">
-          <a class="btn btn-primary" href="#portfolio">Explore my work <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-primary" href="#work">Explore my work <span aria-hidden="true">↗</span></a>
           <a class="btn" href="#contact">Let's talk</a>
         </div>
       </div>
 
-      <div class="scene" aria-hidden="true">
+      <div class="scene" id="scene" aria-hidden="true">
         <div class="orbit"></div>
         <div class="orbit orbit-two"></div>
         <div class="cube">
@@ -448,10 +559,12 @@
         <div class="floating-label label-two">Built with curiosity ↗</div>
         <p class="scene-caption">A DIFFERENT PERSPECTIVE</p>
       </div>
+
+      <button class="tilt-chip" id="tilt-chip" type="button">📱 Enable 3D tilt</button>
     </section>
 
     <section id="about">
-      <div class="container about-grid">
+      <div class="container reveal">
         <div class="portrait-card panel tilt">
           <img src="./img.png.jpeg" alt="Aniket Bhati" loading="lazy" width="600" height="750">
           <div class="portrait-caption">
@@ -460,47 +573,45 @@
           </div>
         </div>
 
-        <div>
-          <p class="eyebrow">Behind the screen</p>
-          <h2 class="section-title">A little<br>about me<span class="accent">.</span></h2>
-          <p class="muted">Passionate Front-End Developer dedicated to creating clean, responsive, and engaging web applications.</p>
+        <p class="eyebrow">Behind the screen</p>
+        <h2 class="section-title">A little<br>about me<span class="accent">.</span></h2>
+        <p class="muted">Passionate Front-End Developer dedicated to creating clean, responsive, and engaging web applications.</p>
 
-          <div class="tab-list" role="tablist" aria-label="About Aniket">
-            <button class="tab" id="tab-skills" role="tab" aria-selected="true" aria-controls="skills" type="button">Skills</button>
-            <button class="tab" id="tab-experience" role="tab" aria-selected="false" aria-controls="experience" tabindex="-1" type="button">Experience</button>
-            <button class="tab" id="tab-education" role="tab" aria-selected="false" aria-controls="education" tabindex="-1" type="button">Education</button>
-          </div>
+        <div class="tab-list" role="tablist" aria-label="About Aniket">
+          <button class="tab" id="tab-skills" role="tab" aria-selected="true" aria-controls="skills" type="button">Skills</button>
+          <button class="tab" id="tab-experience" role="tab" aria-selected="false" aria-controls="experience" tabindex="-1" type="button">Experience</button>
+          <button class="tab" id="tab-education" role="tab" aria-selected="false" aria-controls="education" tabindex="-1" type="button">Education</button>
+        </div>
 
-          <div class="tab-panel" id="skills" role="tabpanel" aria-labelledby="tab-skills" tabindex="0">
-            <ul>
-              <li><strong>UI/UX</strong>Designing modern web interfaces</li>
-              <li><strong>Web Development</strong>HTML, CSS, JavaScript, Responsive Design</li>
-              <li><strong>Tools</strong>Git, GitHub, VS Code</li>
-            </ul>
-          </div>
-          <div class="tab-panel" id="experience" role="tabpanel" aria-labelledby="tab-experience" tabindex="0" hidden>
-            <ul>
-              <li><strong>2024 – Present</strong>Frontend Project Development</li>
-              <li><strong>2023 – 2024</strong>Web Design Projects</li>
-            </ul>
-          </div>
-          <div class="tab-panel" id="education" role="tabpanel" aria-labelledby="tab-education" tabindex="0" hidden>
-            <ul>
-              <li><strong>Computer Science / IT</strong>Coursework &amp; Certifications</li>
-            </ul>
-          </div>
+        <div class="tab-panel" id="skills" role="tabpanel" aria-labelledby="tab-skills" tabindex="0">
+          <ul>
+            <li><strong>UI/UX</strong>Designing modern web interfaces</li>
+            <li><strong>Web Development</strong>HTML, CSS, JavaScript, Responsive Design</li>
+            <li><strong>Tools</strong>Git, GitHub, VS Code</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="experience" role="tabpanel" aria-labelledby="tab-experience" tabindex="0" hidden>
+          <ul>
+            <li><strong>2024 – Present</strong>Frontend Project Development</li>
+            <li><strong>2023 – 2024</strong>Web Design Projects</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="education" role="tabpanel" aria-labelledby="tab-education" tabindex="0" hidden>
+          <ul>
+            <li><strong>Computer Science / IT</strong>Coursework &amp; Certifications</li>
+          </ul>
         </div>
       </div>
     </section>
 
     <section id="services">
       <div class="container">
-        <div class="section-heading">
+        <div class="section-heading reveal">
           <p class="eyebrow">What I do</p>
           <h2 class="section-title">Digital ideas.<br>Beautifully built<span class="accent">.</span></h2>
         </div>
 
-        <div class="cards-grid">
+        <div class="cards-grid reveal">
           <article class="service-card panel tilt">
             <div class="service-icon" aria-hidden="true">&lt;/&gt;</div>
             <h3>Web Design</h3>
@@ -516,22 +627,22 @@
           <article class="service-card panel tilt">
             <div class="service-icon" aria-hidden="true">▦</div>
             <h3>Web Apps</h3>
-            <p>Building high-performance, responsive single-page web applications.</p>
-            <a class="text-link" href="#contact">Bring your idea to life ↗</a>
+            <p>Building fast, interactive applications that feel effortless to use.</p>
+            <a class="text-link" href="#work">See my projects ↗</a>
           </article>
         </div>
       </div>
     </section>
 
-    <section id="portfolio">
+    <section id="work">
       <div class="container">
-        <div class="section-heading">
+        <div class="section-heading reveal">
           <p class="eyebrow">Selected projects</p>
           <h2 class="section-title">My work<span class="accent">.</span></h2>
           <p class="muted">A collection of interfaces built around people and their everyday experiences.</p>
         </div>
 
-        <div class="cards-grid">
+        <div class="cards-grid reveal">
           <article class="work-card panel tilt">
             <div class="work-image">
               <img src="./work-1.png" alt="Social Media App interface" loading="lazy" width="640" height="480">
@@ -550,6 +661,7 @@
               <span class="tag">Audio · Interface design</span>
               <h3>Music App</h3>
               <p>Custom audio streaming player interface with playlist controls.</p>
+              <a href="./music.html" target="_blank" rel="noopener noreferrer" class="btn">Open Music App ↗</a>
             </div>
           </article>
           <article class="work-card panel tilt">
@@ -571,20 +683,20 @@
     </section>
 
     <section id="contact">
-      <div class="container contact-grid">
-        <div>
-          <p class="eyebrow">Have something in mind?</p>
-          <h2 class="section-title">Let's make<br>it happen<span class="accent">.</span></h2>
-          <p class="muted">Tell me about your next website, creative idea, or collaboration.</p>
-          <div class="contact-links">
-            <a href="mailto:Bhatianiket07@gmail.com">Bhatianiket07@gmail.com ↗</a>
-            <a href="tel:+917827894172">+91 7827894172</a>
-            <a href="https://github.com/aniket20121/portfolio" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-          </div>
-          <a href="./cv.pdf" download class="btn">Download CV ↓</a>
+      <div class="container reveal">
+        <p class="eyebrow">Have something in mind?</p>
+        <h2 class="section-title">Let's make<br>it happen<span class="accent">.</span></h2>
+        <p class="muted">Tell me about your next website, creative idea, or collaboration.</p>
+
+        <div class="contact-links">
+          <a href="mailto:Bhatianiket07@gmail.com">Bhatianiket07@gmail.com ↗</a>
+          <a href="tel:+917827894172">+91 7827894172</a>
+          <a href="https://github.com/aniket20121/portfolio" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
         </div>
 
-        <form class="panel" id="contact-form">
+        <a href="./cv.pdf" download class="btn">Download CV ↓</a>
+
+        <form class="panel" id="contact-form" style="margin-top:26px">
           <label for="name">Your name</label>
           <input id="name" name="Name" type="text" autocomplete="name" placeholder="Your name" maxlength="120" required>
 
@@ -592,7 +704,7 @@
           <input id="email" name="Email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required>
 
           <label for="message">Your message</label>
-          <textarea id="message" name="Message" rows="5" placeholder="Tell me about your project..." maxlength="3000" required></textarea>
+          <textarea id="message" name="Message" rows="4" placeholder="Tell me about your project..." maxlength="3000" required></textarea>
 
           <button class="btn btn-primary" type="submit">Compose email ↗</button>
           <p class="form-note">Opens your email app with a draft. Nothing is sent until you send it there.</p>
@@ -606,50 +718,155 @@
     <div class="container">© <span id="year">2026</span> Aniket Bhati. Made with <span class="accent">♥</span> and a new perspective.</div>
   </footer>
 
-  <button class="motion-toggle" type="button" aria-pressed="false">Pause motion</button>
+  <nav class="tabbar" aria-label="Mobile navigation">
+    <a href="#home" data-nav="home"><b aria-hidden="true">⌂</b>Home</a>
+    <a href="#about" data-nav="about"><b aria-hidden="true">◍</b>About</a>
+    <a href="#services" data-nav="services"><b aria-hidden="true">✦</b>Services</a>
+    <a href="#work" data-nav="work"><b aria-hidden="true">▦</b>Work</a>
+    <a href="#contact" data-nav="contact"><b aria-hidden="true">✉</b>Contact</a>
+  </nav>
 
   <script>
     "use strict";
+    document.documentElement.classList.add("js");
 
-    // Mobile navigation.
-    const menuButton = document.querySelector(".menu-toggle");
-    const navigation = document.querySelector("#navigation");
-    const mobileQuery = window.matchMedia("(max-width: 700px)");
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    let userPaused = false;
+    const motionAllowed = () => !reducedMotion.matches && !userPaused;
 
-    function setMenu(open) {
-      navigation.hidden = !open;
-      menuButton.setAttribute("aria-expanded", String(open));
+    const motionBtn = document.getElementById("motion-btn");
+    motionBtn.addEventListener("click", () => {
+      userPaused = !userPaused;
+      document.documentElement.dataset.motion = userPaused ? "off" : "on";
+      motionBtn.setAttribute("aria-pressed", String(userPaused));
+      motionBtn.textContent = userPaused ? "▶ Motion" : "⏸ Motion";
+    });
+
+    /* ---------- Tap glow on cards (hover replacement) ---------- */
+    document.querySelectorAll(".tilt").forEach(card => {
+      let timer;
+      card.addEventListener("touchstart", () => {
+        if (!motionAllowed()) return;
+        card.classList.add("touch-glow");
+        clearTimeout(timer);
+        timer = setTimeout(() => card.classList.remove("touch-glow"), 1300);
+      }, { passive: true });
+    });
+
+    /* ---------- Ripple on buttons, tabs, nav ---------- */
+    document.querySelectorAll(".btn, .tab, .tabbar a, .icon-btn").forEach(el => {
+      el.addEventListener("pointerdown", event => {
+        const rect = el.getBoundingClientRect();
+        const d = Math.max(rect.width, rect.height) * 2;
+        const r = document.createElement("span");
+        r.className = "ripple";
+        r.style.width = r.style.height = d + "px";
+        r.style.left = (event.clientX - rect.left - d / 2) + "px";
+        r.style.top = (event.clientY - rect.top - d / 2) + "px";
+        el.appendChild(r);
+        r.addEventListener("animationend", () => r.remove());
+      }, { passive: true });
+    });
+
+    /* ---------- Gyroscope tilt on the hero cube ---------- */
+    const scene = document.getElementById("scene");
+    const chip = document.getElementById("tilt-chip");
+    let gyroStarted = false, gyroActive = false;
+    let gx = 0, gy = 0, gxT = 0, gyT = 0, gyroFrame = 0;
+
+    function gyroLoop() {
+      gx += (gxT - gx) * 0.1;
+      gy += (gyT - gy) * 0.1;
+      scene.style.setProperty("--sx", gx.toFixed(2) + "deg");
+      scene.style.setProperty("--sy", gy.toFixed(2) + "deg");
+      gyroFrame = requestAnimationFrame(gyroLoop);
     }
 
-    function syncMenu() {
-      setMenu(!mobileQuery.matches);
+    function onOrient(e) {
+      if (e.gamma == null && e.beta == null) return;
+      gyroActive = true;
+      chip.classList.remove("show");
+      gxT = Math.max(-12, Math.min(12, (e.gamma || 0) * 0.35));
+      gyT = Math.max(-10, Math.min(10, ((e.beta || 0) - 45) * 0.25));
     }
 
-    syncMenu();
-    mobileQuery.addEventListener("change", syncMenu);
+    function startGyro() {
+      if (gyroStarted) return;
+      gyroStarted = true;
+      addEventListener("deviceorientation", onOrient, true);
+      gyroFrame = requestAnimationFrame(gyroLoop);
+    }
 
-    menuButton.addEventListener("click", () => {
-      setMenu(navigation.hidden);
+    if (!reducedMotion.matches) {
+      // Android/Chrome: works without permission — try silently.
+      startGyro();
+      setTimeout(() => {
+        // iOS or no sensor: show the opt-in chip (permission needs a user tap).
+        if (!gyroActive) chip.classList.add("show");
+      }, 1500);
+    }
+
+    chip.addEventListener("click", async () => {
+      try {
+        if (typeof DeviceOrientationEvent !== "undefined" &&
+            typeof DeviceOrientationEvent.requestPermission === "function") {
+          const res = await DeviceOrientationEvent.requestPermission();
+          if (res !== "granted") { chip.textContent = "Tilt permission denied"; return; }
+        }
+        startGyro();
+        chip.textContent = "Tilt on ✓";
+        setTimeout(() => {
+          if (!gyroActive) chip.textContent = "Tilt not supported here";
+        }, 1200);
+      } catch { chip.textContent = "Tilt unavailable"; }
     });
 
-    navigation.addEventListener("click", (event) => {
-      if (mobileQuery.matches && event.target.closest("a")) {
-        setMenu(false);
-      }
+    /* ---------- Hide bottom bar while typing ---------- */
+    document.addEventListener("focusin", e => {
+      if (e.target.matches("input, textarea")) document.body.classList.add("kb");
+    });
+    document.addEventListener("focusout", e => {
+      if (e.target.matches("input, textarea")) document.body.classList.remove("kb");
     });
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && mobileQuery.matches && !navigation.hidden) {
-        setMenu(false);
-        menuButton.focus();
-      }
-    });
+    /* ---------- Active section highlighting in bottom nav ---------- */
+    const navLinks = [...document.querySelectorAll(".tabbar a")];
+    const sections = ["home", "about", "services", "work", "contact"]
+      .map(id => document.getElementById(id)).filter(Boolean);
 
-    // Accessible tabs with arrow-key navigation.
+    if ("IntersectionObserver" in window) {
+      const spy = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          navLinks.forEach(link =>
+            link.setAttribute("aria-current",
+              link.dataset.nav === entry.target.id ? "true" : "false"));
+        });
+      }, { rootMargin: "-40% 0px -55% 0px" });
+      sections.forEach(s => spy.observe(s));
+    }
+
+    /* ---------- Scroll reveals ---------- */
+    const revealables = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window && !reducedMotion.matches) {
+      const ro = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            ro.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealables.forEach(el => ro.observe(el));
+    } else {
+      revealables.forEach(el => el.classList.add("in"));
+    }
+
+    /* ---------- Accessible tabs with arrow keys ---------- */
     const tabs = [...document.querySelectorAll('[role="tab"]')];
 
     function activateTab(selected) {
-      tabs.forEach((tab) => {
+      tabs.forEach(tab => {
         const active = tab === selected;
         tab.setAttribute("aria-selected", String(active));
         tab.tabIndex = active ? 0 : -1;
@@ -659,94 +876,19 @@
 
     tabs.forEach((tab, index) => {
       tab.addEventListener("click", () => activateTab(tab));
-      tab.addEventListener("keydown", (event) => {
+      tab.addEventListener("keydown", event => {
         let next;
         if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
         if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
-        if (event.key === "Home") next = 0;
-        if (event.key === "End") next = tabs.length - 1;
         if (next === undefined) return;
-
         event.preventDefault();
         activateTab(tabs[next]);
         tabs[next].focus();
       });
     });
 
-    // Respect system preferences and provide a persistent on-page pause control.
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const motionButton = document.querySelector(".motion-toggle");
-    let userPaused = false;
-
-    function motionAllowed() {
-      return !reducedMotion.matches && !userPaused;
-    }
-
-    const resetCards = [];
-
-    function syncMotion() {
-      const paused = !motionAllowed();
-      document.documentElement.dataset.motion = paused ? "off" : "on";
-      motionButton.setAttribute("aria-pressed", String(paused));
-      motionButton.textContent = reducedMotion.matches
-        ? "Reduced motion enabled"
-        : paused ? "Resume motion" : "Pause motion";
-      motionButton.disabled = reducedMotion.matches;
-      resetCards.forEach((reset) => reset());
-    }
-
-    motionButton.addEventListener("click", () => {
-      userPaused = !userPaused;
-      syncMotion();
-    });
-    reducedMotion.addEventListener("change", syncMotion);
-    finePointer.addEventListener("change", () => {
-      resetCards.forEach((reset) => reset());
-    });
-
-    // Pointer-responsive perspective tilt, limited to mouse/trackpad input.
-    document.querySelectorAll(".tilt").forEach((card) => {
-      let frame = 0;
-      let pointerX = 0;
-      let pointerY = 0;
-
-      function reset() {
-        cancelAnimationFrame(frame);
-        frame = 0;
-        card.style.setProperty("--rx", "0deg");
-        card.style.setProperty("--ry", "0deg");
-      }
-
-      resetCards.push(reset);
-
-      card.addEventListener("pointermove", (event) => {
-        if (!motionAllowed() || !finePointer.matches || event.pointerType === "touch") return;
-
-        pointerX = event.clientX;
-        pointerY = event.clientY;
-        if (frame) return;
-
-        frame = requestAnimationFrame(() => {
-          frame = 0;
-          const rect = card.getBoundingClientRect();
-          const x = Math.max(-0.5, Math.min(0.5, (pointerX - rect.left) / rect.width - 0.5));
-          const y = Math.max(-0.5, Math.min(0.5, (pointerY - rect.top) / rect.height - 0.5));
-
-          card.style.setProperty("--rx", `${-y * 12}deg`);
-          card.style.setProperty("--ry", `${x * 12}deg`);
-        });
-      });
-
-      card.addEventListener("pointerleave", reset);
-      card.addEventListener("pointercancel", reset);
-    });
-
-    window.addEventListener("blur", () => resetCards.forEach((reset) => reset()));
-    syncMotion();
-
-    // No backend: compose an email rather than claiming the message was sent.
-    document.querySelector("#contact-form").addEventListener("submit", (event) => {
+    /* ---------- Contact form (mailto, same as desktop) ---------- */
+    document.querySelector("#contact-form").addEventListener("submit", event => {
       event.preventDefault();
 
       const form = event.currentTarget;
@@ -761,11 +903,9 @@
       }
 
       const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
-      const body = encodeURIComponent(
-        `Name: ${name}\nEmail: ${email}\n\n${message}`
-      );
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
 
-      status.textContent = "Opening your email app. If it doesn't open, email Bhatianiket07@gmail.com directly. Your message remains here.";
+      status.textContent = "Opening your email app. If it doesn't open, email Bhatianiket07@gmail.com directly.";
       window.location.href = `mailto:Bhatianiket07@gmail.com?subject=${subject}&body=${body}`;
     });
 
@@ -773,4 +913,3 @@
   </script>
 </body>
 </html>
-```
