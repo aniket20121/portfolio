@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,12 +6,10 @@
   <meta name="theme-color" content="#050508">
   <meta name="description" content="Aniket Bhati — Front-End Developer & Nature Photography Showcase.">
   <title>Aniket Bhati | Liquid Glass Portfolio</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- GSAP for 3D Fan Carousel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
   <style>
@@ -22,11 +18,11 @@
     :root {
       color-scheme: dark;
       --bg: #050508;
-      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0.06) 100%);
-      --glass-border: rgba(255, 255, 255, 0.18);
-      --glass-highlight: rgba(255, 255, 255, 0.42);
+      --glass-bg: linear-gradient(135deg, rgba(255,255,255,.11) 0%, rgba(255,255,255,.03) 50%, rgba(255,255,255,.06) 100%);
+      --glass-border: rgba(255,255,255,.18);
+      --glass-highlight: rgba(255,255,255,.42);
       --text: #f8f9fc;
-      --muted: rgba(240, 242, 252, 0.68);
+      --muted: rgba(240,242,252,.68);
       --pink: #ff2a6d;
       --cyan: #05d5fa;
       --violet: #9d4edd;
@@ -47,7 +43,6 @@
       min-height: 100svh;
     }
 
-    /* Ambient Apple Liquid Mesh Blobs */
     body::before {
       content: "";
       position: fixed;
@@ -55,16 +50,13 @@
       z-index: -2;
       pointer-events: none;
       background:
-        radial-gradient(circle at 18% 15%, rgba(255, 42, 109, 0.24), transparent 38%),
-        radial-gradient(circle at 82% 28%, rgba(5, 213, 250, 0.18), transparent 40%),
-        radial-gradient(circle at 50% 78%, rgba(157, 78, 221, 0.22), transparent 45%);
+        radial-gradient(circle at 18% 15%, rgba(255,42,109,.24), transparent 38%),
+        radial-gradient(circle at 82% 28%, rgba(5,213,250,.18), transparent 40%),
+        radial-gradient(circle at 50% 78%, rgba(157,78,221,.22), transparent 45%);
       filter: blur(55px);
       animation: ambient-shift 18s ease-in-out infinite alternate;
     }
-    @keyframes ambient-shift {
-      0% { transform: scale(1) translate(0, 0); }
-      100% { transform: scale(1.08) translate(2%, -2%); }
-    }
+    @keyframes ambient-shift { 0% { transform: scale(1) translate(0,0); } 100% { transform: scale(1.08) translate(2%,-2%); } }
 
     a { color: inherit; text-decoration: none; }
     a, button { touch-action: manipulation; }
@@ -76,28 +68,12 @@
 
     .container { width: min(560px, 92%); margin-inline: auto; }
     .container-wide { width: min(1220px, 94%); margin-inline: auto; }
-    @media (min-width: 900px) {
-      .container { width: min(1140px, 92%); }
-    }
+    @media (min-width: 900px) { .container { width: min(1140px, 92%); } }
     section { padding: 72px 0; }
     .text-center { text-align: center; }
 
-    .eyebrow {
-      color: var(--cyan);
-      text-transform: uppercase;
-      letter-spacing: .24em;
-      font-size: .72rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      text-shadow: 0 0 18px rgba(5, 213, 250, 0.45);
-    }
-    .section-title {
-      font-size: clamp(2rem, 6vw, 3rem);
-      letter-spacing: -.04em;
-      line-height: 1.12;
-      margin-bottom: 18px;
-      font-weight: 700;
-    }
+    .eyebrow { color: var(--cyan); text-transform: uppercase; letter-spacing: .24em; font-size: .72rem; font-weight: 600; margin-bottom: 12px; text-shadow: 0 0 18px rgba(5,213,250,.45); }
+    .section-title { font-size: clamp(2rem, 6vw, 3rem); letter-spacing: -.04em; line-height: 1.12; margin-bottom: 18px; font-weight: 700; }
     .muted { color: var(--muted); }
     .accent { color: var(--pink); }
     .section-heading { margin-bottom: 40px; }
@@ -105,13 +81,13 @@
     /* ---------- Scorpion cursor ---------- */
     #scorpion {
       position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
       z-index: 9999;
       pointer-events: none;
       opacity: 0;
       transition: opacity .35s ease;
+      will-change: opacity;
     }
     #scorpion.on { opacity: 1; }
     @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
@@ -136,502 +112,148 @@
       animation: drift 100s linear infinite;
     }
     @keyframes drift { to { transform: translateY(420px); } }
-
     .cube-field { position: absolute; inset: 0; perspective: 900px; }
-    .bg-cube { position: absolute; animation: floaty var(--dur, 14s) ease-in-out infinite alternate; opacity: .75; }
-    .mini-cube {
-      width: var(--s, 34px); aspect-ratio: 1;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: spin-cube var(--spin, 22s) linear infinite;
-    }
-    .mini-cube i {
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(5, 213, 250, 0.12));
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      backdrop-filter: blur(4px);
-    }
-    .mini-cube i:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s, 34px) / 2)); }
-    .mini-cube i:nth-child(3) { transform: rotateX(90deg) translateZ(calc(var(--s, 34px) / 2)); }
-    .mini-cube i:first-child  { transform: translateZ(calc(var(--s, 34px) / 2)); }
+    .bg-cube { position: absolute; animation: floaty var(--dur,14s) ease-in-out infinite alternate; opacity: .75; }
+    .mini-cube { width: var(--s,34px); aspect-ratio: 1; position: relative; transform-style: preserve-3d; animation: spin-cube var(--spin,22s) linear infinite; }
+    .mini-cube i { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(5,213,250,.12)); border: 1px solid rgba(255,255,255,.28); backdrop-filter: blur(4px); }
+    .mini-cube i:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s,34px)/2)); }
+    .mini-cube i:nth-child(3) { transform: rotateX(90deg) translateZ(calc(var(--s,34px)/2)); }
+    .mini-cube i:first-child { transform: translateZ(calc(var(--s,34px)/2)); }
     @keyframes floaty { from { transform: translateY(0); } to { transform: translateY(-55px); } }
     @keyframes spin-cube { from { transform: rotateX(0) rotateY(0); } to { transform: rotateX(360deg) rotateY(360deg); } }
 
     /* ---------- Scroll reveal ---------- */
-    .js .reveal {
-      opacity: 0;
-      transform: translateY(26px);
-      transition: opacity .65s cubic-bezier(.16, 1, .3, 1), transform .65s cubic-bezier(.16, 1, .3, 1);
-    }
+    .js .reveal { opacity: 0; transform: translateY(26px); transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1); }
     .js .reveal.in { opacity: 1; transform: none; }
 
-    /* ========================================================
-       APPLE LIQUID GLASS ENGINE & HOVER EFFECTS
-    ======================================================== */
+    /* ========== LIQUID GLASS ENGINE ========== */
     .panel, .site-header, .tabbar, .btn, .icon-btn, .tab, .fan-arrow-btn, .fan-dots-track, .floating-label, .hero-model {
       background: var(--glass-bg);
       backdrop-filter: blur(28px) saturate(190%);
       -webkit-backdrop-filter: blur(28px) saturate(190%);
       border: 1px solid var(--glass-border);
-      box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.55),
-        inset 0 1px 1px 0 var(--glass-highlight),
-        inset 0 -1px 1px 0 rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0,0,0,.55), inset 0 1px 1px 0 var(--glass-highlight), inset 0 -1px 1px 0 rgba(255,255,255,.08);
     }
+    .panel { position: relative; border-radius: var(--radius); overflow: hidden; }
 
-    .panel {
-      position: relative;
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-
-    /* Interactive 3D Liquid Glass Cards */
     .tilt {
-      --mx: 50%;
-      --my: 50%;
-      --rx: 0deg;
-      --ry: 0deg;
+      --mx: 50%; --my: 50%; --rx: 0deg; --ry: 0deg;
       position: relative;
       transform: perspective(1000px) rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);
-      transition:
-        transform .45s cubic-bezier(.16, 1, .3, 1),
-        box-shadow .45s cubic-bezier(.16, 1, .3, 1),
-        border-color .45s ease;
+      transition: transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s cubic-bezier(.16,1,.3,1), border-color .45s ease;
       will-change: transform, box-shadow;
     }
-
-    /* Layer 1: Chromatic Caustic Liquid Lens */
     .tilt::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background:
-        radial-gradient(
-          420px circle at var(--mx) var(--my),
-          rgba(255, 255, 255, 0.28) 0%,
-          rgba(5, 213, 250, 0.18) 25%,
-          rgba(255, 42, 109, 0.15) 50%,
-          transparent 75%
-        );
-      mix-blend-mode: screen;
-      opacity: 0;
-      transition: opacity .4s ease;
-      pointer-events: none;
-      z-index: 2;
+      content: ""; position: absolute; inset: 0; border-radius: inherit;
+      background: radial-gradient(420px circle at var(--mx) var(--my), rgba(255,255,255,.28) 0%, rgba(5,213,250,.18) 25%, rgba(255,42,109,.15) 50%, transparent 75%);
+      mix-blend-mode: screen; opacity: 0; transition: opacity .4s ease; pointer-events: none; z-index: 2;
     }
-
-    /* Layer 2: Specular Liquid Rim Refraction */
     .tilt::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1.6px;
+      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.6px;
       background:
-        radial-gradient(
-          300px circle at var(--mx) var(--my),
-          #ffffff 0%,
-          var(--cyan) 30%,
-          var(--pink) 60%,
-          transparent 90%
-        ),
-        conic-gradient(from var(--conic-angle), rgba(255,255,255,0.4), transparent 30%, var(--cyan), transparent 70%, var(--pink), rgba(255,255,255,0.4));
+        radial-gradient(300px circle at var(--mx) var(--my), #ffffff 0%, var(--cyan) 30%, var(--pink) 60%, transparent 90%),
+        conic-gradient(from var(--conic-angle), rgba(255,255,255,.4), transparent 30%, var(--cyan), transparent 70%, var(--pink), rgba(255,255,255,.4));
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity .4s ease;
-      pointer-events: none;
-      z-index: 3;
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity .4s ease; pointer-events: none; z-index: 3;
     }
-
-    .tilt:hover,
-    .tilt.touch-glow {
-      border-color: rgba(255, 255, 255, 0.38);
-      box-shadow:
-        0 30px 65px rgba(0, 0, 0, 0.72),
-        0 0 40px rgba(5, 213, 250, 0.18),
-        0 0 60px rgba(255, 42, 109, 0.14),
-        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.65),
-        inset 0 0 28px rgba(255, 255, 255, 0.08);
+    .tilt:hover, .tilt.touch-glow {
+      border-color: rgba(255,255,255,.38);
+      box-shadow: 0 30px 65px rgba(0,0,0,.72), 0 0 40px rgba(5,213,250,.18), 0 0 60px rgba(255,42,109,.14), inset 0 1.5px 2px 0 rgba(255,255,255,.65), inset 0 0 28px rgba(255,255,255,.08);
     }
-
-    .tilt:hover::before,
-    .tilt.touch-glow::before {
-      opacity: 1;
-    }
-
-    .tilt:hover::after,
-    .tilt.touch-glow::after {
-      opacity: 1;
-      animation: conic-spin 4s linear infinite;
-    }
-
+    .tilt:hover::before, .tilt.touch-glow::before { opacity: 1; }
+    .tilt:hover::after, .tilt.touch-glow::after { opacity: 1; animation: conic-spin 4s linear infinite; }
     .tilt:active { transform: perspective(1000px) scale(.985); }
     @keyframes conic-spin { to { --conic-angle: 360deg; } }
 
-    /* ---------- Top Floating Glass Pill Bar ---------- */
-    .site-header {
-      position: sticky;
-      top: calc(12px + var(--sat));
-      z-index: 50;
-      width: min(1140px, 92%);
-      margin: 12px auto 0;
-      border-radius: 999px;
-      padding: 0 22px;
-      transition: transform .3s ease, box-shadow .3s ease;
-    }
-    .site-header:hover {
-      box-shadow:
-        0 18px 45px rgba(0, 0, 0, 0.65),
-        0 0 25px rgba(5, 213, 250, 0.16),
-        inset 0 1.5px 1px rgba(255, 255, 255, 0.55);
-    }
-    .topbar {
-      min-height: 58px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    /* ---------- Header ---------- */
+    .site-header { position: sticky; top: calc(12px + var(--sat)); z-index: 50; width: min(1140px, 92%); margin: 12px auto 0; border-radius: 999px; padding: 0 22px; transition: transform .3s ease, box-shadow .3s ease; }
+    .site-header:hover { box-shadow: 0 18px 45px rgba(0,0,0,.65), 0 0 25px rgba(5,213,250,.16), inset 0 1.5px 1px rgba(255,255,255,.55); }
+    .topbar { min-height: 58px; display: flex; align-items: center; justify-content: space-between; }
     .brand { font-weight: 800; font-size: 1.45rem; letter-spacing: -.06em; }
     .brand span { color: var(--pink); }
-    .icon-btn {
-      border-radius: 999px;
-      color: white;
-      font-size: .74rem;
-      font-weight: 500;
-      padding: 9px 16px;
-      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-    }
-    .icon-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.45);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.4), 0 0 18px rgba(5, 213, 250, 0.25);
-    }
-    .icon-btn[aria-pressed="true"] { border-color: var(--pink); background: rgba(255, 42, 109, 0.22); }
+    .icon-btn { border-radius: 999px; color: white; font-size: .74rem; font-weight: 500; padding: 9px 16px; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+    .icon-btn:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.45); box-shadow: 0 10px 24px rgba(0,0,0,.4), 0 0 18px rgba(5,213,250,.25); }
+    .icon-btn[aria-pressed="true"] { border-color: var(--pink); background: rgba(255,42,109,.22); }
 
     /* ---------- Hero ---------- */
-    .hero {
-      min-height: calc(100svh - 80px - var(--sat));
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 10px;
-      padding-block: 36px 30px;
-    }
-    .hero h1 {
-      font-size: clamp(2.6rem, 11vw, 4.4rem);
-      line-height: 1.06;
-      letter-spacing: -.05em;
-      margin: 14px 0;
-    }
-    .gradient-text {
-      background: linear-gradient(100deg, #ffffff 0%, #ff7eb3 30%, #67e8f9 65%, #ffffff 100%);
-      background-size: 220% auto;
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      animation: hue-slide 7s linear infinite;
-    }
+    .hero { min-height: calc(100svh - 80px - var(--sat)); display: flex; flex-direction: column; justify-content: center; gap: 10px; padding-block: 36px 30px; }
+    .hero h1 { font-size: clamp(2.6rem, 11vw, 4.4rem); line-height: 1.06; letter-spacing: -.05em; margin: 14px 0; }
+    .gradient-text { background: linear-gradient(100deg, #fff 0%, #ff7eb3 30%, #67e8f9 65%, #fff 100%); background-size: 220% auto; background-clip: text; -webkit-background-clip: text; color: transparent; animation: hue-slide 7s linear infinite; }
     @keyframes hue-slide { to { background-position: 220% center; } }
     .hero-description { color: var(--muted); font-size: 1.02rem; max-width: 52ch; }
     .location { margin-top: 12px; font-size: .84rem; color: var(--muted); }
     .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
 
-    /* Liquid Glass Pill Buttons */
-    .btn {
-      --mx: 50%;
-      --my: 50%;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      padding: 13px 24px;
-      border-radius: 999px;
-      color: white;
-      font-weight: 500;
-      font-size: .9rem;
-      position: relative;
-      overflow: hidden;
-      transition: transform .3s cubic-bezier(.16, 1, .3, 1), box-shadow .3s ease, border-color .3s ease;
-    }
-    .btn::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(140px circle at var(--mx) var(--my), rgba(255,255,255,0.38), transparent 70%);
-      opacity: 0;
-      transition: opacity .3s ease;
-      pointer-events: none;
-    }
-    .btn:hover {
-      transform: translateY(-3px) scale(1.03);
-      border-color: rgba(255, 255, 255, 0.55);
-      box-shadow:
-        0 16px 36px rgba(0, 0, 0, 0.55),
-        0 0 28px rgba(5, 213, 250, 0.28),
-        inset 0 1.5px 2px rgba(255, 255, 255, 0.75);
-    }
+    .btn { --mx: 50%; --my: 50%; display: inline-flex; justify-content: center; align-items: center; gap: 10px; padding: 13px 24px; border-radius: 999px; color: white; font-weight: 500; font-size: .9rem; position: relative; overflow: hidden; transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease, border-color .3s ease; }
+    .btn::before { content: ""; position: absolute; inset: 0; background: radial-gradient(140px circle at var(--mx) var(--my), rgba(255,255,255,.38), transparent 70%); opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+    .btn:hover { transform: translateY(-3px) scale(1.03); border-color: rgba(255,255,255,.55); box-shadow: 0 16px 36px rgba(0,0,0,.55), 0 0 28px rgba(5,213,250,.28), inset 0 1.5px 2px rgba(255,255,255,.75); }
     .btn:hover::before { opacity: 1; }
     .btn:active { transform: scale(.96); }
+    .btn-primary { background: linear-gradient(135deg, rgba(255,42,109,.78), rgba(157,78,221,.68)); border-color: rgba(255,160,195,.55); box-shadow: 0 14px 34px rgba(255,42,109,.35), inset 0 1.5px 1.5px rgba(255,255,255,.65); }
+    .btn-primary:hover { box-shadow: 0 20px 44px rgba(255,42,109,.55), 0 0 32px rgba(255,42,109,.45), inset 0 2px 3px rgba(255,255,255,.85); }
 
-    .btn-primary {
-      background: linear-gradient(135deg, rgba(255, 42, 109, 0.78), rgba(157, 78, 221, 0.68));
-      border-color: rgba(255, 160, 195, 0.55);
-      box-shadow:
-        0 14px 34px rgba(255, 42, 109, 0.35),
-        inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65);
-    }
-    .btn-primary:hover {
-      box-shadow:
-        0 20px 44px rgba(255, 42, 109, 0.55),
-        0 0 32px rgba(255, 42, 109, 0.45),
-        inset 0 2px 3px rgba(255, 255, 255, 0.85);
-    }
-
-    .ripple {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffffff88, #ffffff22 40%, transparent 70%);
-      transform: scale(0);
-      animation: ripple .55s ease-out forwards;
-      pointer-events: none;
-    }
+    .ripple { position: absolute; border-radius: 50%; background: radial-gradient(circle, #ffffff88, #ffffff22 40%, transparent 70%); transform: scale(0); animation: ripple .55s ease-out forwards; pointer-events: none; }
     @keyframes ripple { to { transform: scale(1); opacity: 0; } }
 
-    /* ---------- Hero cube ---------- */
-    .scene {
-      --size: clamp(115px, 38vw, 165px);
-      --half: calc(var(--size) / 2);
-      --sx: 0deg; --sy: 0deg;
-      position: relative;
-      height: 330px;
-      display: grid;
-      place-items: center;
-      perspective: 800px;
-      margin-top: 10px;
-      transform: rotateY(var(--sx)) rotateX(var(--sy));
-      transition: transform .25s ease-out;
-    }
-    .scene::before {
-      content: "";
-      position: absolute;
-      width: 82%;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ff004f26, #6750ff14 45%, transparent 70%);
-    }
-    .cube {
-      width: var(--size);
-      height: var(--size);
-      position: relative;
-      transform-style: preserve-3d;
-      animation: rotate-cube 20s linear infinite;
-    }
-    .face {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 42, 109, 0.14));
-      backdrop-filter: blur(12px);
-      box-shadow: inset 0 0 28px rgba(255, 255, 255, 0.18);
-      backface-visibility: hidden;
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ffffff;
-      text-shadow: 0 0 22px rgba(255, 42, 109, 0.7);
-    }
-    .face-front  { transform: translateZ(var(--half)); }
-    .face-back   { transform: rotateY(180deg) translateZ(var(--half)); }
-    .face-right  { transform: rotateY(90deg) translateZ(var(--half)); }
-    .face-left   { transform: rotateY(-90deg) translateZ(var(--half)); }
-    .face-top    { transform: rotateX(90deg) translateZ(var(--half)); }
+    /* ---------- Hero cube (fallback) ---------- */
+    .scene { --size: clamp(115px, 38vw, 165px); --half: calc(var(--size)/2); --sx: 0deg; --sy: 0deg; position: relative; height: 330px; display: grid; place-items: center; perspective: 800px; margin-top: 10px; transform: rotateY(var(--sx)) rotateX(var(--sy)); transition: transform .25s ease-out; }
+    .scene::before { content: ""; position: absolute; width: 82%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #ff004f26, #6750ff14 45%, transparent 70%); }
+    .cube { width: var(--size); height: var(--size); position: relative; transform-style: preserve-3d; animation: rotate-cube 20s linear infinite; }
+    .face { position: absolute; inset: 0; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.35); background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,42,109,.14)); backdrop-filter: blur(12px); box-shadow: inset 0 0 28px rgba(255,255,255,.18); backface-visibility: hidden; font-size: 2rem; font-weight: 700; color: #fff; text-shadow: 0 0 22px rgba(255,42,109,.7); }
+    .face-front { transform: translateZ(var(--half)); }
+    .face-back { transform: rotateY(180deg) translateZ(var(--half)); }
+    .face-right { transform: rotateY(90deg) translateZ(var(--half)); }
+    .face-left { transform: rotateY(-90deg) translateZ(var(--half)); }
+    .face-top { transform: rotateX(90deg) translateZ(var(--half)); }
     .face-bottom { transform: rotateX(-90deg) translateZ(var(--half)); }
-
-    .orbit {
-      position: absolute;
-      width: 92%;
-      aspect-ratio: 1;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 50%;
-      transform: rotateX(68deg) rotateZ(-25deg);
-      pointer-events: none;
-      animation: orbit-spin 16s linear infinite;
-    }
-    .orbit-two {
-      width: 106%;
-      border-color: rgba(5, 213, 250, 0.28);
-      transform: rotateX(65deg) rotateY(25deg) rotateZ(35deg);
-      animation-name: orbit-spin-two;
-      animation-duration: 24s;
-      animation-direction: reverse;
-    }
+    .orbit { position: absolute; width: 92%; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.25); border-radius: 50%; transform: rotateX(68deg) rotateZ(-25deg); pointer-events: none; animation: orbit-spin 16s linear infinite; }
+    .orbit-two { width: 106%; border-color: rgba(5,213,250,.28); transform: rotateX(65deg) rotateY(25deg) rotateZ(35deg); animation-name: orbit-spin-two; animation-duration: 24s; animation-direction: reverse; }
     @keyframes orbit-spin { to { transform: rotateX(68deg) rotateZ(335deg); } }
     @keyframes orbit-spin-two { to { transform: rotateX(65deg) rotateY(25deg) rotateZ(-325deg); } }
-
-    .floating-label {
-      position: absolute;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: .7rem;
-      animation: float 5s ease-in-out infinite;
-    }
+    .floating-label { position: absolute; padding: 8px 14px; border-radius: 999px; font-size: .7rem; animation: float 5s ease-in-out infinite; }
     .label-one { top: 10%; left: 0; }
     .label-two { bottom: 12%; right: 0; animation-delay: -2s; color: var(--cyan); }
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    @keyframes rotate-cube {
-      from { transform: rotateX(-18deg) rotateY(0deg); }
-      to { transform: rotateX(-18deg) rotateY(360deg); }
-    }
-    .scene-caption {
-      position: absolute;
-      bottom: 0;
-      font-size: .6rem;
-      letter-spacing: .25em;
-      color: var(--muted);
-    }
-
-    .tilt-chip {
-      display: none;
-      margin: 14px auto 0;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(255, 42, 109, 0.16);
-      backdrop-filter: blur(14px);
-      color: #ffb3c8;
-      border-radius: 30px;
-      padding: 10px 18px;
-      font-size: .78rem;
-    }
+    @keyframes rotate-cube { from { transform: rotateX(-18deg) rotateY(0deg); } to { transform: rotateX(-18deg) rotateY(360deg); } }
+    .scene-caption { position: absolute; bottom: 0; font-size: .6rem; letter-spacing: .25em; color: var(--muted); }
+    .tilt-chip { display: none; margin: 14px auto 0; border: 1px solid rgba(255,255,255,.25); background: rgba(255,42,109,.16); backdrop-filter: blur(14px); color: #ffb3c8; border-radius: 30px; padding: 10px 18px; font-size: .78rem; }
     .tilt-chip.show { display: inline-block; }
 
-    /* ---------- About Section ---------- */
-    .about-grid {
-      display: grid;
-      gap: 36px;
-      align-items: center;
-    }
-    @media (min-width: 900px) {
-      .about-grid {
-        grid-template-columns: 380px 1fr;
-        gap: 56px;
-      }
-    }
+    /* ---------- About ---------- */
+    .about-grid { display: grid; gap: 36px; align-items: center; }
+    @media (min-width: 900px) { .about-grid { grid-template-columns: 380px 1fr; gap: 56px; } }
     .portrait-card { padding: 16px; width: 100%; max-width: 380px; margin-inline: auto; }
-    .portrait-card img {
-      width: 100%;
-      aspect-ratio: 4/5;
-      object-fit: cover;
-      border-radius: 18px;
-      background: #181824;
-      transition: transform .55s cubic-bezier(.16, 1, .3, 1);
-    }
+    .portrait-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 18px; background: #181824; transition: transform .55s cubic-bezier(.16,1,.3,1); }
     .portrait-card:hover img { transform: scale(1.03); }
     .portrait-caption { padding: 18px 8px 6px; position: relative; z-index: 4; }
     .portrait-caption strong { display: block; font-size: 1.22rem; }
     .portrait-caption span { color: var(--muted); font-size: .82rem; }
-
     .tab-list { display: flex; gap: 10px; flex-wrap: wrap; margin: 24px 0 20px; }
-    .tab {
-      border-radius: 999px;
-      padding: 10px 20px;
-      color: var(--muted);
-      font-size: .86rem;
-      font-weight: 500;
-      position: relative;
-      overflow: hidden;
-      transition: all .25s ease;
-    }
-    .tab:hover {
-      color: #fff;
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.42);
-    }
+    .tab { border-radius: 999px; padding: 10px 20px; color: var(--muted); font-size: .86rem; font-weight: 500; position: relative; overflow: hidden; transition: all .25s ease; }
+    .tab:hover { color: #fff; transform: translateY(-2px); border-color: rgba(255,255,255,.42); }
     .tab:active { transform: scale(.95); }
-    .tab[aria-selected="true"] {
-      color: white;
-      background: linear-gradient(135deg, rgba(255, 42, 109, 0.45), rgba(5, 213, 250, 0.25));
-      border-color: rgba(255, 255, 255, 0.55);
-      box-shadow: 0 8px 24px rgba(255, 42, 109, 0.25), inset 0 1px 1px rgba(255,255,255,0.6);
-    }
+    .tab[aria-selected="true"] { color: white; background: linear-gradient(135deg, rgba(255,42,109,.45), rgba(5,213,250,.25)); border-color: rgba(255,255,255,.55); box-shadow: 0 8px 24px rgba(255,42,109,.25), inset 0 1px 1px rgba(255,255,255,.6); }
     .tab-panel ul { list-style: none; display: grid; gap: 16px; }
-    .tab-panel li {
-      border-left: 2px solid var(--cyan);
-      padding: 10px 16px;
-      border-radius: 0 14px 14px 0;
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--muted);
-      font-size: .9rem;
-      transition: transform .25s ease, background .25s ease, border-color .25s ease;
-    }
-    .tab-panel li:hover {
-      transform: translateX(6px);
-      background: rgba(255, 255, 255, 0.07);
-      border-left-color: var(--pink);
-    }
+    .tab-panel li { border-left: 2px solid var(--cyan); padding: 10px 16px; border-radius: 0 14px 14px 0; background: rgba(255,255,255,.03); color: var(--muted); font-size: .9rem; transition: transform .25s ease, background .25s ease, border-color .25s ease; }
+    .tab-panel li:hover { transform: translateX(6px); background: rgba(255,255,255,.07); border-left-color: var(--pink); }
     .tab-panel strong { display: block; color: white; font-weight: 600; margin-bottom: 2px; }
 
-    /* ---------- Services & Work Grids ---------- */
-    .cards-grid {
-      display: grid;
-      gap: 22px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 720px) {
-      .cards-grid { grid-template-columns: repeat(3, 1fr); }
-    }
+    /* ---------- Services & Work ---------- */
+    .cards-grid { display: grid; gap: 22px; grid-template-columns: 1fr; }
+    @media (min-width: 720px) { .cards-grid { grid-template-columns: repeat(3, 1fr); } }
     .service-card { padding: 30px 26px; display: flex; flex-direction: column; justify-content: space-between; }
-    .service-icon {
-      display: grid;
-      place-items: center;
-      width: 58px;
-      height: 58px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 42, 109, 0.18));
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 10px 24px rgba(0,0,0,0.3);
-      border-radius: 18px;
-      color: #fff;
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 22px;
-      transition: transform .35s cubic-bezier(.16, 1, .3, 1), box-shadow .35s ease;
-    }
-    .service-card:hover .service-icon {
-      transform: translateY(-4px) scale(1.08) rotate(-4deg);
-      box-shadow: 0 14px 28px rgba(255, 42, 109, 0.35), inset 0 1.5px 2px #fff;
-    }
+    .service-icon { display: grid; place-items: center; width: 58px; height: 58px; background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,42,109,.18)); border: 1px solid rgba(255,255,255,.35); box-shadow: inset 0 1px 1px rgba(255,255,255,.6), 0 10px 24px rgba(0,0,0,.3); border-radius: 18px; color: #fff; font-size: 1.35rem; font-weight: 700; margin-bottom: 22px; transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s ease; }
+    .service-card:hover .service-icon { transform: translateY(-4px) scale(1.08) rotate(-4deg); box-shadow: 0 14px 28px rgba(255,42,109,.35), inset 0 1.5px 2px #fff; }
     .service-card h3 { font-size: 1.25rem; margin-bottom: 10px; position: relative; z-index: 4; }
     .service-card p { color: var(--muted); font-size: .9rem; position: relative; z-index: 4; }
-    .text-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 22px;
-      color: var(--cyan);
-      font-size: .86rem;
-      font-weight: 500;
-      position: relative;
-      z-index: 4;
-      transition: gap .25s ease, color .25s ease;
-    }
+    .text-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 22px; color: var(--cyan); font-size: .86rem; font-weight: 500; position: relative; z-index: 4; transition: gap .25s ease, color .25s ease; }
     .service-card:hover .text-link { gap: 10px; color: #fff; }
 
-    /* Work section cards */
     .work-card { overflow: hidden; display: flex; flex-direction: column; }
     .work-image { overflow: hidden; background: #181824; position: relative; }
-    .work-image img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      transition: transform .65s cubic-bezier(.16, 1, .3, 1), filter .5s ease;
-    }
-    .work-card:hover .work-image img,
-    .work-card.touch-glow .work-image img {
-      transform: scale(1.08);
-      filter: brightness(1.1) contrast(1.05);
-    }
+    .work-image img { width: 100%; aspect-ratio: 4/3; object-fit: cover; transition: transform .65s cubic-bezier(.16,1,.3,1), filter .5s ease; }
+    .work-card:hover .work-image img, .work-card.touch-glow .work-image img { transform: scale(1.08); filter: brightness(1.1) contrast(1.05); }
     .work-content { padding: 24px; position: relative; z-index: 4; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
     .work-content h3 { font-size: 1.18rem; margin: 8px 0; }
     .work-content p { color: var(--muted); font-size: .88rem; }
@@ -639,331 +261,58 @@
     .tag { color: var(--cyan); font-size: .65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .15em; }
     .center { text-align: center; margin-top: 36px; }
 
-    /* ========================================================
-       NATURE PHOTOGRAPHY 3D LIQUID GLASS FAN SLIDER
-    ======================================================== */
-    .fan-section-wrapper {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      user-select: none;
-    }
-
-    .fan-stage {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      min-height: 480px;
-      perspective: 1200px;
-      margin-top: 10px;
-    }
-    @media (min-width: 640px) {
-      .fan-stage { min-height: 530px; }
-    }
-    @media (min-width: 1024px) {
-      .fan-stage { min-height: 580px; }
-    }
-
-    .fan-card {
-      --mx: 50%;
-      --my: 50%;
-      position: absolute;
-      width: clamp(210px, 52vw, 320px);
-      height: clamp(310px, 72vw, 470px);
-      border-radius: var(--radius);
-      background: rgba(20, 20, 30, 0.55);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      overflow: hidden;
-      box-shadow:
-        0 25px 55px rgba(0, 0, 0, 0.75),
-        inset 0 1.5px 2px rgba(255, 255, 255, 0.5);
-      will-change: transform, opacity;
-      cursor: pointer;
-      transition: border-color .35s, box-shadow .35s;
-    }
-
-    .fan-card img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform .65s cubic-bezier(.16, 1, .3, 1), filter .5s;
-    }
-    .fan-card:hover img {
-      transform: scale(1.08);
-      filter: saturate(1.15);
-    }
-
-    /* Liquid Glass Glare on Fan Cards */
-    .fan-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(
-        320px circle at var(--mx) var(--my),
-        rgba(255, 255, 255, 0.35),
-        rgba(5, 213, 250, 0.16) 35%,
-        transparent 70%
-      );
-      mix-blend-mode: overlay;
-      opacity: 0;
-      transition: opacity .35s ease;
-      pointer-events: none;
-      z-index: 4;
-    }
+    /* ========== 3D FAN SLIDER ========== */
+    .fan-section-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; user-select: none; }
+    .fan-stage { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 480px; perspective: 1200px; margin-top: 10px; }
+    @media (min-width: 640px) { .fan-stage { min-height: 530px; } }
+    @media (min-width: 1024px) { .fan-stage { min-height: 580px; } }
+    .fan-card { --mx: 50%; --my: 50%; position: absolute; width: clamp(210px, 52vw, 320px); height: clamp(310px, 72vw, 470px); border-radius: var(--radius); background: rgba(20,20,30,.55); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.25); overflow: hidden; box-shadow: 0 25px 55px rgba(0,0,0,.75), inset 0 1.5px 2px rgba(255,255,255,.5); will-change: transform, opacity; cursor: pointer; transition: border-color .35s, box-shadow .35s; }
+    .fan-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .65s cubic-bezier(.16,1,.3,1), filter .5s; }
+    .fan-card:hover img { transform: scale(1.08); filter: saturate(1.15); }
+    .fan-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(320px circle at var(--mx) var(--my), rgba(255,255,255,.35), rgba(5,213,250,.16) 35%, transparent 70%); mix-blend-mode: overlay; opacity: 0; transition: opacity .35s ease; pointer-events: none; z-index: 4; }
     .fan-card:hover::after { opacity: 1; }
-
-    .fan-card-scrim {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(0, 0, 0, 0.1) 45%,
-        rgba(5, 5, 12, 0.78) 85%,
-        rgba(5, 5, 12, 0.94) 100%
-      );
-      pointer-events: none;
-    }
-
-    .fan-card-info {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
-      backdrop-filter: blur(18px) saturate(180%);
-      -webkit-backdrop-filter: blur(18px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
-      display: flex;
-      flex-direction: column;
-      text-align: left;
-      pointer-events: none;
-      z-index: 5;
-    }
-    .fan-card-tag {
-      color: var(--cyan);
-      font-size: .64rem;
-      font-weight: 600;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      margin-bottom: 3px;
-    }
-    .fan-card-title {
-      font-size: clamp(1.05rem, 3vw, 1.25rem);
-      font-weight: 700;
-      line-height: 1.2;
-      color: #fff;
-    }
-
-    .fan-card.is-center {
-      border-color: rgba(255, 255, 255, 0.65);
-      box-shadow:
-        0 30px 65px rgba(0, 0, 0, 0.9),
-        0 0 42px rgba(255, 42, 109, 0.32),
-        0 0 25px rgba(5, 213, 250, 0.22),
-        inset 0 2px 3px rgba(255, 255, 255, 0.75);
-    }
-
-    /* Controls */
-    .fan-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-top: 28px;
-      z-index: 30;
-    }
-    .fan-arrow-btn {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text);
-      transition: transform .25s cubic-bezier(.16, 1, .3, 1), border-color .25s, box-shadow .25s;
-    }
-    .fan-arrow-btn:hover {
-      transform: translateY(-2px) scale(1.06);
-      border-color: rgba(255, 255, 255, 0.6);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 22px rgba(5, 213, 250, 0.35), inset 0 1.5px 2px #fff;
-    }
-    .fan-arrow-btn:active { transform: scale(0.92); }
+    .fan-card-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(0,0,0,.1) 45%, rgba(5,5,12,.78) 85%, rgba(5,5,12,.94) 100%); pointer-events: none; }
+    .fan-card-info { position: absolute; bottom: 12px; left: 12px; right: 12px; padding: 14px 16px; border-radius: 18px; background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); backdrop-filter: blur(18px) saturate(180%); -webkit-backdrop-filter: blur(18px) saturate(180%); border: 1px solid rgba(255,255,255,.24); box-shadow: inset 0 1px 1px rgba(255,255,255,.45); display: flex; flex-direction: column; text-align: left; pointer-events: none; z-index: 5; }
+    .fan-card-tag { color: var(--cyan); font-size: .64rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 3px; }
+    .fan-card-title { font-size: clamp(1.05rem, 3vw, 1.25rem); font-weight: 700; line-height: 1.2; color: #fff; }
+    .fan-card.is-center { border-color: rgba(255,255,255,.65); box-shadow: 0 30px 65px rgba(0,0,0,.9), 0 0 42px rgba(255,42,109,.32), 0 0 25px rgba(5,213,250,.22), inset 0 2px 3px rgba(255,255,255,.75); }
+    .fan-controls { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 28px; z-index: 30; }
+    .fan-arrow-btn { width: 48px; height: 48px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--text); transition: transform .25s cubic-bezier(.16,1,.3,1), border-color .25s, box-shadow .25s; }
+    .fan-arrow-btn:hover { transform: translateY(-2px) scale(1.06); border-color: rgba(255,255,255,.6); box-shadow: 0 12px 28px rgba(0,0,0,.5), 0 0 22px rgba(5,213,250,.35), inset 0 1.5px 2px #fff; }
+    .fan-arrow-btn:active { transform: scale(.92); }
     .fan-arrow-btn svg { width: 20px; height: 20px; }
-
-    .fan-dots-track {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 18px;
-      border-radius: 999px;
-    }
-    .fan-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.28);
-      border: none;
-      transition: all .35s cubic-bezier(.16, 1, .3, 1);
-      cursor: pointer;
-    }
-    .fan-dot:hover { background: rgba(255, 255, 255, 0.65); transform: scale(1.2); }
-    .fan-dot.active {
-      width: 28px;
-      border-radius: 8px;
-      background: linear-gradient(90deg, var(--pink), var(--cyan));
-      box-shadow: 0 0 14px var(--pink);
-    }
-
-    .fan-hint {
-      font-size: .74rem;
-      color: var(--muted);
-      margin-top: 16px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      opacity: .85;
-    }
-    .fan-hint kbd {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 6px;
-      padding: 2px 7px;
-      font-size: .68rem;
-      color: #fff;
-    }
+    .fan-dots-track { display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 999px; }
+    .fan-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.28); border: none; transition: all .35s cubic-bezier(.16,1,.3,1); cursor: pointer; }
+    .fan-dot:hover { background: rgba(255,255,255,.65); transform: scale(1.2); }
+    .fan-dot.active { width: 28px; border-radius: 8px; background: linear-gradient(90deg, var(--pink), var(--cyan)); box-shadow: 0 0 14px var(--pink); }
+    .fan-hint { font-size: .74rem; color: var(--muted); margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; opacity: .85; }
+    .fan-hint kbd { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 6px; padding: 2px 7px; font-size: .68rem; color: #fff; }
 
     /* ---------- Contact ---------- */
-    .contact-grid {
-      display: grid;
-      gap: 32px;
-      align-items: start;
-    }
-    @media (min-width: 900px) {
-      .contact-grid {
-        grid-template-columns: 1fr 1.15fr;
-        gap: 48px;
-      }
-    }
+    .contact-grid { display: grid; gap: 32px; align-items: start; }
+    @media (min-width: 900px) { .contact-grid { grid-template-columns: 1fr 1.15fr; gap: 48px; } }
     .contact-links { display: grid; gap: 14px; margin: 24px 0; }
-    .contact-links a {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 18px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--text);
-      font-size: .92rem;
-      overflow-wrap: anywhere;
-      transition: transform .25s ease, border-color .25s ease, background .25s ease;
-    }
-    .contact-links a:hover {
-      transform: translateX(6px);
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.35);
-      color: var(--cyan);
-    }
+    .contact-links a { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); color: var(--text); font-size: .92rem; overflow-wrap: anywhere; transition: transform .25s ease, border-color .25s ease, background .25s ease; }
+    .contact-links a:hover { transform: translateX(6px); background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.35); color: var(--cyan); }
     form { padding: 30px; }
     label { display: block; margin-bottom: 7px; font-size: .8rem; font-weight: 500; position: relative; z-index: 4; }
-    input, textarea {
-      width: 100%;
-      font-size: 16px;
-      padding: 14px 16px;
-      margin-bottom: 18px;
-      background: rgba(5, 5, 12, 0.45);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
-      border-radius: 14px;
-      color: white;
-      position: relative;
-      z-index: 4;
-      transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
-    }
+    input, textarea { width: 100%; font-size: 16px; padding: 14px 16px; margin-bottom: 18px; background: rgba(5,5,12,.45); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.16); box-shadow: inset 0 2px 6px rgba(0,0,0,.4); border-radius: 14px; color: white; position: relative; z-index: 4; transition: border-color .25s ease, box-shadow .25s ease, background .25s ease; }
     textarea { resize: vertical; min-height: 130px; }
-    input:focus, textarea:focus {
-      border-color: var(--cyan);
-      background: rgba(10, 12, 22, 0.65);
-      box-shadow: 0 0 20px rgba(5, 213, 250, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.25);
-      outline: none;
-    }
+    input:focus, textarea:focus { border-color: var(--cyan); background: rgba(10,12,22,.65); box-shadow: 0 0 20px rgba(5,213,250,.2), inset 0 1px 2px rgba(255,255,255,.25); outline: none; }
     .form-note, .form-status { color: var(--muted); font-size: .74rem; margin-top: 14px; position: relative; z-index: 4; }
-    
-    footer {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 32px 0 calc(36px + var(--nav-h) + var(--sab));
-      text-align: center;
-      color: var(--muted);
-      font-size: .8rem;
-    }
+    footer { border-top: 1px solid rgba(255,255,255,.1); padding: 32px 0 calc(36px + var(--nav-h) + var(--sab)); text-align: center; color: var(--muted); font-size: .8rem; }
 
-    /* ---------- Bottom Floating Apple Liquid Glass Dock ---------- */
-    .tabbar {
-      position: fixed;
-      left: 50%;
-      bottom: calc(14px + var(--sab));
-      transform: translateX(-50%);
-      width: min(560px, 92%);
-      z-index: 60;
-      display: flex;
-      height: var(--nav-h);
-      padding: 6px;
-      border-radius: 999px;
-      transition: transform .3s cubic-bezier(.16, 1, .3, 1), box-shadow .3s ease;
-    }
+    /* ---------- Bottom dock ---------- */
+    .tabbar { position: fixed; left: 50%; bottom: calc(14px + var(--sab)); transform: translateX(-50%); width: min(560px, 92%); z-index: 60; display: flex; height: var(--nav-h); padding: 6px; border-radius: 999px; transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease; }
     body.kb .tabbar { transform: translate(-50%, 150%); }
-    .tabbar a {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      color: var(--muted);
-      font-size: .62rem;
-      font-weight: 500;
-      letter-spacing: .03em;
-      border-radius: 999px;
-      position: relative;
-      overflow: hidden;
-      transition: color .25s ease, transform .25s ease, background .25s ease;
-    }
-    .tabbar a:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.08);
-    }
+    .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .62rem; font-weight: 500; letter-spacing: .03em; border-radius: 999px; position: relative; overflow: hidden; transition: color .25s ease, transform .25s ease, background .25s ease; }
+    .tabbar a:hover { color: #fff; background: rgba(255,255,255,.08); }
     .tabbar a b { font-size: 1.15rem; font-weight: 500; }
-    .tabbar a[aria-current="true"] {
-      color: white;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-      box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.55),
-        0 6px 18px rgba(0, 0, 0, 0.35);
-      text-shadow: 0 0 12px rgba(255, 42, 109, 0.8);
-    }
+    .tabbar a[aria-current="true"] { color: white; background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.05)); box-shadow: inset 0 1px 1px rgba(255,255,255,.55), 0 6px 18px rgba(0,0,0,.35); text-shadow: 0 0 12px rgba(255,42,109,.8); }
     .tabbar a:active { transform: scale(.92); }
 
     html[data-motion="off"] { scroll-behavior: auto; }
-    html[data-motion="off"] *,
-    html[data-motion="off"] *::before,
-    html[data-motion="off"] *::after {
-      animation: none !important;
-      transition: none !important;
-    }
+    html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation: none !important; transition: none !important; }
     html[data-motion="off"] .cube { transform: rotateX(-18deg) rotateY(30deg); }
     html[data-motion="off"] .scene { transform: none; }
     html[data-motion="off"] .reveal { opacity: 1; transform: none; }
@@ -979,61 +328,14 @@
       #scorpion { display: none; }
     }
 
-    /* ---------- 3D avatar preview ---------- */
-    .hero-model {
-      position: relative;
-      width: min(100%, 420px);
-      height: clamp(280px, 72vw, 390px);
-      margin: 10px auto 0;
-      overflow: hidden;
-      border-radius: 30px;
-    }
+    /* ---------- 3D avatar ---------- */
+    .hero-model { position: relative; width: min(100%, 420px); height: clamp(280px, 72vw, 390px); margin: 10px auto 0; overflow: hidden; border-radius: 30px; }
     #avatar-roamer canvas { width: 100%; height: 100%; display: block; position: relative; z-index: 1; }
-    #avatar-roamer .model-label {
-      position: absolute;
-      left: 18px;
-      bottom: 16px;
-      z-index: 4;
-      color: var(--muted);
-      font-size: .68rem;
-      font-weight: 600;
-      letter-spacing: .18em;
-      pointer-events: none;
-    }
+    #avatar-roamer .model-label { position: absolute; left: 18px; bottom: 16px; z-index: 4; color: var(--muted); font-size: .68rem; font-weight: 600; letter-spacing: .18em; pointer-events: none; }
     #avatar-roamer .model-label span { color: var(--pink); }
-    #avatar-roamer .avatar-hit {
-      position: absolute;
-      inset: 0;
-      z-index: 3;
-      width: 100%;
-      border: 0;
-      border-radius: inherit;
-      background: transparent;
-      cursor: grab;
-      touch-action: pan-y;
-    }
+    #avatar-roamer .avatar-hit { position: absolute; inset: 0; z-index: 3; width: 100%; border: 0; border-radius: inherit; background: transparent; cursor: grab; touch-action: pan-y; }
     #avatar-roamer .avatar-hit:active { cursor: grabbing; }
-    #avatar-roamer .avatar-say {
-      position: absolute;
-      z-index: 4;
-      top: 16px;
-      left: 50%;
-      transform: translate(-50%, -6px);
-      width: max-content;
-      max-width: calc(100% - 28px);
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.38);
-      box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px 1px rgba(255,255,255,0.6);
-      color: #fff;
-      font: 500 .74rem/1.35 "Poppins", sans-serif;
-      text-align: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s ease, transform .25s ease;
-      backdrop-filter: blur(16px);
-    }
+    #avatar-roamer .avatar-say { position: absolute; z-index: 4; top: 16px; left: 50%; transform: translate(-50%, -6px); width: max-content; max-width: calc(100% - 28px); padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.38); box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px 1px rgba(255,255,255,.6); color: #fff; font: 500 .74rem/1.35 "Poppins", sans-serif; text-align: center; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; backdrop-filter: blur(16px); }
     #avatar-roamer .avatar-say.show { opacity: 1; transform: translate(-50%, 0); }
     @media (min-width: 900px) {
       .hero { width: min(1140px, 92%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); align-items: center; gap: 44px; }
@@ -1042,36 +344,27 @@
       .hero > .tilt-chip { grid-column: 1; }
     }
 
-    /* ---------- Mobile Optimizations ---------- */
+    /* ---------- Mobile ---------- */
     @media (max-width: 899px) {
       .hero > .scene { display: none !important; }
       .hero { min-height: auto; padding-top: 24px; gap: 20px; }
       .hero-model { height: clamp(260px, 60vw, 340px); width: 100%; margin: 0 auto; }
-
       .panel, .site-header, .tabbar, .btn, .icon-btn, .tab, .fan-arrow-btn, .fan-dots-track {
         backdrop-filter: blur(12px) saturate(140%) !important;
         -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45) !important;
+        box-shadow: 0 10px 24px rgba(0,0,0,.45) !important;
       }
       body::before { animation: none; filter: blur(35px); }
-
-      /* Keep the decorative scorpion visible on touch screens too. */
       #scorpion { display: block; }
-
       .fan-stage { min-height: 380px; }
-      .fan-card {
-        width: clamp(180px, 50vw, 240px);
-        height: clamp(260px, 68vw, 340px);
-      }
+      .fan-card { width: clamp(180px, 50vw, 240px); height: clamp(260px, 68vw, 340px); }
       .fan-controls { margin-top: 16px; }
-
       body { padding-bottom: calc(var(--nav-h) + var(--sab) + 24px); }
       footer { padding-bottom: calc(20px + var(--nav-h) + var(--sab)); }
     }
   </style>
 </head>
 <body>
-  <!-- Hidden Apple Liquid Glass SVG Refraction Filter -->
   <svg width="0" height="0" style="position:absolute; pointer-events:none;" aria-hidden="true">
     <defs>
       <filter id="apple-liquid-refract" x="-10%" y="-10%" width="120%" height="120%">
@@ -1100,15 +393,12 @@
   </header>
 
   <main>
-    <!-- HERO SECTION -->
+    <!-- HERO -->
     <section id="home" class="container hero">
       <div>
         <p class="eyebrow">Front-End Developer</p>
         <h1>Hi, I'm<br><span class="gradient-text">Aniket Bhati.</span></h1>
-        <p class="hero-description">
-          I turn ideas into beautiful, responsive web experiences.
-          Thoughtful design. Clean code. A little extra dimension.
-        </p>
+        <p class="hero-description">I turn ideas into beautiful, responsive web experiences. Thoughtful design. Clean code. A little extra dimension.</p>
         <p class="location">Based in Delhi, India · Building for the web</p>
         <div class="actions">
           <a class="btn btn-primary" href="#work">Explore my work <span aria-hidden="true">↗</span></a>
@@ -1142,7 +432,7 @@
       <button class="tilt-chip" id="tilt-chip" type="button">📱 Enable 3D tilt</button>
     </section>
 
-    <!-- ABOUT SECTION -->
+    <!-- ABOUT -->
     <section id="about">
       <div class="container reveal about-grid">
         <div class="portrait-card panel tilt">
@@ -1152,7 +442,6 @@
             <span>Developer · Designer · Creative thinker</span>
           </div>
         </div>
-
         <div>
           <p class="eyebrow">Behind the screen</p>
           <h2 class="section-title">A little<br>about me<span class="accent">.</span></h2>
@@ -1187,14 +476,13 @@
       </div>
     </section>
 
-    <!-- SERVICES SECTION -->
+    <!-- SERVICES -->
     <section id="services">
       <div class="container">
         <div class="section-heading reveal">
           <p class="eyebrow">What I do</p>
           <h2 class="section-title">Digital ideas.<br>Beautifully built<span class="accent">.</span></h2>
         </div>
-
         <div class="cards-grid reveal">
           <article class="service-card panel tilt">
             <div>
@@ -1224,7 +512,7 @@
       </div>
     </section>
 
-    <!-- NATURE PHOTOGRAPHY SLIDER SECTION -->
+    <!-- GALLERY -->
     <section id="gallery">
       <div class="container">
         <div class="section-heading reveal text-center">
@@ -1234,56 +522,34 @@
         </div>
       </div>
 
-      <!-- 3D Fan Carousel Container -->
       <div class="container-wide reveal">
         <div class="fan-section-wrapper" id="fan-carousel-wrapper">
-          
-          <div class="fan-stage" id="fan-stage" aria-label="Nature Photography 3D Carousel">
-            <!-- Cards rendered via JavaScript -->
-          </div>
+          <div class="fan-stage" id="fan-stage" aria-label="Nature Photography 3D Carousel"></div>
 
-          <!-- Carousel Controls -->
           <div class="fan-controls">
             <button class="fan-arrow-btn" id="fan-prev" type="button" aria-label="Previous Photo">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
-
             <button class="fan-arrow-btn" id="fan-playpause" type="button" aria-label="Toggle Autoplay">
-              <svg id="fan-play-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none; width: 18px; height: 18px; margin-left: 2px;">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              <svg id="fan-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 18px; height: 18px;">
-                <rect x="6" y="4" width="4" height="16" rx="1"></rect>
-                <rect x="14" y="4" width="4" height="16" rx="1"></rect>
-              </svg>
+              <svg id="fan-play-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none; width:18px; height:18px; margin-left:2px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <svg id="fan-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>
             </button>
-
-            <div class="fan-dots-track" id="fan-dots">
-              <!-- Dots rendered via JavaScript -->
-            </div>
-
+            <div class="fan-dots-track" id="fan-dots"></div>
             <button class="fan-arrow-btn" id="fan-next" type="button" aria-label="Next Photo">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
           </div>
 
           <div class="fan-hint">
-            <span>Use <kbd>←</kbd> <kbd>→</kbd> or swipe</span>
-            <span>•</span>
-            <span><kbd>Space</kbd> to pause</span>
-            <span>•</span>
+            <span>Use <kbd>←</kbd> <kbd>→</kbd> or swipe</span><span>•</span>
+            <span><kbd>Space</kbd> to pause</span><span>•</span>
             <span>Click any card to center</span>
           </div>
-
         </div>
       </div>
     </section>
 
-    <!-- WORK SECTION -->
+    <!-- WORK -->
     <section id="work">
       <div class="container">
         <div class="section-heading reveal">
@@ -1291,12 +557,9 @@
           <h2 class="section-title">My work<span class="accent">.</span></h2>
           <p class="muted">A collection of interfaces built around people and their everyday experiences.</p>
         </div>
-
         <div class="cards-grid reveal">
           <article class="work-card panel tilt">
-            <div class="work-image">
-              <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop" alt="Social Media App interface" loading="lazy" width="640" height="480">
-            </div>
+            <div class="work-image"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop" alt="Social Media App interface" loading="lazy" width="640" height="480"></div>
             <div class="work-content">
               <div>
                 <span class="tag">Community · Web application</span>
@@ -1307,9 +570,7 @@
             </div>
           </article>
           <article class="work-card panel tilt">
-            <div class="work-image">
-              <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop" alt="Music App interface" loading="lazy" width="640" height="480">
-            </div>
+            <div class="work-image"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop" alt="Music App interface" loading="lazy" width="640" height="480"></div>
             <div class="work-content">
               <div>
                 <span class="tag">Audio · Interface design</span>
@@ -1320,9 +581,7 @@
             </div>
           </article>
           <article class="work-card panel tilt">
-            <div class="work-image">
-              <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&auto=format&fit=crop" alt="Online Shopping App interface" loading="lazy" width="640" height="480">
-            </div>
+            <div class="work-image"><img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&auto=format&fit=crop" alt="Online Shopping App interface" loading="lazy" width="640" height="480"></div>
             <div class="work-content">
               <div>
                 <span class="tag">Commerce · Responsive design</span>
@@ -1332,40 +591,34 @@
             </div>
           </article>
         </div>
-
         <div class="center">
           <a href="https://github.com/aniket20121/portfolio" target="_blank" rel="noopener noreferrer" class="btn">Explore on GitHub ↗</a>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT SECTION -->
+    <!-- CONTACT -->
     <section id="contact">
       <div class="container reveal contact-grid">
         <div>
           <p class="eyebrow">Have something in mind?</p>
           <h2 class="section-title">Let's make<br>it happen<span class="accent">.</span></h2>
           <p class="muted">Tell me about your next website, creative idea, or collaboration.</p>
-
           <div class="contact-links">
             <a href="mailto:Bhatianiket07@gmail.com">✉ Bhatianiket07@gmail.com ↗</a>
             <a href="tel:+917827894172">☏ +91 7827894172</a>
             <a href="https://github.com/aniket20121/portfolio" target="_blank" rel="noopener noreferrer">⌘ GitHub Profile ↗</a>
           </div>
-
           <a href="./cv.pdf" download class="btn">Download CV ↓</a>
         </div>
 
         <form class="panel tilt" id="contact-form">
           <label for="name">Your name</label>
           <input id="name" name="Name" type="text" autocomplete="name" placeholder="Your name" maxlength="120" required>
-
           <label for="email">Email address</label>
           <input id="email" name="Email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required>
-
           <label for="message">Your message</label>
           <textarea id="message" name="Message" rows="4" placeholder="Tell me about your project..." maxlength="3000" required></textarea>
-
           <button class="btn btn-primary" type="submit">Compose email ↗</button>
           <p class="form-note">Opens your email app with a draft. Nothing is sent until you send it there.</p>
           <p class="form-status" id="form-status" role="status"></p>
@@ -1387,7 +640,7 @@
     <a href="#contact" data-nav="contact"><b aria-hidden="true">✉</b>Contact</a>
   </nav>
 
-  <!-- ================= BASE PORTFOLIO & LIQUID GLASS SCRIPTS ================= -->
+  <!-- ================= BASE SCRIPTS ================= -->
   <script>
     "use strict";
     document.documentElement.classList.add("js");
@@ -1404,33 +657,23 @@
       motionBtn.textContent = userPaused ? "▶ Motion" : "⏸ Motion";
     });
 
-    /* Apple Liquid Glass 3D Tilt & Specular Cursor Tracking */
     function bindLiquidHover(elements, enableTilt = true) {
       elements.forEach(el => {
         let timer;
         el.addEventListener("pointermove", e => {
           if (!motionAllowed() || e.pointerType === "touch") return;
           const rect = el.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
+          const x = e.clientX - rect.left, y = e.clientY - rect.top;
           el.style.setProperty("--mx", `${x}px`);
           el.style.setProperty("--my", `${y}px`);
-
           if (enableTilt) {
-            const px = (x / rect.width) - 0.5;
-            const py = (y / rect.height) - 0.5;
-            el.style.setProperty("--rx", `${(-py * 10).toFixed(2)}deg`);
-            el.style.setProperty("--ry", `${(px * 10).toFixed(2)}deg`);
+            el.style.setProperty("--rx", `${(-((y / rect.height) - 0.5) * 10).toFixed(2)}deg`);
+            el.style.setProperty("--ry", `${(((x / rect.width) - 0.5) * 10).toFixed(2)}deg`);
           }
         }, { passive: true });
-
         el.addEventListener("pointerleave", () => {
-          if (enableTilt) {
-            el.style.setProperty("--rx", "0deg");
-            el.style.setProperty("--ry", "0deg");
-          }
+          if (enableTilt) { el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); }
         }, { passive: true });
-
         el.addEventListener("touchstart", () => {
           if (!motionAllowed()) return;
           el.classList.add("touch-glow");
@@ -1439,11 +682,9 @@
         }, { passive: true });
       });
     }
-
     bindLiquidHover(document.querySelectorAll(".tilt"), true);
     bindLiquidHover(document.querySelectorAll(".btn"), false);
 
-    /* Ripple on interactive elements */
     document.querySelectorAll(".btn, .tab, .tabbar a, .icon-btn, .fan-arrow-btn").forEach(el => {
       el.addEventListener("pointerdown", event => {
         const rect = el.getBoundingClientRect();
@@ -1463,15 +704,12 @@
     const chip = document.getElementById("tilt-chip");
     let gyroStarted = false, gyroActive = false;
     let gx = 0, gy = 0, gxT = 0, gyT = 0, gyroFrame = 0;
-
     function gyroLoop() {
-      gx += (gxT - gx) * 0.1;
-      gy += (gyT - gy) * 0.1;
+      gx += (gxT - gx) * 0.1; gy += (gyT - gy) * 0.1;
       scene.style.setProperty("--sx", gx.toFixed(2) + "deg");
       scene.style.setProperty("--sy", gy.toFixed(2) + "deg");
       gyroFrame = requestAnimationFrame(gyroLoop);
     }
-
     function onOrient(e) {
       if (e.gamma == null && e.beta == null) return;
       gyroActive = true;
@@ -1479,78 +717,53 @@
       gxT = Math.max(-12, Math.min(12, (e.gamma || 0) * 0.35));
       gyT = Math.max(-10, Math.min(10, ((e.beta || 0) - 45) * 0.25));
     }
-
     function startGyro() {
       if (gyroStarted) return;
       gyroStarted = true;
       addEventListener("deviceorientation", onOrient, true);
       gyroFrame = requestAnimationFrame(gyroLoop);
     }
-
     if (!reducedMotion.matches) {
       startGyro();
-      setTimeout(() => {
-        if (!gyroActive) chip.classList.add("show");
-      }, 1500);
+      setTimeout(() => { if (!gyroActive) chip.classList.add("show"); }, 1500);
     }
-
     chip.addEventListener("click", async () => {
       try {
-        if (typeof DeviceOrientationEvent !== "undefined" &&
-            typeof DeviceOrientationEvent.requestPermission === "function") {
+        if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
           const res = await DeviceOrientationEvent.requestPermission();
           if (res !== "granted") { chip.textContent = "Tilt permission denied"; return; }
         }
         startGyro();
         chip.textContent = "Tilt on ✓";
-        setTimeout(() => {
-          if (!gyroActive) chip.textContent = "Tilt not supported here";
-        }, 1200);
+        setTimeout(() => { if (!gyroActive) chip.textContent = "Tilt not supported here"; }, 1200);
       } catch { chip.textContent = "Tilt unavailable"; }
     });
 
-    /* Hide tabbar while typing */
-    document.addEventListener("focusin", e => {
-      if (e.target.matches("input, textarea")) document.body.classList.add("kb");
-    });
-    document.addEventListener("focusout", e => {
-      if (e.target.matches("input, textarea")) document.body.classList.remove("kb");
-    });
+    document.addEventListener("focusin", e => { if (e.target.matches("input, textarea")) document.body.classList.add("kb"); });
+    document.addEventListener("focusout", e => { if (e.target.matches("input, textarea")) document.body.classList.remove("kb"); });
 
-    /* Active section scroll spy */
     const navLinks = [...document.querySelectorAll(".tabbar a")];
-    const sections = ["home", "about", "services", "gallery", "work", "contact"]
-      .map(id => document.getElementById(id)).filter(Boolean);
-
+    const sections = ["home", "about", "services", "gallery", "work", "contact"].map(id => document.getElementById(id)).filter(Boolean);
     if ("IntersectionObserver" in window) {
       const spy = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           if (!entry.isIntersecting) return;
-          navLinks.forEach(link =>
-            link.setAttribute("aria-current",
-              link.dataset.nav === entry.target.id ? "true" : "false"));
+          navLinks.forEach(link => link.setAttribute("aria-current", link.dataset.nav === entry.target.id ? "true" : "false"));
         });
       }, { rootMargin: "-40% 0px -55% 0px" });
       sections.forEach(s => spy.observe(s));
     }
 
-    /* Scroll reveals */
     const revealables = document.querySelectorAll(".reveal");
     if ("IntersectionObserver" in window && !reducedMotion.matches) {
       const ro = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            ro.unobserve(entry.target);
-          }
-        });
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("in"); ro.unobserve(entry.target); } });
       }, { threshold: 0.12 });
       revealables.forEach(el => ro.observe(el));
     } else {
       revealables.forEach(el => el.classList.add("in"));
     }
 
-    /* Tab switching */
     const tabs = [...document.querySelectorAll('[role="tab"]')];
     function activateTab(selected) {
       tabs.forEach(tab => {
@@ -1560,7 +773,6 @@
         document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
       });
     }
-
     tabs.forEach((tab, index) => {
       tab.addEventListener("click", () => activateTab(tab));
       tab.addEventListener("keydown", event => {
@@ -1574,7 +786,6 @@
       });
     });
 
-    /* Contact form */
     document.querySelector("#contact-form").addEventListener("submit", event => {
       event.preventDefault();
       const form = event.currentTarget;
@@ -1582,68 +793,29 @@
       const email = form.elements.namedItem("Email").value.trim();
       const message = form.elements.namedItem("Message").value.trim();
       const status = document.querySelector("#form-status");
-
-      if (!name || !email || !message) {
-        status.textContent = "Please complete every field with more than spaces.";
-        return;
-      }
-
+      if (!name || !email || !message) { status.textContent = "Please complete every field with more than spaces."; return; }
       const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\n${message}`);
-
       status.textContent = "Opening your email app. If it doesn't open, email Bhatianiket07@gmail.com directly.";
       window.location.href = `mailto:Bhatianiket07@gmail.com?subject=${subject}&body=${body}`;
     });
-
     document.querySelector("#year").textContent = new Date().getFullYear();
   </script>
 
-  <!-- ================= PURE NATURE PHOTO SLIDER LOGIC ================= -->
+  <!-- ================= NATURE PHOTO SLIDER ================= -->
   <script>
   (() => {
     "use strict";
-
     const NATURE_PHOTOS = [
-      {
-        tag: "Highlands",
-        title: "Mukteshwar Ridge",
-        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&auto=format&fit=crop"
-      },
-      {
-        tag: "Pine Trails",
-        title: "Lansdowne Mist",
-        img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=900&auto=format&fit=crop"
-      },
-      {
-        tag: "Horizons",
-        title: "Silent Valley",
-        img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=900&auto=format&fit=crop"
-      },
-      {
-        tag: "Night Sky",
-        title: "Mountain Constellations",
-        img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&auto=format&fit=crop"
-      },
-      {
-        tag: "Forest Shade",
-        title: "Morning Sunbeams",
-        img: "https://images.unsplash.com/photo-1511497584788-87676104235f?w=900&auto=format&fit=crop"
-      },
-      {
-        tag: "Golden Hour",
-        title: "Chakrata Sunset",
-        img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=900&auto=format&fit=crop"
-      },
-      {
-        tag: "Solitude",
-        title: "Pangoot Wilds",
-        img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&auto=format&fit=crop"
-      }
+      { tag: "Highlands", title: "Mukteshwar Ridge", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&auto=format&fit=crop" },
+      { tag: "Pine Trails", title: "Lansdowne Mist", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=900&auto=format&fit=crop" },
+      { tag: "Horizons", title: "Silent Valley", img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=900&auto=format&fit=crop" },
+      { tag: "Night Sky", title: "Mountain Constellations", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&auto=format&fit=crop" },
+      { tag: "Forest Shade", title: "Morning Sunbeams", img: "https://images.unsplash.com/photo-1511497584788-87676104235f?w=900&auto=format&fit=crop" },
+      { tag: "Golden Hour", title: "Chakrata Sunset", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=900&auto=format&fit=crop" },
+      { tag: "Solitude", title: "Pangoot Wilds", img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&auto=format&fit=crop" }
     ];
-
-    const MAX_VISIBLE = 7;
-    const HALF = 3;
-
+    const MAX_VISIBLE = 7, HALF = 3;
     const FAN_POSITIONS = [
       { rot: -22, scale: 0.76, x: -38, y: 8.5, zIndex: 1 },
       { rot: -15, scale: 0.84, x: -26, y: 4.8, zIndex: 2 },
@@ -1653,37 +825,19 @@
       { rot: 15,  scale: 0.84, x: 26,  y: 4.8, zIndex: 2 },
       { rot: 22,  scale: 0.76, x: 38,  y: 8.5, zIndex: 1 },
     ];
-
-    function getResponsiveMultiplier(width) {
-      if (width < 480) return 0.32;
-      if (width < 640) return 0.45;
-      if (width < 768) return 0.58;
-      if (width < 1024) return 0.78;
-      return 1.0;
-    }
-
-    function getHeightMultiplier(width) {
-      let idealPx = 38 * 16;
-      if (width < 480) idealPx = 24 * 16;
-      else if (width < 768) idealPx = 30 * 16;
-      else if (width < 1024) idealPx = 35 * 16;
-
+    function getResponsiveMultiplier(w) { if (w < 480) return 0.32; if (w < 640) return 0.45; if (w < 768) return 0.58; if (w < 1024) return 0.78; return 1.0; }
+    function getHeightMultiplier(w) {
+      let ideal = 38 * 16;
+      if (w < 480) ideal = 24 * 16; else if (w < 768) ideal = 30 * 16; else if (w < 1024) ideal = 35 * 16;
       const available = window.innerHeight * 0.75;
-      return available >= idealPx ? 1 : Math.max(0.65, available / idealPx);
+      return available >= ideal ? 1 : Math.max(0.65, available / ideal);
     }
-
-    function getSlotConfig(totalCards, slot) {
-      if (totalCards >= MAX_VISIBLE) return FAN_POSITIONS[slot];
-      const center = totalCards >> 1;
-      const distance = totalCards > 1 ? (slot - center) / center : 0;
-      const absDistance = Math.abs(distance);
-      return {
-        rot: distance * 22,
-        scale: 1.0 - 0.2244 * absDistance * absDistance,
-        x: distance * 38,
-        y: absDistance * absDistance * 8.5,
-        zIndex: 10 - Math.abs(slot - center),
-      };
+    function getSlotConfig(total, slot) {
+      if (total >= MAX_VISIBLE) return FAN_POSITIONS[slot];
+      const center = total >> 1;
+      const distance = total > 1 ? (slot - center) / center : 0;
+      const a = Math.abs(distance);
+      return { rot: distance * 22, scale: 1.0 - 0.2244 * a * a, x: distance * 38, y: a * a * 8.5, zIndex: 10 - Math.abs(slot - center) };
     }
 
     const stage = document.getElementById("fan-stage");
@@ -1696,119 +850,69 @@
     const carouselWrapper = document.getElementById("fan-carousel-wrapper");
 
     const totalCards = NATURE_PHOTOS.length;
-    let centerIndex = HALF;
-    let isAnimating = false;
-    let hasEntered = false;
-    let direction = null;
-    let prevVisible = new Set();
-    let isPlaying = true;
-    let isHovered = false;
-    let autoplayTimer = null;
-    let cardElements = [];
+    let centerIndex = HALF, isAnimating = false, hasEntered = false, direction = null;
+    let prevVisible = new Set(), isPlaying = true, isHovered = false, autoplayTimer = null, cardElements = [];
 
     function initDOM() {
-      stage.innerHTML = "";
-      dotsTrack.innerHTML = "";
-
+      stage.innerHTML = ""; dotsTrack.innerHTML = "";
       NATURE_PHOTOS.forEach((item, index) => {
         const card = document.createElement("div");
         card.className = "fan-card";
         card.setAttribute("data-index", index);
         card.setAttribute("role", "button");
         card.setAttribute("aria-label", `View photo: ${item.title}`);
-
         card.innerHTML = `
           <img src="${item.img}" alt="${item.title}" loading="lazy" />
           <div class="fan-card-scrim"></div>
-          <div class="fan-card-info">
-            <span class="fan-card-tag">${item.tag}</span>
-            <h3 class="fan-card-title">${item.title}</h3>
-          </div>
-        `;
-
+          <div class="fan-card-info"><span class="fan-card-tag">${item.tag}</span><h3 class="fan-card-title">${item.title}</h3></div>`;
         card.addEventListener("pointermove", e => {
           const rect = card.getBoundingClientRect();
           card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
           card.style.setProperty("--my", `${e.clientY - rect.top}px`);
         }, { passive: true });
-
-        card.addEventListener("click", () => {
-          jumpToIndex(index);
-        });
-
+        card.addEventListener("click", () => jumpToIndex(index));
         stage.appendChild(card);
-
         const dot = document.createElement("button");
         dot.className = "fan-dot";
         dot.setAttribute("aria-label", `Go to photo ${index + 1}`);
         dot.addEventListener("click", () => jumpToIndex(index));
         dotsTrack.appendChild(dot);
       });
-
       cardElements = Array.from(stage.querySelectorAll(".fan-card"));
     }
 
     function getVisibleMap(center) {
       const map = new Map();
-      for (let slot = 0; slot < MAX_VISIBLE; slot++) {
-        map.set(((center + slot - HALF) % totalCards + totalCards) % totalCards, slot);
-      }
+      for (let slot = 0; slot < MAX_VISIBLE; slot++) map.set(((center + slot - HALF) % totalCards + totalCards) % totalCards, slot);
       return map;
     }
-
     function updateDots() {
-      const dots = dotsTrack.querySelectorAll(".fan-dot");
-      dots.forEach((dot, i) => {
-        if (i === centerIndex) {
-          dot.classList.add("active");
-        } else {
-          dot.classList.remove("active");
-        }
-      });
+      dotsTrack.querySelectorAll(".fan-dot").forEach((dot, i) => dot.classList.toggle("active", i === centerIndex));
     }
 
     function renderCards() {
       if (!cardElements.length) return;
-
       const visibleMap = getVisibleMap(centerIndex);
       const isFirstMount = !hasEntered;
       const multiplier = getResponsiveMultiplier(window.innerWidth);
       const hMult = getHeightMultiplier(window.innerWidth);
-      const slotCount = MAX_VISIBLE;
-      const config = (slot) => getSlotConfig(slotCount, slot);
-
+      const config = (slot) => getSlotConfig(MAX_VISIBLE, slot);
       if (isFirstMount) isAnimating = true;
 
       let completedCount = 0;
       const visibleCount = visibleMap.size;
       const onCardDone = () => {
-        if (++completedCount >= visibleCount) {
-          isAnimating = false;
-          if (isFirstMount) hasEntered = true;
-        }
+        if (++completedCount >= visibleCount) { isAnimating = false; if (isFirstMount) hasEntered = true; }
       };
 
       cardElements.forEach((card, cardIndex) => {
         const slot = visibleMap.get(cardIndex);
         const wasVisible = prevVisible.has(cardIndex);
-
-        if (cardIndex === centerIndex) {
-          card.classList.add("is-center");
-        } else {
-          card.classList.remove("is-center");
-        }
+        card.classList.toggle("is-center", cardIndex === centerIndex);
 
         if (slot !== undefined) {
           const { x, y, rot, scale, zIndex } = config(slot);
-          const target = {
-            x: `${x * multiplier}rem`,
-            y: `${y * hMult}rem`,
-            rotation: rot,
-            scale,
-            opacity: 1,
-            zIndex,
-          };
-
+          const target = { x: `${x * multiplier}rem`, y: `${y * hMult}rem`, rotation: rot, scale, opacity: 1, zIndex };
           if (isFirstMount) {
             gsap.set(card, { x: 0, y: `${12 * hMult}rem`, rotation: 0, scale: 0.5, opacity: 0 });
             gsap.to(card, { ...target, duration: 1.1, ease: "elastic.out(1.05,.78)", delay: 0.15 + slot * 0.05, onComplete: onCardDone });
@@ -1832,70 +936,39 @@
       attachHoverInteractions(visibleMap, config);
     }
 
-    let currentEnterHandlers = [];
-    let currentLeaveHandler = null;
-
+    let currentEnterHandlers = [], currentLeaveHandler = null;
     function attachHoverInteractions(visibleMap, config) {
       currentEnterHandlers.forEach(({ el, handler }) => el.removeEventListener("mouseenter", handler));
       currentEnterHandlers = [];
       if (currentLeaveHandler) stage.removeEventListener("mouseleave", currentLeaveHandler);
 
       const visibleEntries = [];
-      cardElements.forEach((el, i) => {
-        const slot = visibleMap.get(i);
-        if (slot !== undefined) visibleEntries.push({ el, slot });
-      });
+      cardElements.forEach((el, i) => { const slot = visibleMap.get(i); if (slot !== undefined) visibleEntries.push({ el, slot }); });
       visibleEntries.sort((a, b) => a.slot - b.slot);
 
-      let activeSlot = null;
-      let leaveTimer = null;
+      let activeSlot = null, leaveTimer = null;
       const centerSlot = visibleEntries.length >> 1;
 
       const updateHoverLayout = (hoveredSlot) => {
         const mult = getResponsiveMultiplier(window.innerWidth);
         const hM = getHeightMultiplier(window.innerWidth);
-
         visibleEntries.forEach(({ el, slot }) => {
           const base = config(slot);
-          let targetX = base.x * mult;
-          let targetY = base.y * hM;
-          let targetRot = base.rot;
-          let targetScale = base.scale;
-          let delay = 0;
-
+          let targetX = base.x * mult, targetY = base.y * hM, targetRot = base.rot, targetScale = base.scale, delay = 0;
           if (hoveredSlot !== null) {
             const distance = Math.abs(slot - hoveredSlot);
             delay = distance * 0.02;
-
-            if (slot === hoveredSlot) {
-              targetY -= 2.6 * hM;
-              targetScale *= 1.07;
-            } else {
+            if (slot === hoveredSlot) { targetY -= 2.6 * hM; targetScale *= 1.07; }
+            else {
               const normalized = centerSlot > 0 ? (slot - centerSlot) / centerSlot : 0;
               const pushStrength = 7 * (1 - Math.abs(normalized)) * (1 + 0.2 * Math.max(0, 3 - distance));
-
-              if (slot < hoveredSlot) {
-                targetX -= pushStrength * mult;
-                targetRot -= 3.5 / (distance + 1);
-              } else {
-                targetX += pushStrength * mult;
-                targetRot += 3.5 / (distance + 1);
-              }
+              if (slot < hoveredSlot) { targetX -= pushStrength * mult; targetRot -= 3.5 / (distance + 1); }
+              else { targetX += pushStrength * mult; targetRot += 3.5 / (distance + 1); }
             }
           } else {
             delay = Math.abs(slot - centerSlot) * 0.02;
           }
-
-          gsap.to(el, {
-            x: `${targetX}rem`,
-            y: `${targetY}rem`,
-            rotation: targetRot,
-            scale: targetScale,
-            duration: 0.45,
-            delay,
-            ease: "elastic.out(1,.75)",
-            overwrite: "auto",
-          });
+          gsap.to(el, { x: `${targetX}rem`, y: `${targetY}rem`, rotation: targetRot, scale: targetScale, duration: 0.45, delay, ease: "elastic.out(1,.75)", overwrite: "auto" });
           gsap.set(el, { zIndex: base.zIndex });
         });
       };
@@ -1904,36 +977,25 @@
         const handler = () => {
           if (isAnimating) return;
           if (leaveTimer) clearTimeout(leaveTimer);
-          if (activeSlot !== slot) {
-            activeSlot = slot;
-            updateHoverLayout(slot);
-          }
+          if (activeSlot !== slot) { activeSlot = slot; updateHoverLayout(slot); }
         };
         el.addEventListener("mouseenter", handler);
         return { el, handler };
       });
-
       currentLeaveHandler = () => {
         if (isAnimating) return;
         if (leaveTimer) clearTimeout(leaveTimer);
-        leaveTimer = setTimeout(() => {
-          activeSlot = null;
-          updateHoverLayout(null);
-        }, 60);
+        leaveTimer = setTimeout(() => { activeSlot = null; updateHoverLayout(null); }, 60);
       };
       stage.addEventListener("mouseleave", currentLeaveHandler);
     }
 
     function cycle(dir) {
       if (isAnimating) return;
-      isAnimating = true;
-      direction = dir;
-      centerIndex = dir === "right" 
-        ? (centerIndex + 1) % totalCards 
-        : (centerIndex - 1 + totalCards) % totalCards;
+      isAnimating = true; direction = dir;
+      centerIndex = dir === "right" ? (centerIndex + 1) % totalCards : (centerIndex - 1 + totalCards) % totalCards;
       renderCards();
     }
-
     function jumpToIndex(target) {
       if (isAnimating || target === centerIndex) return;
       isAnimating = true;
@@ -1941,420 +1003,298 @@
       centerIndex = target;
       renderCards();
     }
-
     function startAutoplay() {
       stopAutoplay();
-      autoplayTimer = setInterval(() => {
-        if (isPlaying && !isHovered && motionAllowed()) {
-          cycle("right");
-        }
-      }, 3400);
+      autoplayTimer = setInterval(() => { if (isPlaying && !isHovered && motionAllowed()) cycle("right"); }, 3400);
     }
-
-    function stopAutoplay() {
-      if (autoplayTimer) clearInterval(autoplayTimer);
-      autoplayTimer = null;
-    }
-
+    function stopAutoplay() { if (autoplayTimer) clearInterval(autoplayTimer); autoplayTimer = null; }
     function setPlayState(playing) {
       isPlaying = playing;
-      if (isPlaying) {
-        playIcon.style.display = "none";
-        pauseIcon.style.display = "block";
-      } else {
-        playIcon.style.display = "block";
-        pauseIcon.style.display = "none";
-      }
+      playIcon.style.display = playing ? "none" : "block";
+      pauseIcon.style.display = playing ? "block" : "none";
     }
 
     prevBtn.addEventListener("click", () => cycle("left"));
     nextBtn.addEventListener("click", () => cycle("right"));
-
-    playPauseBtn.addEventListener("click", () => {
-      setPlayState(!isPlaying);
-    });
-
+    playPauseBtn.addEventListener("click", () => setPlayState(!isPlaying));
     carouselWrapper.addEventListener("mouseenter", () => { isHovered = true; });
     carouselWrapper.addEventListener("mouseleave", () => { isHovered = false; });
 
     let touchStartX = 0;
-    carouselWrapper.addEventListener("touchstart", (e) => {
-      touchStartX = e.touches[0].clientX;
+    carouselWrapper.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    carouselWrapper.addEventListener("touchend", e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (dx > 40) cycle("left"); else if (dx < -40) cycle("right");
     }, { passive: true });
 
-    carouselWrapper.addEventListener("touchend", (e) => {
-      const deltaX = e.changedTouches[0].clientX - touchStartX;
-      if (deltaX > 40) cycle("left");
-      else if (deltaX < -40) cycle("right");
-    }, { passive: true });
-
-    window.addEventListener("keydown", (e) => {
-      if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA") return;
+    window.addEventListener("keydown", e => {
+      const tag = document.activeElement.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (e.key === "ArrowLeft") cycle("left");
       if (e.key === "ArrowRight") cycle("right");
-      if (e.key === " ") {
-        e.preventDefault();
-        setPlayState(!isPlaying);
-      }
+      if (e.key === " ") { e.preventDefault(); setPlayState(!isPlaying); }
     });
+    window.addEventListener("resize", () => { if (!isAnimating) renderCards(); });
 
-    window.addEventListener("resize", () => {
-      if (!isAnimating) renderCards();
-    });
-
-    initDOM();
-    renderCards();
-    startAutoplay();
+    initDOM(); renderCards(); startAutoplay();
   })();
   </script>
 
-  <!-- ================= ENHANCED & BUG-FIXED 3D SCORPION CURSOR ================= -->
+  <!-- ================= SMOOTH SCORPION CURSOR (desktop + mobile) ================= -->
   <script>
   (() => {
     "use strict";
 
     const canvas = document.getElementById("scorpion");
-    const ctx = canvas?.getContext("2d", { alpha: true });
+    const ctx = canvas && canvas.getContext("2d", { alpha: true });
     if (!canvas || !ctx) return;
 
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    const coarsePointer = matchMedia("(pointer: coarse)");
+    const isTouch = matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
     const motionOff = () => reduceMotion.matches || document.documentElement.dataset.motion === "off";
 
-    // Fixed segment count: 12 body segments (removed 14 unused ghost segments)
+    /* Quality profile: mobile uses flat fills, lower DPR and a slightly smaller body
+       so every frame stays cheap and the scorpion glides at a steady 60fps. */
+    const FANCY = !isTouch;
     const BODY_COUNT = 12;
-    const SPACING = 7.8;
+    const SCALE = isTouch ? 0.86 : 1;
+    const SPACING = 7.8 * SCALE;
+    const FOLLOW_TAU = isTouch ? 0.085 : 0.03;   // lower = tighter to the cursor
+    const MAX_DT = 1 / 30;
 
     let width = 0, height = 0, dpr = 1;
     let time = 0, walkPhase = 0, lastTime = 0;
     let started = false, visible = true;
-    let isHoveringInteractive = false;
-    let strikeProgress = 0; // 0 = idle, >0 = striking on click
-    let hoverBlend = 0;     // Smoothly interpolates alert stance on links/buttons
-    let currentSpeed = 0;   // Tracks velocity so legs only walk when moving
+    let hovering = false, hoverBlend = 0;
+    let strike = 0, speed = 0, idleFor = 0;
 
-    const pointer = {
-      x: innerWidth / 2,
-      y: innerHeight / 2,
-      tx: innerWidth / 2,
-      ty: innerHeight / 2
-    };
-
-    const segments = Array.from({ length: BODY_COUNT }, (_, i) => ({
-      x: pointer.x - (i + 1) * SPACING,
-      y: pointer.y,
-      angle: 0
-    }));
-
+    const pointer = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
+    const segs = Array.from({ length: BODY_COUNT }, (_, i) => ({ x: pointer.x - (i + 1) * SPACING, y: pointer.y, angle: 0 }));
     const sparks = [];
 
-    // Touch devices have no hover cursor, so start the scorpion near the lower-right
-    // edge and let taps reposition it. This keeps it visible without covering the hero.
-    if (coarsePointer.matches && !motionOff()) {
-      started = true;
-      pointer.x = pointer.tx = Math.max(72, innerWidth - 90);
-      pointer.y = pointer.ty = Math.max(110, innerHeight - 145);
-      segments.forEach((seg, i) => {
-        seg.x = pointer.x - (i + 1) * SPACING;
-        seg.y = pointer.y;
-        seg.angle = 0;
-      });
-      canvas.classList.add("on");
-    }
+    const TAU = Math.PI * 2;
+    const angleDiff = (a, b) => { let d = (b - a) % TAU; if (d > Math.PI) d -= TAU; if (d < -Math.PI) d += TAU; return d; };
+    const lerpAngle = (a, b, t) => a + angleDiff(a, b) * t;
+    const pt = (x, y, a, l) => ({ x: x + Math.cos(a) * l, y: y + Math.sin(a) * l });
 
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      width = window.innerWidth;
-      height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, isTouch ? 1.5 : 2);
+      width = window.innerWidth; height = window.innerHeight;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     window.addEventListener("resize", resize, { passive: true });
+    window.addEventListener("orientationchange", () => setTimeout(resize, 200), { passive: true });
 
-    //Shortest angular difference to prevent 360-degree snapping bug
-    function angleDiff(a, b) {
-      let d = ((b - a + Math.PI) % (Math.PI * 2)) - Math.PI;
-      return d < -Math.PI ? d + Math.PI * 2 : d;
+    const interactiveSel = "a, button, input, textarea, select, label, [role='button'], [role='tab'], .fan-card, .avatar-hit";
+    const checkInteractive = el => !!(el && el.closest && el.closest(interactiveSel));
+
+    function place(x, y) {
+      pointer.x = pointer.tx = x; pointer.y = pointer.ty = y;
+      segs.forEach((s, i) => { s.x = x - (i + 1) * SPACING; s.y = y; s.angle = 0; });
     }
 
-    function lerpAngle(a, b, t) {
-      return a + angleDiff(a, b) * t;
-    }
-
-    const point = (x, y, angle, length) => ({
-      x: x + Math.cos(angle) * length,
-      y: y + Math.sin(angle) * length
-    });
-
-    function checkInteractive(target) {
-      if (!target || typeof target.closest !== "function") return false;
-      return Boolean(
-        target.closest("a, button, input, textarea, select, label, [role='button'], [role='tab'], .fan-card, .avatar-hit")
-      );
-    }
-
-    function setTarget(x, y, targetEl) {
-      pointer.tx = x;
-      pointer.ty = y;
-      visible = true;
-      if (targetEl !== undefined) {
-        isHoveringInteractive = checkInteractive(targetEl);
-      }
-
+    function setTarget(x, y, el) {
+      pointer.tx = x; pointer.ty = y; visible = true; idleFor = 0;
+      if (el !== undefined) hovering = checkInteractive(el);
       if (!started) {
         started = true;
-        pointer.x = x;
-        pointer.y = y;
-        segments.forEach((seg, i) => {
-          seg.x = x - (i + 1) * SPACING;
-          seg.y = y;
-          seg.angle = 0;
-        });
-        if (!coarsePointer.matches && !motionOff()) {
-          canvas.classList.add("on");
-          document.documentElement.classList.add("scorpion-ready");
-        }
-      }
-    }
-
-    window.addEventListener("pointermove", e => {
-      if (e.pointerType !== "touch") setTarget(e.clientX, e.clientY, e.target);
-    }, { passive: true });
-
-    window.addEventListener("pointerdown", e => {
-      if (e.pointerType === "touch") {
+        place(x, y);
         if (!motionOff()) {
-          setTarget(e.clientX, e.clientY, e.target);
           canvas.classList.add("on");
+          if (!isTouch) document.documentElement.classList.add("scorpion-ready");
         }
-        return;
-      }
-      setTarget(e.clientX, e.clientY, e.target);
-      // Trigger claw snap + stinger strike animation
-      strikeProgress = 1.0;
-
-      // Spawnvenom/ember sparks at cursor tip
-      for (let i = 0; i < 8; i++) {
-        const ang = (Math.PI * 2 * i) / 8 + (Math.random() - 0.5) * 0.5;
-        const spd = 45 + Math.random() * 85;
-        sparks.push({
-          x: e.clientX,
-          y: e.clientY,
-          vx: Math.cos(ang) * spd,
-          vy: Math.sin(ang) * spd,
-          life: 1,
-          color: i % 2 === 0 ? "#05d5fa" : "#ff2a6d"
-        });
-      }
-    }, { passive: true });
-
-    document.addEventListener("mouseleave", () => {
-      visible = false;
-      canvas.classList.remove("on");
-    });
-
-    document.addEventListener("mouseenter", () => {
-      if (started && !coarsePointer.matches && !motionOff()) {
-        visible = true;
-        canvas.classList.add("on");
-      }
-    });
-
-    function follow(dt) {
-      const prevX = pointer.x;
-      const prevY = pointer.y;
-
-      const smoothing = 1 - Math.exp(-dt / 0.028);
-      pointer.x += (pointer.tx - pointer.x) * smoothing;
-      pointer.y += (pointer.ty - pointer.y) * smoothing;
-
-      // Calculate cursor velocity for realistic gait cycle
-      const instSpeed = Math.hypot(pointer.x - prevX, pointer.y - prevY) / Math.max(dt, 0.001);
-      currentSpeed += (instSpeed - currentSpeed) * Math.min(1, dt * 12);
-
-      // Advance leg walk phase strictly when moving, plus subtle idle breathing
-      const normalizedWalk = Math.min(currentSpeed / 160, 2.6);
-      walkPhase += dt * (normalizedWalk * 12 + 0.45);
-
-      hoverBlend += ((isHoveringInteractive ? 1 : 0) - hoverBlend) * Math.min(1, dt * 10);
-      if (strikeProgress > 0) {
-        strikeProgress = Math.max(0, strikeProgress - dt * 3.4);
-      }
-
-      // Head stays slightly behind exact cursor tip so pincers frame the target
-      const head = segments[0];
-      const dxHead = pointer.tx - head.x;
-      const dyHead = pointer.ty - head.y;
-      const distToPointer = Math.hypot(dxHead, dyHead);
-
-      if (distToPointer > 1.5) {
-        const desiredAngle = Math.atan2(dyHead, dxHead);
-        head.angle = lerpAngle(head.angle, desiredAngle, Math.min(1, dt * 18));
-      }
-
-      const headOffset = 10 - strikeProgress * 5;
-      const targetHeadX = pointer.x - Math.cos(head.angle) * headOffset;
-      const targetHeadY = pointer.y - Math.sin(head.angle) * headOffset;
-
-      const headEase = 1 - Math.exp(-dt / 0.02);
-      head.x += (targetHeadX - head.x) * headEase;
-      head.y += (targetHeadY - head.y) * headEase;
-
-      // Inverse Kinematics chain with spine angular constraint (prevents kinking)
-      for (let i = 1; i < BODY_COUNT; i++) {
-        const lead = segments[i - 1];
-        const part = segments[i];
-        const dx = lead.x - part.x;
-        const dy = lead.y - part.y;
-        const rawAngle = Math.atan2(dy, dx);
-
-        // Constrain bend angle relative to the parent segment
-        let diff = angleDiff(lead.angle, rawAngle);
-        const maxBend = 0.46;
-        if (Math.abs(diff) > maxBend) {
-          diff = Math.sign(diff) * maxBend;
-        }
-        part.angle = lead.angle + diff;
-
-        const targetSpacing = SPACING + Math.sin(time * 3 - i * 0.4) * 0.2;
-        part.x = lead.x - Math.cos(part.angle) * targetSpacing;
-        part.y = lead.y - Math.sin(part.angle) * targetSpacing;
-      }
-
-      // Update click sparks
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        const sp = sparks[i];
-        sp.x += sp.vx * dt;
-        sp.y += sp.vy * dt;
-        sp.vx *= 0.92;
-        sp.vy *= 0.92;
-        sp.life -= dt * 2.8;
-        if (sp.life <= 0) sparks.splice(i, 1);
       }
     }
 
-    function drawLimbSegment(a, b, radiusA, radiusB, color, highlight = "rgba(255,190,130,.75)") {
+    function burst(x, y) {
+      strike = 1;
+      const n = isTouch ? 6 : 8;
+      for (let i = 0; i < n; i++) {
+        const a = (TAU * i) / n + (Math.random() - 0.5) * 0.5, v = 45 + Math.random() * 85;
+        sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, color: i % 2 ? "#ff2a6d" : "#05d5fa" });
+      }
+    }
+
+    /* Mouse / pen */
+    window.addEventListener("pointermove", e => { if (e.pointerType !== "touch") setTarget(e.clientX, e.clientY, e.target); }, { passive: true });
+    window.addEventListener("pointerdown", e => {
+      if (e.pointerType === "touch") return;
+      setTarget(e.clientX, e.clientY, e.target); burst(e.clientX, e.clientY);
+    }, { passive: true });
+
+    /* Touch: touch events keep firing while the page scrolls (pointer events get cancelled),
+       so the scorpion keeps following the finger smoothly during scroll. */
+    const onTouch = (e, tap) => {
+      if (motionOff() || !e.touches.length) return;
+      const t = e.touches[0];
+      setTarget(t.clientX, t.clientY, e.target);
+      if (tap) burst(t.clientX, t.clientY);
+    };
+    window.addEventListener("touchstart", e => onTouch(e, true), { passive: true });
+    window.addEventListener("touchmove", e => onTouch(e, false), { passive: true });
+    window.addEventListener("touchend", () => { hovering = false; }, { passive: true });
+    window.addEventListener("touchcancel", () => { hovering = false; }, { passive: true });
+
+    document.addEventListener("mouseleave", () => { if (!isTouch) { visible = false; canvas.classList.remove("on"); } });
+    document.addEventListener("mouseenter", () => {
+      if (started && !isTouch && !motionOff()) { visible = true; canvas.classList.add("on"); }
+    });
+
+    /* Touch devices have no hover cursor: park the scorpion low-right until the first touch. */
+    if (isTouch && !motionOff()) {
+      started = true;
+      place(Math.max(72, innerWidth - 90), Math.max(110, innerHeight - 160));
+      canvas.classList.add("on");
+    }
+
+    /* ---------- simulation ---------- */
+    function follow(dt) {
+      const px = pointer.x, py = pointer.y;
+      const k = 1 - Math.exp(-dt / FOLLOW_TAU);
+      pointer.x += (pointer.tx - pointer.x) * k;
+      pointer.y += (pointer.ty - pointer.y) * k;
+
+      const moved = Math.hypot(pointer.x - px, pointer.y - py);
+      speed += (moved / Math.max(dt, 0.001) - speed) * Math.min(1, dt * 10);
+
+      /* Leg phase is driven by distance travelled → feet never "skate" or jitter. */
+      walkPhase += moved * 0.3 + dt * 0.35;
+
+      hoverBlend += ((hovering ? 1 : 0) - hoverBlend) * Math.min(1, dt * 10);
+      if (strike > 0) strike = Math.max(0, strike - dt * 3.2);
+      idleFor += dt;
+
+      const head = segs[0];
+      const dx = pointer.x - head.x, dy = pointer.y - head.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 2.5) head.angle = lerpAngle(head.angle, Math.atan2(dy, dx), Math.min(1, dt * (isTouch ? 12 : 16)));
+
+      const off = (10 - strike * 5) * SCALE;
+      const hx = pointer.x - Math.cos(head.angle) * off;
+      const hy = pointer.y - Math.sin(head.angle) * off;
+      const he = 1 - Math.exp(-dt / 0.018);
+      head.x += (hx - head.x) * he;
+      head.y += (hy - head.y) * he;
+
+      for (let i = 1; i < BODY_COUNT; i++) {
+        const lead = segs[i - 1], part = segs[i];
+        const raw = Math.atan2(lead.y - part.y, lead.x - part.x);
+        let diff = angleDiff(lead.angle, raw);
+        const maxBend = 0.46;
+        if (diff > maxBend) diff = maxBend; else if (diff < -maxBend) diff = -maxBend;
+        part.angle = lead.angle + diff;
+        const sp = SPACING + Math.sin(time * 3 - i * 0.4) * 0.2 * SCALE;
+        part.x = lead.x - Math.cos(part.angle) * sp;
+        part.y = lead.y - Math.sin(part.angle) * sp;
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.x += s.vx * dt; s.y += s.vy * dt;
+        const damp = Math.exp(-dt * 5);
+        s.vx *= damp; s.vy *= damp;
+        s.life -= dt * 2.8;
+        if (s.life <= 0) sparks.splice(i, 1);
+      }
+    }
+
+    /* ---------- drawing ---------- */
+    function limb(a, b, ra, rb, color, hi) {
       const dist = Math.hypot(b.x - a.x, b.y - a.y);
       if (dist < 0.1) return;
-      const angle = Math.atan2(b.y - a.y, b.x - a.x);
       ctx.save();
       ctx.translate(a.x, a.y);
-      ctx.rotate(angle);
-      const grad = ctx.createLinearGradient(0, -radiusA, 0, radiusA);
-      grad.addColorStop(0, "#ffd09a");
-      grad.addColorStop(0.18, color);
-      grad.addColorStop(0.56, "#35100d");
-      grad.addColorStop(0.82, "#16090b");
-      grad.addColorStop(1, "#060609");
+      ctx.rotate(Math.atan2(b.y - a.y, b.x - a.x));
+      if (FANCY) {
+        const g = ctx.createLinearGradient(0, -ra, 0, ra);
+        g.addColorStop(0, "#ffd09a"); g.addColorStop(0.18, color); g.addColorStop(0.56, "#35100d");
+        g.addColorStop(0.82, "#16090b"); g.addColorStop(1, "#060609");
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = color;
       ctx.strokeStyle = "rgba(255,133,96,.86)";
       ctx.lineWidth = 0.8;
-      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.moveTo(0, -radiusA);
-      ctx.lineTo(dist, -radiusB);
-      ctx.quadraticCurveTo(dist + 2, 0, dist, radiusB);
-      ctx.lineTo(0, radiusA);
-      ctx.quadraticCurveTo(-2, 0, 0, -radiusA);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.strokeStyle = highlight;
-      ctx.globalAlpha = 0.55;
-      ctx.lineWidth = 0.7;
-      ctx.beginPath();
-      ctx.moveTo(2, -radiusA * 0.45);
-      ctx.quadraticCurveTo(dist * 0.5, -radiusA * 0.65, Math.max(2, dist - 2), -radiusB * 0.45);
-      ctx.stroke();
+      ctx.moveTo(0, -ra); ctx.lineTo(dist, -rb);
+      ctx.quadraticCurveTo(dist + 2, 0, dist, rb);
+      ctx.lineTo(0, ra);
+      ctx.quadraticCurveTo(-2, 0, 0, -ra);
+      ctx.fill(); ctx.stroke();
+      if (FANCY) {
+        ctx.strokeStyle = hi || "rgba(255,190,130,.75)";
+        ctx.globalAlpha = 0.55; ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(2, -ra * 0.45);
+        ctx.quadraticCurveTo(dist * 0.5, -ra * 0.65, Math.max(2, dist - 2), -rb * 0.45);
+        ctx.stroke();
+      }
       ctx.restore();
     }
 
-    function drawJoint(x, y, radius = 2.2) {
-      const g = ctx.createRadialGradient(x - 0.8, y - 1, 0.2, x, y, radius * 1.6);
-      g.addColorStop(0, "#ffd6a4");
-      g.addColorStop(0.35, "#a74832");
-      g.addColorStop(1, "#17090b");
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255,151,112,.7)";
-      ctx.lineWidth = 0.7;
-      ctx.stroke();
+    function joint(x, y, r) {
+      if (FANCY) {
+        const g = ctx.createRadialGradient(x - 0.8, y - 1, 0.2, x, y, r * 1.6);
+        g.addColorStop(0, "#ffd6a4"); g.addColorStop(0.35, "#a74832"); g.addColorStop(1, "#17090b");
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = "#a74832";
+      ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+      if (FANCY) { ctx.strokeStyle = "rgba(255,151,112,.7)"; ctx.lineWidth = 0.7; ctx.stroke(); }
     }
 
     function drawLegs() {
-      const moveFactor = Math.min(currentSpeed / 90, 1);
+      const mf = Math.min(speed / 90, 1);
       [2, 4, 6, 8].forEach((index, pair) => {
-        const anchor = segments[index];
-        const heading = anchor.angle;
+        const anchor = segs[index], heading = anchor.angle;
         for (const side of [-1, 1]) {
-          // Alternating tetrapod arachnid gait
           const phase = walkPhase + pair * 1.55 + (side < 0 ? Math.PI : 0);
-          const stride = Math.sin(phase) * (0.45 * moveFactor + 0.03 * Math.sin(time * 2 + pair));
-          const lift = Math.max(0, Math.cos(phase)) * 2.2 * moveFactor;
-
-          const hipAngle = heading + side * (0.85 + stride * 0.22);
-          const knee = point(anchor.x, anchor.y, hipAngle, 8.5 + pair * 0.35 - lift * 0.3);
-          const foot = point(knee.x, knee.y, heading + side * (1.82 + stride * 0.9), 13.2 + pair * 0.45 + lift * 0.5);
-          const toe = point(foot.x, foot.y, heading + side * 1.3, 3.4);
-
-          drawLimbSegment(anchor, knee, 2.2, 1.45, "#7f3028");
-          drawJoint(knee.x, knee.y, 1.8);
-          drawLimbSegment(knee, foot, 1.5, 0.9, "#a34a35");
-          drawJoint(foot.x, foot.y, 1.2);
-          drawLimbSegment(foot, toe, 0.9, 0.35, "#d07956");
+          const stride = Math.sin(phase) * (0.45 * mf + 0.03 * Math.sin(time * 2 + pair));
+          const lift = Math.max(0, Math.cos(phase)) * 2.2 * mf;
+          const knee = pt(anchor.x, anchor.y, heading + side * (0.85 + stride * 0.22), (8.5 + pair * 0.35 - lift * 0.3) * SCALE);
+          const foot = pt(knee.x, knee.y, heading + side * (1.82 + stride * 0.9), (13.2 + pair * 0.45 + lift * 0.5) * SCALE);
+          const toe = pt(foot.x, foot.y, heading + side * 1.3, 3.4 * SCALE);
+          limb(anchor, knee, 2.2 * SCALE, 1.45 * SCALE, "#7f3028");
+          joint(knee.x, knee.y, 1.8 * SCALE);
+          limb(knee, foot, 1.5 * SCALE, 0.9 * SCALE, "#a34a35");
+          joint(foot.x, foot.y, 1.2 * SCALE);
+          limb(foot, toe, 0.9 * SCALE, 0.35 * SCALE, "#d07956");
         }
       });
     }
 
     function drawClaws() {
-      const head = segments[0];
-      const heading = head.angle;
-      const strikeReach = Math.sin(strikeProgress * Math.PI);
-
+      const head = segs[0], heading = head.angle, reach = Math.sin(strike * Math.PI);
       for (const side of [-1, 1]) {
-        const spread = 0.78 + hoverBlend * 0.14 - strikeReach * 0.28;
-        const shoulder = point(head.x, head.y, heading + side * spread, 5.8);
-        const elbow = point(shoulder.x, shoulder.y, heading + side * (0.88 - strikeReach * 0.32), 9.2 + strikeReach * 3.2);
-        const palm = point(elbow.x, elbow.y, heading + side * (0.42 - strikeReach * 0.22), 8.2 + strikeReach * 2.5);
-
-        drawLimbSegment(shoulder, elbow, 2.8, 2.2, "#a54532");
-        drawJoint(elbow.x, elbow.y, 2.3);
-        drawLimbSegment(elbow, palm, 3.3, 4.1, "#b84e37");
+        const spread = 0.78 + hoverBlend * 0.14 - reach * 0.28;
+        const shoulder = pt(head.x, head.y, heading + side * spread, 5.8 * SCALE);
+        const elbow = pt(shoulder.x, shoulder.y, heading + side * (0.88 - reach * 0.32), (9.2 + reach * 3.2) * SCALE);
+        const palm = pt(elbow.x, elbow.y, heading + side * (0.42 - reach * 0.22), (8.2 + reach * 2.5) * SCALE);
+        limb(shoulder, elbow, 2.8 * SCALE, 2.2 * SCALE, "#a54532");
+        joint(elbow.x, elbow.y, 2.3 * SCALE);
+        limb(elbow, palm, 3.3 * SCALE, 4.1 * SCALE, "#b84e37");
 
         ctx.save();
         ctx.translate(palm.x, palm.y);
-        ctx.rotate(heading + side * (0.42 - strikeReach * 0.25));
-
-        const clawGrad = ctx.createLinearGradient(0, -5, 0, 5);
-        clawGrad.addColorStop(0, "#ffd09a");
-        clawGrad.addColorStop(0.2, "#a94734");
-        clawGrad.addColorStop(0.65, "#35100d");
-        clawGrad.addColorStop(1, "#11090b");
-        ctx.fillStyle = clawGrad;
+        ctx.rotate(heading + side * (0.42 - reach * 0.25));
+        ctx.scale(SCALE, SCALE);
+        if (FANCY) {
+          const g = ctx.createLinearGradient(0, -5, 0, 5);
+          g.addColorStop(0, "#ffd09a"); g.addColorStop(0.2, "#a94734"); g.addColorStop(0.65, "#35100d"); g.addColorStop(1, "#11090b");
+          ctx.fillStyle = g;
+        } else ctx.fillStyle = "#8a3a2b";
         ctx.strokeStyle = hoverBlend > 0.3 ? "#ff8c6b" : "#e57c58";
         ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(1, 0, 6, 4.5, 0, 0, TAU); ctx.fill(); ctx.stroke();
 
-        ctx.beginPath();
-        ctx.ellipse(1, 0, 6, 4.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        // Pincers open wider on interactive elements and snap shut on click
-        const baseOpen = 0.2 + (Math.sin(time * 2.5) + 1) * 0.05 + hoverBlend * 0.24;
-        const open = Math.max(0.02, baseOpen * (1 - strikeReach * 0.95));
-
-        [-1, 1].forEach(fingerSide => {
+        const open = Math.max(0.02, (0.2 + (Math.sin(time * 2.5) + 1) * 0.05 + hoverBlend * 0.24) * (1 - reach * 0.95));
+        [-1, 1].forEach(f => {
           ctx.beginPath();
-          ctx.moveTo(5, fingerSide * 2.1);
-          ctx.quadraticCurveTo(11.5, fingerSide * (3.1 + open * 5.2), 15.5, fingerSide * (1.2 + open * 6.8));
-          ctx.quadraticCurveTo(10.5, fingerSide * 0.2, 5, fingerSide * -0.3);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
+          ctx.moveTo(5, f * 2.1);
+          ctx.quadraticCurveTo(11.5, f * (3.1 + open * 5.2), 15.5, f * (1.2 + open * 6.8));
+          ctx.quadraticCurveTo(10.5, f * 0.2, 5, f * -0.3);
+          ctx.closePath(); ctx.fill(); ctx.stroke();
         });
         ctx.restore();
       }
@@ -2362,209 +1302,150 @@
 
     function drawBody() {
       for (let i = BODY_COUNT - 1; i >= 0; i--) {
-        const p = segments[i];
-        const angle = p.angle;
-        const abdomenRadius = i < 3 ? 6.6 + i * 0.45 : Math.max(2.6, 6.8 - (i - 3) * 0.42);
-        const length = i < 3 ? 7.6 : 6.9;
-
+        const p = segs[i];
+        const r = (i < 3 ? 6.6 + i * 0.45 : Math.max(2.6, 6.8 - (i - 3) * 0.42)) * SCALE;
+        const len = (i < 3 ? 7.6 : 6.9) * SCALE;
         ctx.save();
         ctx.translate(p.x, p.y);
-        ctx.rotate(angle);
-
-        const shell = ctx.createLinearGradient(0, -abdomenRadius, 0, abdomenRadius);
-        shell.addColorStop(0, "#ffc48b");
-        shell.addColorStop(0.14, "#9e3c2d");
-        shell.addColorStop(0.48, "#4a1714");
-        shell.addColorStop(0.8, "#210c10");
-        shell.addColorStop(1, "#08070a");
-
-        ctx.fillStyle = shell;
+        ctx.rotate(p.angle);
+        if (FANCY) {
+          const g = ctx.createLinearGradient(0, -r, 0, r);
+          g.addColorStop(0, "#ffc48b"); g.addColorStop(0.14, "#9e3c2d"); g.addColorStop(0.48, "#4a1714");
+          g.addColorStop(0.8, "#210c10"); g.addColorStop(1, "#08070a");
+          ctx.fillStyle = g;
+        } else ctx.fillStyle = "#5a1d18";
         ctx.strokeStyle = "rgba(255,143,103,.86)";
         ctx.lineWidth = 0.9;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, length, abdomenRadius, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.strokeStyle = "rgba(255,207,158,.55)";
-        ctx.lineWidth = 0.75;
-        ctx.beginPath();
-        ctx.ellipse(-1, -abdomenRadius * 0.2, length * 0.62, abdomenRadius * 0.36, -0.08, Math.PI, Math.PI * 1.88);
-        ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(0, 0, len, r, 0, 0, TAU); ctx.fill(); ctx.stroke();
+        if (FANCY) {
+          ctx.strokeStyle = "rgba(255,207,158,.55)"; ctx.lineWidth = 0.75;
+          ctx.beginPath(); ctx.ellipse(-1, -r * 0.2, len * 0.62, r * 0.36, -0.08, Math.PI, Math.PI * 1.88); ctx.stroke();
+        }
         ctx.restore();
       }
     }
 
     function drawHead() {
-      const head = segments[0];
-      const heading = head.angle;
+      const head = segs[0];
       ctx.save();
       ctx.translate(head.x, head.y);
-      ctx.rotate(heading);
-
-      const shell = ctx.createRadialGradient(-2, -3, 1, 0, 0, 8.5);
-      shell.addColorStop(0, "#ffd5a1");
-      shell.addColorStop(0.22, "#b94b35");
-      shell.addColorStop(0.7, "#431411");
-      shell.addColorStop(1, "#10090b");
-
-      ctx.fillStyle = shell;
+      ctx.rotate(head.angle);
+      ctx.scale(SCALE, SCALE);
+      if (FANCY) {
+        const g = ctx.createRadialGradient(-2, -3, 1, 0, 0, 8.5);
+        g.addColorStop(0, "#ffd5a1"); g.addColorStop(0.22, "#b94b35"); g.addColorStop(0.7, "#431411"); g.addColorStop(1, "#10090b");
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = "#7a2c20";
       ctx.strokeStyle = "#ff9d6e";
       ctx.lineWidth = 1.1;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 7.4, 6.2, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      // Glowing eyes (shift to cyan when hovering interactive elements)
+      ctx.beginPath(); ctx.ellipse(0, 0, 7.4, 6.2, 0, 0, TAU); ctx.fill(); ctx.stroke();
       ctx.fillStyle = hoverBlend > 0.5 ? "#05d5fa" : "#fff0c4";
-      [-1, 1].forEach(side => {
-        ctx.beginPath();
-        ctx.arc(4.2, side * 2.5, 0.95, 0, Math.PI * 2);
-        ctx.fill();
-      });
+      [-1, 1].forEach(s => { ctx.beginPath(); ctx.arc(4.2, s * 2.5, 0.95, 0, TAU); ctx.fill(); });
       ctx.restore();
-
       drawClaws();
     }
 
     function drawStinger() {
-      const anchor = segments[BODY_COUNT - 1];
-      const heading = anchor.angle;
+      const anchor = segs[BODY_COUNT - 1], heading = anchor.angle;
       const wag = Math.sin(time * 2.4) * 0.08;
-      const strikeWhip = Math.sin(strikeProgress * Math.PI);
-
-      // Tail curls forward over the back when striking or hovering links
-      const alertCurl = hoverBlend * 0.28 + strikeWhip * 1.45;
-      const bends = [
-        -2.75 + alertCurl * 0.45,
-        -2.20 + alertCurl * 0.65,
-        -1.58 + alertCurl * 0.85,
-        -0.96 + alertCurl * 1.05,
-        -0.44 + alertCurl * 1.25
-      ];
-      const lengths = [11.5, 11.5, 10.8, 10, 9.2];
-      const radii = [4.9, 4.3, 3.7, 3.0, 2.3];
+      const whip = Math.sin(strike * Math.PI);
+      const curl = hoverBlend * 0.28 + whip * 1.45;
+      const bends = [-2.75 + curl * 0.45, -2.2 + curl * 0.65, -1.58 + curl * 0.85, -0.96 + curl * 1.05, -0.44 + curl * 1.25];
+      const lens = [11.5, 11.5, 10.8, 10, 9.2];
+      const rads = [4.9, 4.3, 3.7, 3.0, 2.3];
 
       let start = { x: anchor.x, y: anchor.y };
-      bends.forEach((bend, index) => {
-        const segAngle = heading + bend + wag * ((index + 1) / bends.length);
-        const end = point(start.x, start.y, segAngle, lengths[index] + strikeWhip * 2.4);
-        drawLimbSegment(start, end, radii[index], radii[index] * 0.78, "#8c3027", "rgba(255,196,145,.9)");
-        drawJoint(start.x, start.y, 2.1 - index * 0.16);
+      bends.forEach((bend, i) => {
+        const a = heading + bend + wag * ((i + 1) / bends.length);
+        const end = pt(start.x, start.y, a, (lens[i] + whip * 2.4) * SCALE);
+        limb(start, end, rads[i] * SCALE, rads[i] * 0.78 * SCALE, "#8c3027", "rgba(255,196,145,.9)");
+        joint(start.x, start.y, (2.1 - i * 0.16) * SCALE);
         start = end;
       });
 
-      const stingAngle = heading - 0.08 + wag + alertCurl * 1.35;
-      const tip = point(start.x, start.y, stingAngle, 11.5 + strikeWhip * 3);
-      const barbSide = point(start.x, start.y, stingAngle + 0.92, 4.2);
-
-      const sting = ctx.createLinearGradient(start.x, start.y, tip.x, tip.y);
-      sting.addColorStop(0, "#ffc991");
-      sting.addColorStop(0.35, strikeWhip > 0.2 ? "#ff2a6d" : "#d74c32");
-      sting.addColorStop(1, "#260b10");
-
-      ctx.fillStyle = sting;
-      ctx.strokeStyle = strikeWhip > 0.2 || hoverBlend > 0.5 ? "#05d5fa" : "#ffad78";
+      const sa = heading - 0.08 + wag + curl * 1.35;
+      const tip = pt(start.x, start.y, sa, (11.5 + whip * 3) * SCALE);
+      const barb = pt(start.x, start.y, sa + 0.92, 4.2 * SCALE);
+      if (FANCY) {
+        const g = ctx.createLinearGradient(start.x, start.y, tip.x, tip.y);
+        g.addColorStop(0, "#ffc991"); g.addColorStop(0.35, whip > 0.2 ? "#ff2a6d" : "#d74c32"); g.addColorStop(1, "#260b10");
+        ctx.fillStyle = g;
+      } else ctx.fillStyle = whip > 0.2 ? "#ff2a6d" : "#d74c32";
+      ctx.strokeStyle = whip > 0.2 || hoverBlend > 0.5 ? "#05d5fa" : "#ffad78";
       ctx.lineWidth = 0.85;
       ctx.beginPath();
       ctx.moveTo(start.x - Math.cos(heading) * 2, start.y - Math.sin(heading) * 2);
-      ctx.quadraticCurveTo(barbSide.x, barbSide.y, tip.x, tip.y);
-      ctx.quadraticCurveTo(barbSide.x - Math.cos(heading) * 2, barbSide.y - Math.sin(heading) * 2, start.x, start.y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
+      ctx.quadraticCurveTo(barb.x, barb.y, tip.x, tip.y);
+      ctx.quadraticCurveTo(barb.x - Math.cos(heading) * 2, barb.y - Math.sin(heading) * 2, start.x, start.y);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
 
-      // Glowing venom drop at stinger tip when hovering or striking
-      if (hoverBlend > 0.1 || strikeWhip > 0.1) {
+      if (hoverBlend > 0.1 || whip > 0.1) {
         ctx.save();
-        ctx.fillStyle = strikeWhip > 0.2 ? "#ff2a6d" : "#05d5fa";
-        ctx.globalAlpha = Math.min(1, hoverBlend * 0.85 + strikeWhip);
-        ctx.beginPath();
-        ctx.arc(tip.x, tip.y, 1.8 + strikeWhip * 1.5, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillStyle = whip > 0.2 ? "#ff2a6d" : "#05d5fa";
+        ctx.globalAlpha = Math.min(1, hoverBlend * 0.85 + whip);
+        ctx.beginPath(); ctx.arc(tip.x, tip.y, 1.8 + whip * 1.5, 0, TAU); ctx.fill();
         ctx.restore();
       }
     }
 
-    function drawTargetReticle() {
-      // Precision cursor dot at exact pointer coordinates so clicking small UI controls is effortless
+    function drawReticle() {
+      /* Desktop: dot sits exactly on the real mouse position so clicks stay precise.
+         Mobile: dot follows the smoothed position so it doesn't jitter against the finger. */
+      const rx = isTouch ? pointer.x : pointer.tx, ry = isTouch ? pointer.y : pointer.ty;
       ctx.save();
-      const r = 2.5 + hoverBlend * 2.5 - strikeProgress * 1.2;
       ctx.fillStyle = hoverBlend > 0.5 ? "#05d5fa" : "#ff2a6d";
-      ctx.beginPath();
-      ctx.arc(pointer.tx, pointer.ty, Math.max(1.5, r), 0, Math.PI * 2);
-      ctx.fill();
-
-      if (hoverBlend > 0.05 || strikeProgress > 0.05) {
-        ctx.strokeStyle = hoverBlend > 0.5 ? "rgba(5, 213, 250, 0.65)" : "rgba(255, 42, 109, 0.65)";
+      ctx.beginPath(); ctx.arc(rx, ry, Math.max(1.5, 2.5 + hoverBlend * 2.5 - strike * 1.2), 0, TAU); ctx.fill();
+      if (hoverBlend > 0.05 || strike > 0.05) {
+        ctx.strokeStyle = hoverBlend > 0.5 ? "rgba(5,213,250,.65)" : "rgba(255,42,109,.65)";
         ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.arc(pointer.tx, pointer.ty, 7 + hoverBlend * 5 + strikeProgress * 8, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.beginPath(); ctx.arc(rx, ry, 7 + hoverBlend * 5 + strike * 8, 0, TAU); ctx.stroke();
       }
       ctx.restore();
-
-      // Render click sparks
-      sparks.forEach(sp => {
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, sp.life);
-        ctx.fillStyle = sp.color;
-        ctx.beginPath();
-        ctx.arc(sp.x, sp.y, 1.8 * sp.life, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+      sparks.forEach(s => {
+        ctx.globalAlpha = Math.max(0, s.life);
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(s.x, s.y, 1.8 * s.life, 0, TAU); ctx.fill();
       });
+      ctx.globalAlpha = 1;
     }
 
-    function drawScorpion() {
-      ctx.save();
-      ctx.globalCompositeOperation = "source-over";
-      drawTargetReticle();
-      drawLegs();
-      drawBody();
-      drawHead();
-      // Draw stinger last so it arches cleanly over the carapace in 3D space
-      drawStinger();
-      ctx.restore();
-    }
-
-    function animate(now) {
-      requestAnimationFrame(animate);
+    function frame(now) {
+      requestAnimationFrame(frame);
       if (motionOff() || document.hidden || !started || !visible) {
         lastTime = now;
-        if (motionOff()) {
-          canvas.classList.remove("on");
-          document.documentElement.classList.remove("scorpion-ready");
-        }
+        if (motionOff()) { canvas.classList.remove("on"); document.documentElement.classList.remove("scorpion-ready"); }
         return;
       }
-
       canvas.classList.add("on");
-      document.documentElement.classList.add("scorpion-ready");
+      if (!isTouch) document.documentElement.classList.add("scorpion-ready");
 
-      const dt = Math.min(Math.max((now - (lastTime || now)) / 1000, 0.001), 0.04);
-      lastTime = now;
-      time += dt;
+      const dt = Math.min(Math.max((now - (lastTime || now)) / 1000, 0.001), MAX_DT);
+      lastTime = now; time += dt;
 
       follow(dt);
       ctx.clearRect(0, 0, width, height);
 
-      const halo = ctx.createRadialGradient(pointer.x, pointer.y, 1, pointer.x, pointer.y, 82);
-      halo.addColorStop(0, hoverBlend > 0.5 ? "rgba(5, 213, 250, 0.12)" : "rgba(255, 76, 35, 0.11)");
-      halo.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = halo;
-      ctx.fillRect(pointer.x - 82, pointer.y - 82, 164, 164);
+      if (FANCY) {
+        const halo = ctx.createRadialGradient(pointer.x, pointer.y, 1, pointer.x, pointer.y, 82);
+        halo.addColorStop(0, hoverBlend > 0.5 ? "rgba(5,213,250,.12)" : "rgba(255,76,35,.11)");
+        halo.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = halo;
+        ctx.fillRect(pointer.x - 82, pointer.y - 82, 164, 164);
+      }
 
-      drawScorpion();
+      drawReticle();
+      drawLegs();
+      drawBody();
+      drawHead();
+      drawStinger();
     }
 
     resize();
-    requestAnimationFrame(animate);
+    requestAnimationFrame(frame);
   })();
   </script>
 
-  <!-- 3D companion loaded from the supplied GLB model -->
+  <!-- ================= 3D AVATAR (preview.glb) ================= -->
   <script type="importmap">
     {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
   </script>
