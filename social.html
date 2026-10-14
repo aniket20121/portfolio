@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Realtime relay client (no account / no setup needed) -->
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; }
   body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#05050a; color:#fff; }
@@ -49,7 +51,7 @@
     .mobile-frame { max-width:420px !important; height:94dvh !important; margin:3dvh auto !important; border-radius:46px;
       border:1.5px solid rgba(255,255,255,.28); box-shadow:0 30px 90px rgba(0,0,0,.85), 0 0 0 8px rgba(255,255,255,.04), inset 0 1px 2px rgba(255,255,255,.45); }
   }
-  input { -webkit-user-select:text; user-select:text; font-size:16px; } /* 16px stops iOS zoom on focus */
+  input { -webkit-user-select:text; user-select:text; font-size:16px; }
   #toast { transition:opacity .25s, transform .25s; }
 </style>
 </head>
@@ -60,7 +62,7 @@
 <div class="mobile-frame relative z-10 w-full flex flex-col overflow-hidden bg-black/20 backdrop-blur-md">
 
   <!-- Status bar -->
-  <div class="pt-2 pb-1 px-6 flex items-center justify-between text-[11px] font-semibold tracking-wide text-white/80 shrink-0" style="padding-top:max(.5rem, env(safe-area-inset-top))">
+  <div class="pb-1 px-6 flex items-center justify-between text-[11px] font-semibold tracking-wide text-white/80 shrink-0" style="padding-top:max(.5rem, env(safe-area-inset-top))">
     <span id="clockTime">9:41</span>
     <div class="h-5 px-3 rounded-full bg-black/70 border border-white/15 flex items-center justify-center gap-1.5 shadow-inner">
       <span id="liveDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -79,7 +81,7 @@
       <div class="min-w-0">
         <div class="flex items-center gap-1.5">
           <h1 class="font-bold text-sm tracking-tight text-white">Public Lounge</h1>
-          <span class="px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-white/15 border border-white/20 text-pink-200">GLOBAL</span>
+          <span id="roomBadge" class="px-1.5 py-0.5 text-[9px] font-semibold rounded-full bg-white/15 border border-white/20 text-pink-200 truncate max-w-[90px]">GLOBAL</span>
         </div>
         <p class="text-[11px] text-white/70 flex items-center gap-1.5 whitespace-nowrap">
           <span id="onlineCountText">Connecting...</span><span>•</span><span class="text-white/50">Double-tap to ❤️</span>
@@ -88,7 +90,7 @@
     </div>
     <div class="flex items-center gap-1.5 shrink-0">
       <button id="soundToggleBtn" class="w-9 h-9 rounded-full liquid-pill flex items-center justify-center text-white/85 active:scale-90 transition-all" title="Toggle Sound"><i id="soundIcon" class="fa-solid fa-volume-high text-xs"></i></button>
-      <button id="infoModalBtn" class="w-9 h-9 rounded-full liquid-pill flex items-center justify-center text-white/85 active:scale-90 transition-all" title="About"><i class="fa-solid fa-wand-magic-sparkles text-xs"></i></button>
+      <button id="infoModalBtn" class="w-9 h-9 rounded-full liquid-pill flex items-center justify-center text-white/85 active:scale-90 transition-all" title="Room & privacy"><i class="fa-solid fa-shield-halved text-xs"></i></button>
     </div>
   </header>
 
@@ -103,8 +105,8 @@
       <div class="w-12 h-12 rounded-3xl liquid-pill flex items-center justify-center mb-3 animate-bounce">
         <i class="fa-brands fa-instagram text-2xl bg-gradient-to-tr from-amber-300 via-pink-500 to-purple-500 bg-clip-text text-transparent"></i>
       </div>
-      <p class="text-sm font-medium text-white/85">Opening Liquid Glass Stream...</p>
-      <p class="text-xs text-white/50 mt-1">Syncing live public messages</p>
+      <p class="text-sm font-medium text-white/85">Joining the lounge...</p>
+      <p class="text-xs text-white/50 mt-1">Connecting anonymously</p>
     </div>
     <div id="messagesList" class="space-y-3 pb-3 hidden"></div>
   </main>
@@ -113,7 +115,7 @@
     <span>New messages</span><i class="fa-solid fa-arrow-down text-[10px]"></i>
   </button>
 
-  <div id="toast" class="pointer-events-none absolute top-24 left-1/2 -translate-x-1/2 z-[60] opacity-0 -translate-y-2 liquid-glass-heavy px-4 py-2 rounded-full text-xs text-white whitespace-nowrap max-w-[90%] truncate"></div>
+  <div id="toast" class="pointer-events-none absolute top-24 left-1/2 -translate-x-1/2 z-[60] opacity-0 -translate-y-2 liquid-glass-heavy px-4 py-2 rounded-full text-xs text-white max-w-[92%] text-center"></div>
 
   <!-- Reply bar -->
   <div id="replyPreviewBar" class="hidden mx-3.5 mb-1.5 px-3.5 py-2 rounded-2xl liquid-glass flex items-center justify-between text-xs z-20">
@@ -151,14 +153,15 @@
       <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 p-0.5 shadow-xl">
         <div id="selectedAvatarPreview" class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-3xl">⚡</div>
       </div>
-      <h2 class="text-lg font-bold text-white">Your InstaGlass Identity</h2>
-      <p class="text-xs text-white/65 mt-0.5 mb-4">Visible to everyone in the Public Lounge. Don't share personal info with strangers.</p>
+      <h2 class="text-lg font-bold text-white">Your Anonymous Identity</h2>
+      <p class="text-xs text-white/65 mt-0.5 mb-4">No sign-up, no real name. Use any nickname. Others only see this.</p>
 
       <div class="text-left mb-4">
-        <label class="text-[11px] font-semibold uppercase tracking-wider text-white/60 ml-2">Display Handle</label>
-        <div id="usernameWrap" class="liquid-pill rounded-2xl px-3.5 py-2.5 mt-1 flex items-center gap-2">
+        <label class="text-[11px] font-semibold uppercase tracking-wider text-white/60 ml-2">Nickname</label>
+        <div class="liquid-pill rounded-2xl px-3.5 py-2.5 mt-1 flex items-center gap-2">
           <span class="text-white/50 font-semibold text-sm">@</span>
           <input id="usernameInput" type="text" maxlength="18" autocapitalize="off" autocomplete="off" placeholder="your_name" class="bg-transparent w-full text-white font-medium focus:outline-none" />
+          <button type="button" id="shuffleNameBtn" title="Random nickname" class="text-white/70 active:scale-90 transition-transform"><i class="fa-solid fa-dice"></i></button>
         </div>
         <p id="usernameError" class="hidden text-[11px] text-red-300 ml-2 mt-1">Use 2–18 letters, numbers or underscores.</p>
       </div>
@@ -176,95 +179,91 @@
       </div>
 
       <button id="saveProfileBtn" type="button" class="w-full py-3 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-bold text-sm shadow-xl active:scale-95 transition-transform">Enter Public Chat</button>
+      <button id="newIdentityBtn" type="button" class="mt-3 text-[11px] text-white/60 underline underline-offset-2">Start fresh with a brand-new anonymous ID</button>
     </div>
   </div>
 
-  <!-- Info modal -->
-  <div id="infoModal" class="hidden absolute inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-5">
+  <!-- Room / privacy modal -->
+  <div id="infoModal" class="hidden absolute inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-5 overflow-y-auto">
     <div class="liquid-glass-heavy w-full max-w-sm rounded-[32px] p-6 relative pop-in">
       <button id="closeInfoModalBtn" class="absolute top-4 right-4 w-8 h-8 rounded-full liquid-pill flex items-center justify-center text-white/70"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 to-indigo-500 flex items-center justify-center text-lg shadow-md"><i class="fa-solid fa-layer-group"></i></div>
-        <div><h3 class="font-bold text-base text-white">InstaGlass</h3><p class="text-[11px] text-pink-300">Meet &amp; chat with strangers, live</p></div>
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 to-indigo-500 flex items-center justify-center text-lg shadow-md"><i class="fa-solid fa-user-secret"></i></div>
+        <div><h3 class="font-bold text-base text-white">Room &amp; Privacy</h3><p id="roomLabel" class="text-[11px] text-pink-300">Public room</p></div>
       </div>
       <ul class="text-xs text-white/80 space-y-2.5 my-4">
-        <li class="flex items-start gap-2"><i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i><span><strong>One public room:</strong> everyone who opens the app joins the same live chat. No sign-up.</span></li>
-        <li class="flex items-start gap-2"><i class="fa-solid fa-heart text-pink-400 mt-0.5"></i><span><strong>Reactions:</strong> double-tap a bubble to like it, or tap Reply to answer someone.</span></li>
-        <li class="flex items-start gap-2"><i class="fa-solid fa-shield-halved text-sky-400 mt-0.5"></i><span><strong>Stay safe:</strong> be kind, and never share your real name, address, phone or passwords.</span></li>
+        <li class="flex items-start gap-2"><i class="fa-solid fa-user-secret text-emerald-400 mt-0.5"></i><span><b>Anonymous by design:</b> no login, no name, no phone. You get a random ID and nickname. Other users never see your IP or device.</span></li>
+        <li class="flex items-start gap-2"><i class="fa-solid fa-ban text-pink-400 mt-0.5"></i><span><b>Auto-protection:</b> emails and phone numbers are blocked from being sent. Links are never clickable.</span></li>
+        <li class="flex items-start gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-300 mt-0.5"></i><span><b>Still public:</b> anyone in the room can read messages, so never share real details. Use <b>Block</b> under a message to hide a person.</span></li>
       </ul>
-      <div class="p-3 rounded-2xl liquid-glass text-[11px] text-white/70 flex items-center justify-between gap-2">
-        <span class="shrink-0">Your ID:</span>
-        <code id="displayUserId" class="text-pink-300 font-mono text-[10px] truncate">Signing in...</code>
+      <div class="space-y-2">
+        <button id="copyInviteBtn" type="button" class="w-full py-2.5 rounded-2xl liquid-pill text-xs font-semibold active:scale-95 transition-transform"><i class="fa-solid fa-link mr-1.5"></i>Copy invite link</button>
+        <button id="privateRoomBtn" type="button" class="w-full py-2.5 rounded-2xl liquid-pill text-xs font-semibold active:scale-95 transition-transform"><i class="fa-solid fa-lock mr-1.5"></i>Start a private room for friends</button>
+        <button id="clearBlockedBtn" type="button" class="hidden w-full py-2.5 rounded-2xl liquid-pill text-xs font-semibold active:scale-95 transition-transform"></button>
+      </div>
+      <div class="mt-3 p-3 rounded-2xl liquid-glass text-[11px] text-white/70 flex items-center justify-between gap-2">
+        <span class="shrink-0">Anonymous ID:</span>
+        <code id="displayUserId" class="text-pink-300 font-mono text-[10px] truncate"></code>
       </div>
     </div>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit, arrayUnion, arrayRemove }
-  from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
 // =====================================================================
-// 0. FIREBASE SETUP  —  paste YOUR config here (see setup steps below)
-//    Firebase console → Project settings → Your apps → Web app → Config
-// =====================================================================
-const FIREBASE_CONFIG = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
-  messagingSenderId: "PASTE",
-  appId: "PASTE"
-};
-
-// =====================================================================
-// 1. STATE
+// 1. CONFIG & STATE
 // =====================================================================
 const AVATAR_OPTIONS = ["⚡","🦊","🚀","🌸","🎧","🐱","🔥","💎","🌊","🍕","👾","🦋"];
 const VIBE_STICKERS = ["✨ Sending good vibes only! ✨","🚀 To the moon fam!","🔥 This chat is officially lit!","🎧 Listening to lo-fi beats right now","👋 Hey everyone in the Public Lounge!"];
-const MAX_MESSAGES = 150;          // how many recent messages to load
-const ONLINE_WINDOW_MS = 90000;    // user counts as online if seen in the last 90s
-const HEARTBEAT_MS = 30000;
-const SEND_COOLDOWN_MS = 700;      // basic anti-spam
+const ADJ = ["swift","cosmic","lucky","neon","quiet","wild","happy","sunny","brave","lazy","fuzzy","tiny"];
+const ANIMAL = ["fox","panda","otter","owl","koala","lynx","moth","crow","gecko","yak","wolf","seal"];
+
+// Free public MQTT-over-WebSocket relays (tried in order). No account needed.
+const BROKERS = ["wss://broker.emqx.io:8084/mqtt", "wss://broker.hivemq.com:8884/mqtt", "wss://test.mosquitto.org:8081"];
+
+const MAX_LEN = 350, MAX_MESSAGES = 200, HISTORY_ON_JOIN = 50;
+const HEARTBEAT_MS = 15000, PRESENCE_TTL = 50000, SEND_COOLDOWN_MS = 700;
+
+const ROOM = (location.hash.slice(1).toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 24)) || 'lounge';
+const TOPIC = `instaglass-v1/${ROOM}`;
+
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const randHandle = () => `${pick(ADJ)}_${pick(ANIMAL)}_${100 + Math.floor(Math.random() * 900)}`;
+const randId = () => { const a = new Uint8Array(9); crypto.getRandomValues(a); return Array.from(a, b => b.toString(36).padStart(2, '0')).join('').slice(0, 12); };
 
 const store = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
                 set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
 
 const saved = store.get('instaglass_profile');
 let myProfile = {
-  username: saved?.username || "guest_" + Math.floor(100 + Math.random() * 899),
-  avatar:   saved?.avatar   || AVATAR_OPTIONS[Math.floor(Math.random() * AVATAR_OPTIONS.length)],
-  note:     saved?.note     || "Chilling in Lounge ✨"
+  username: saved?.username || randHandle(),
+  avatar: AVATAR_OPTIONS.includes(saved?.avatar) ? saved.avatar : pick(AVATAR_OPTIONS),
+  note: saved?.note || "Chilling in Lounge ✨"
 };
-let localId = store.get('instaglass_local_id') || ('u_' + Math.random().toString(36).slice(2, 10));
-store.set('instaglass_local_id', localId);
+let me = store.get('instaglass_uid');
+if (typeof me !== 'string' || !/^[A-Za-z0-9_-]{4,24}$/.test(me)) { me = randId(); store.set('instaglass_uid', me); }
+const blocked = new Set(store.get('instaglass_blocked') || []);
 
-let mode = 'connecting';           // 'cloud' | 'local' | 'connecting'
-let db = null, currentUser = null;
-let base = [];                     // Firestore path prefix
+let mode = 'connecting';            // 'live' | 'local' | 'connecting'
+let client = null, channel = null;
 let messagesCache = [];
-let activeUsersMap = new Map();
-let replyContext = null;
-let soundEnabled = true;
-let lastSendAt = 0;
-let firstRender = true;
-let listenersStarted = false;
-let channel = null;                // BroadcastChannel for local demo mode
-const domMap = new Map();          // message id -> element
+const msgIndex = new Map();         // id -> message
+const pendingLikes = new Map();     // id -> Map(uid -> bool) for likes that arrive before their message
+const activeUsersMap = new Map();
+const rateBuckets = new Map();
+const domMap = new Map();
+let replyContext = null, soundEnabled = true, lastSendAt = 0, initialScrolled = false, presenceTimer = null;
+const lastSyncReply = new Map();
 
 const $ = id => document.getElementById(id);
 const messagesList = $('messagesList'), loadingIndicator = $('loadingIndicator'), chatContainer = $('chatContainer');
 const messageInput = $('messageInput'), activeUsersBar = $('activeUsersBar'), onlineCountText = $('onlineCountText');
 const headerMyAvatar = $('headerMyAvatar'), profileModal = $('profileModal'), usernameInput = $('usernameInput');
 const statusNoteInput = $('statusNoteInput'), avatarGrid = $('avatarGrid'), selectedAvatarPreview = $('selectedAvatarPreview');
-const replyPreviewBar = $('replyPreviewBar'), scrollBottomBtn = $('scrollBottomBtn'), displayUserId = $('displayUserId');
-
-const myUid = () => currentUser?.uid || localId;
+const replyPreviewBar = $('replyPreviewBar'), scrollBottomBtn = $('scrollBottomBtn');
 
 // =====================================================================
-// 2. HELPERS (sound, clock, toast, escape)
+// 2. HELPERS
 // =====================================================================
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
@@ -276,239 +275,214 @@ function playGlassSound(type = 'send') {
     const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
     const t = audioCtx.currentTime;
-    const [f1, f2, dur, vol, wave] = type === 'send' ? [520, 880, .1, .08, 'sine']
-                                   : type === 'receive' ? [660, 520, .12, .05, 'sine']
-                                   : [440, 740, .14, .1, 'triangle'];
+    const [f1, f2, dur, vol, wave] = type === 'send' ? [520, 880, .1, .08, 'sine'] : type === 'receive' ? [660, 520, .12, .05, 'sine'] : [440, 740, .14, .1, 'triangle'];
     osc.type = wave;
-    osc.frequency.setValueAtTime(f1, t);
-    osc.frequency.exponentialRampToValueAtTime(f2, t + dur * .9);
-    gain.gain.setValueAtTime(vol, t);
-    gain.gain.exponentialRampToValueAtTime(.001, t + dur);
+    osc.frequency.setValueAtTime(f1, t); osc.frequency.exponentialRampToValueAtTime(f2, t + dur * .9);
+    gain.gain.setValueAtTime(vol, t); gain.gain.exponentialRampToValueAtTime(.001, t + dur);
     osc.start(t); osc.stop(t + dur);
   } catch {}
 }
-
-function updateClock() {
-  const n = new Date();
-  $('clockTime').textContent = `${n.getHours() % 12 || 12}:${String(n.getMinutes()).padStart(2, '0')}`;
-}
+function updateClock() { const n = new Date(); $('clockTime').textContent = `${n.getHours() % 12 || 12}:${String(n.getMinutes()).padStart(2, '0')}`; }
 setInterval(updateClock, 10000); updateClock();
 
-function formatTimestamp(ms) {
-  if (!ms) return 'Just now';
-  return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-}
+const formatTimestamp = ms => ms ? new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+const escapeHtml = s => String(s ?? '').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+
 let toastTimer;
 function toast(msg) {
   const el = $('toast'); el.textContent = msg;
   el.classList.remove('opacity-0', '-translate-y-2');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add('opacity-0', '-translate-y-2'), 2600);
+  toastTimer = setTimeout(() => el.classList.add('opacity-0', '-translate-y-2'), 3000);
 }
 function setStatus(kind) {
-  const dot = $('liveDot'), txt = $('liveText');
-  const map = { cloud: ['bg-emerald-400', 'Live'], local: ['bg-sky-400', 'Demo'], connecting: ['bg-amber-400', 'Connecting'], error: ['bg-red-400', 'Offline'] };
+  const map = { live: ['bg-emerald-400', 'Live'], local: ['bg-sky-400', 'Offline demo'], connecting: ['bg-amber-400', 'Connecting'] };
   const [cls, label] = map[kind];
-  dot.className = `w-2 h-2 rounded-full animate-pulse ${cls}`;
-  txt.textContent = label;
+  $('liveDot').className = `w-2 h-2 rounded-full animate-pulse ${cls}`;
+  $('liveText').textContent = label;
 }
-
-// scrolling
 const isNearBottom = () => chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 140;
-function scrollToBottom(smooth = true) {
-  chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
-  scrollBottomBtn.classList.add('hidden');
-}
+function scrollToBottom(smooth = true) { chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: smooth ? 'smooth' : 'auto' }); scrollBottomBtn.classList.add('hidden'); }
 chatContainer.addEventListener('scroll', () => { if (isNearBottom()) scrollBottomBtn.classList.add('hidden'); });
 scrollBottomBtn.addEventListener('click', () => scrollToBottom(true));
 
-// =====================================================================
-// 3. PROFILE
-// =====================================================================
-function renderAvatarPicker() {
-  avatarGrid.innerHTML = '';
-  AVATAR_OPTIONS.forEach(emoji => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = `h-10 rounded-xl flex items-center justify-center text-xl transition-all ${emoji === myProfile.avatar ? 'bg-white/25 border-2 border-pink-400 scale-105 shadow-md' : 'liquid-glass hover:bg-white/15'}`;
-    btn.textContent = emoji;
-    btn.addEventListener('click', () => { myProfile.avatar = emoji; selectedAvatarPreview.textContent = emoji; renderAvatarPicker(); });
-    avatarGrid.appendChild(btn);
-  });
+// validation (everything that arrives from the network is untrusted)
+const isUid = v => typeof v === 'string' && /^[A-Za-z0-9_-]{4,24}$/.test(v);
+const isHandle = v => typeof v === 'string' && /^[a-z0-9_]{2,18}$/.test(v);
+const cleanText = (t, n) => String(t).replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, n);
+
+function sanitizeMsg(o) {
+  if (!o || typeof o !== 'object') return null;
+  const { id, uid, username, avatar, text, timestamp, likes, replyTo } = o;
+  if (typeof id !== 'string' || id.length < 6 || id.length > 64 || !/^[\w-]+$/.test(id)) return null;
+  if (!isUid(uid) || !isHandle(username) || !AVATAR_OPTIONS.includes(avatar) || typeof text !== 'string') return null;
+  const clean = cleanText(text, MAX_LEN); if (!clean) return null;
+  const ts = Number.isFinite(timestamp) ? Math.min(timestamp, Date.now() + 60000) : Date.now();
+  const likesArr = Array.isArray(likes) ? [...new Set(likes.filter(isUid))].slice(0, 200) : [];
+  let rt = null;
+  if (replyTo && typeof replyTo === 'object' && isHandle(replyTo.username) && typeof replyTo.text === 'string')
+    rt = { id: typeof replyTo.id === 'string' ? replyTo.id.slice(0, 64) : '', username: replyTo.username, text: cleanText(replyTo.text, 45) };
+  return { id, uid, username, avatar, text: clean, timestamp: ts, likes: likesArr, replyTo: rt };
 }
-function openProfileModal() {
-  usernameInput.value = myProfile.username;
-  statusNoteInput.value = myProfile.note;
-  selectedAvatarPreview.textContent = myProfile.avatar;
-  $('usernameError').classList.add('hidden');
-  renderAvatarPicker();
-  profileModal.classList.remove('hidden');
+const exportMsg = m => ({ id: m.id, uid: m.uid, username: m.username, avatar: m.avatar, text: m.text, timestamp: m.timestamp, likes: m.likes, replyTo: m.replyTo });
+
+function allowIncoming(uid) {
+  const now = Date.now(); let b = rateBuckets.get(uid);
+  if (!b || now - b.start > 10000) b = { start: now, n: 0 };
+  b.n++; rateBuckets.set(uid, b);
+  return b.n <= 8;
 }
-$('openProfileBtn').addEventListener('click', openProfileModal);
 
-$('saveProfileBtn').addEventListener('click', async () => {
-  const clean = usernameInput.value.trim().replace(/\s+/g, '_').toLowerCase();
-  if (!/^[a-z0-9_]{2,18}$/.test(clean)) { $('usernameError').classList.remove('hidden'); return; }
-  myProfile.username = clean;
-  myProfile.note = statusNoteInput.value.trim() || "Chilling in Lounge ✨";
-  store.set('instaglass_profile', myProfile);
-  headerMyAvatar.textContent = myProfile.avatar;
-  profileModal.classList.add('hidden');
-  await pushPresence();
-  renderActiveUsers();
-  messageInput.focus();
-});
-usernameInput.addEventListener('keydown', e => { if (e.key === 'Enter') $('saveProfileBtn').click(); });
-
-$('soundToggleBtn').addEventListener('click', () => {
-  soundEnabled = !soundEnabled;
-  $('soundIcon').className = soundEnabled ? 'fa-solid fa-volume-high text-xs text-white' : 'fa-solid fa-volume-xmark text-xs text-white/40';
-});
-$('infoModalBtn').addEventListener('click', () => $('infoModal').classList.remove('hidden'));
-$('closeInfoModalBtn').addEventListener('click', () => $('infoModal').classList.add('hidden'));
-$('infoModal').addEventListener('click', e => { if (e.target === $('infoModal')) $('infoModal').classList.add('hidden'); });
-
-function setReply(msg) {
-  replyContext = { id: msg.id, username: msg.username, text: String(msg.text).slice(0, 45) };
-  $('replyToName').textContent = `@${msg.username}`;
-  $('replyToSnippet').textContent = msg.text;
-  replyPreviewBar.classList.remove('hidden');
-  messageInput.focus();
-}
-$('cancelReplyBtn').addEventListener('click', () => { replyContext = null; replyPreviewBar.classList.add('hidden'); });
+// privacy guard: stop people from accidentally leaking their identity
+const PII = [/[\w.+-]+@[\w-]+\.[\w.-]+/, /(?:\+?\d[\s().-]?){10,}/];
+const looksLikePII = t => PII.some(r => r.test(t));
 
 // =====================================================================
-// 4. BACKEND  (Firebase cloud mode, or local demo mode)
+// 3. TRANSPORT (shared by live relay + offline demo)
 // =====================================================================
-function resolveFirebaseConfig() {
-  // Preview environments inject __firebase_config; otherwise use the config pasted above.
-  if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-    try { return { cfg: JSON.parse(__firebase_config), injected: true }; } catch {}
+function publish(suffix, obj) {
+  if (mode === 'live') {
+    if (!client?.connected) return false;
+    client.publish(`${TOPIC}/${suffix}`, JSON.stringify(obj), { qos: 0 });
+    return true;
   }
-  if (FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PASTE')) return { cfg: FIREBASE_CONFIG, injected: false };
-  return null;
+  if (mode === 'local') { channel?.postMessage({ s: suffix, o: obj }); return true; }
+  return false;
 }
 
-async function initBackend() {
-  const resolved = resolveFirebaseConfig();
-  if (!resolved) { startLocalMode('No Firebase config — demo mode'); return; }
-  try {
-    const app = initializeApp(resolved.cfg);
-    const auth = getAuth(app);
-    db = getFirestore(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'instaglass-public';
-    base = resolved.injected ? ['artifacts', appId, 'public', 'data'] : ['rooms', 'lounge'];
-
-    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-    else await signInAnonymously(auth);
-
-    if (mode === 'local') return; // timeout fallback already kicked in
-    currentUser = auth.currentUser;
-    displayUserId.textContent = currentUser.uid;
-    mode = 'cloud'; setStatus('cloud');
-    await pushPresence();
-    startCloudListeners();
-    startHeartbeat();
-  } catch (err) {
-    console.error('Firebase init error:', err);
-    db = null; currentUser = null;
-    startLocalMode('Could not reach Firebase — demo mode');
-  }
+function pushPresence() { publish('p', { uid: me, username: myProfile.username, avatar: myProfile.avatar, note: myProfile.note }); }
+function schedulePresenceReply() {
+  if (presenceTimer) return;
+  presenceTimer = setTimeout(() => { presenceTimer = null; pushPresence(); }, 200 + Math.random() * 800);
 }
 
-const col = name => collection(db, ...base, name);
-const docRef = (name, id) => doc(db, ...base, name, id);
+function handleIncoming(suffix, o) {
+  if (!o || typeof o !== 'object') return;
+  const [kind, target] = suffix.split('/');
 
-function startCloudListeners() {
-  if (listenersStarted) return; listenersStarted = true;
+  if (kind === 'm') {
+    const m = sanitizeMsg(o); if (!m) return;
+    if (msgIndex.has(m.id)) return;               // own echo / duplicate
+    if (m.uid !== me && !allowIncoming(m.uid)) return; // flood protection
+    ingest([m], false);
 
-  const q = query(col('messages'), orderBy('timestamp', 'desc'), limit(MAX_MESSAGES));
-  onSnapshot(q, snap => {
-    const prevLast = messagesCache[messagesCache.length - 1]?.id;
-    const loaded = [];
-    snap.forEach(d => loaded.push({ id: d.id, ...d.data() }));
-    loaded.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-    messagesCache = loaded;
-    const last = loaded[loaded.length - 1];
-    const gotNew = last && last.id !== prevLast;
-    const wasNear = isNearBottom();
-    renderMessages();
-    if (firstRender) { scrollToBottom(false); firstRender = false; }
-    else if (gotNew) {
-      if (last.uid === myUid() || wasNear) scrollToBottom(true); else scrollBottomBtn.classList.remove('hidden');
-      if (last.uid !== myUid()) playGlassSound('receive');
-    }
-  }, err => {
-    console.error('Messages listener error:', err);
-    setStatus('error');
-    toast(err.code === 'permission-denied' ? 'Permission denied — check Firestore rules' : 'Connection problem');
-    loadingIndicator.classList.add('hidden'); messagesList.classList.remove('hidden');
-  });
+  } else if (kind === 'l') {
+    if (typeof o.id !== 'string' || !isUid(o.uid) || typeof o.like !== 'boolean') return;
+    applyLike(o.id, o.uid, o.like); renderMessages();
 
-  onSnapshot(col('presence'), snap => {
-    activeUsersMap.clear();
-    snap.forEach(d => { const u = d.data(); if (u?.uid) activeUsersMap.set(u.uid, u); });
+  } else if (kind === 'p') {
+    if (!isUid(o.uid) || o.uid === me) return;
+    if (o.bye) { activeUsersMap.delete(o.uid); renderActiveUsers(); return; }
+    if (!isHandle(o.username) || !AVATAR_OPTIONS.includes(o.avatar)) return;
+    const prev = activeUsersMap.get(o.uid);
+    const isNew = !prev || Date.now() - prev.lastSeen > PRESENCE_TTL;
+    activeUsersMap.set(o.uid, { uid: o.uid, username: o.username, avatar: o.avatar, note: cleanText(o.note || '', 24), lastSeen: Date.now() });
     renderActiveUsers();
-  }, err => console.error('Presence listener error:', err));
+    if (isNew) schedulePresenceReply();
 
-  setInterval(renderActiveUsers, HEARTBEAT_MS); // drop stale users from the bar
-}
+  } else if (kind === 's') {                      // a new joiner asks for recent history
+    if (!isUid(o.uid) || o.uid === me) return;
+    const last = lastSyncReply.get(o.uid) || 0;
+    if (Date.now() - last < 5000 || !messagesCache.length) { pushPresence(); return; }
+    lastSyncReply.set(o.uid, Date.now());
+    setTimeout(() => { publish(`r/${o.uid}`, { msgs: messagesCache.slice(-HISTORY_ON_JOIN).map(exportMsg) }); pushPresence(); }, 150 + Math.random() * 1200);
 
-async function pushPresence() {
-  const entry = { uid: myUid(), username: myProfile.username, avatar: myProfile.avatar, note: myProfile.note, lastSeen: Date.now() };
-  if (mode === 'cloud' && db && currentUser) {
-    try { await setDoc(docRef('presence', currentUser.uid), entry, { merge: true }); } catch (e) { console.error('Presence error:', e); }
-  } else if (mode === 'local') {
-    activeUsersMap.set(entry.uid, entry);
-    channel?.postMessage({ type: 'presence', entry });
+  } else if (kind === 'r') {                      // history addressed to me
+    if (target !== me || !Array.isArray(o.msgs)) return;
+    ingest(o.msgs.slice(0, 60).map(sanitizeMsg).filter(Boolean), true);
   }
 }
-function startHeartbeat() {
-  setInterval(() => { if (!document.hidden) pushPresence(); }, HEARTBEAT_MS);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) pushPresence(); });
-  window.addEventListener('pagehide', () => { if (db && currentUser) deleteDoc(docRef('presence', currentUser.uid)).catch(() => {}); });
+
+function onConnected() {
+  client.subscribe([`${TOPIC}/m`, `${TOPIC}/l`, `${TOPIC}/p`, `${TOPIC}/s`, `${TOPIC}/r/${me}`], { qos: 0 });
+  pushPresence();
+  publish('s', { uid: me });                      // ask peers for recent messages
 }
 
-// ---- Local demo mode: works offline; chats between tabs of the same browser ----
+function connectBroker(i) {
+  if (typeof mqtt === 'undefined' || i >= BROKERS.length) { startLocalMode('Could not reach the chat relay — offline demo'); return; }
+  let ok = false, dead = false;
+  const c = mqtt.connect(BROKERS[i], {
+    clientId: `ig_${me}_${Math.random().toString(16).slice(2, 6)}`,
+    clean: true, connectTimeout: 4500, reconnectPeriod: 3000, keepalive: 30,
+    will: { topic: `${TOPIC}/p`, payload: JSON.stringify({ uid: me, bye: true }), qos: 0, retain: false }
+  });
+  const fail = () => { if (ok || dead) return; dead = true; clearTimeout(timer); try { c.end(true); } catch {} connectBroker(i + 1); };
+  const timer = setTimeout(fail, 5500);
+  c.on('connect', () => {
+    if (dead) { try { c.end(true); } catch {} return; }
+    clearTimeout(timer); ok = true; client = c; mode = 'live'; setStatus('live');
+    loadingIndicator.classList.add('hidden'); messagesList.classList.remove('hidden'); renderMessages();
+    onConnected();
+  });
+  c.on('error', e => { console.warn('MQTT error', BROKERS[i], e?.message); fail(); });
+  c.on('close', () => { if (!ok) fail(); else setStatus('connecting'); });
+  c.on('message', (topic, payload) => {
+    if (!topic.startsWith(TOPIC + '/') || payload.length > 60000) return;
+    let o; try { o = JSON.parse(payload.toString()); } catch { return; }
+    handleIncoming(topic.slice(TOPIC.length + 1), o);
+  });
+}
+
 function startLocalMode(reason) {
-  mode = 'local'; setStatus('local');
-  displayUserId.textContent = localId + ' (demo)';
-  toast(reason);
-  messagesCache = [
-    { id: 'demo_1', uid: 'demo_1', username: 'aria_design', avatar: '🦋', text: 'Hey! Welcome to the Public Lounge ✨', timestamp: Date.now() - 120000, likes: ['demo_2'] },
-    { id: 'demo_2', uid: 'demo_2', username: 'dev_leo', avatar: '🚀', text: 'Double-tap any message to drop a heart ❤️', timestamp: Date.now() - 60000, likes: [] }
-  ];
-  activeUsersMap.set('demo_1', { uid: 'demo_1', username: 'aria_design', avatar: '🦋', note: 'Designing UI 🎨', lastSeen: Date.now() + 1e12 });
-  activeUsersMap.set('demo_2', { uid: 'demo_2', username: 'dev_leo', avatar: '🚀', note: 'Coding JS ⚡', lastSeen: Date.now() + 1e12 });
+  try { client?.end(true); } catch {}
+  client = null; mode = 'local'; setStatus('local');
+  toast(reason + ' (chats only between tabs on this device)');
   if ('BroadcastChannel' in window) {
-    channel = new BroadcastChannel('instaglass-demo');
-    channel.onmessage = ({ data }) => {
-      if (data.type === 'msg') { messagesCache.push(data.msg); renderMessages(); if (isNearBottom()) scrollToBottom(true); playGlassSound('receive'); }
-      else if (data.type === 'likes') { const m = messagesCache.find(x => x.id === data.id); if (m) { m.likes = data.likes; renderMessages(); } }
-      else if (data.type === 'presence') { activeUsersMap.set(data.entry.uid, data.entry); renderActiveUsers(); }
-    };
+    channel = new BroadcastChannel('instaglass-' + TOPIC);
+    channel.onmessage = e => handleIncoming(e.data.s, e.data.o);
   }
   loadingIndicator.classList.add('hidden'); messagesList.classList.remove('hidden');
-  renderMessages(); scrollToBottom(false); firstRender = false;
-  pushPresence(); renderActiveUsers();
-  setInterval(() => { pushPresence(); renderActiveUsers(); }, HEARTBEAT_MS);
+  renderMessages(); pushPresence(); publish('s', { uid: me });
 }
 
+setInterval(() => { if (!document.hidden && mode !== 'connecting') pushPresence(); renderActiveUsers(); }, HEARTBEAT_MS);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  if (mode === 'live' && client && !client.connected) client.reconnect();
+  else if (mode !== 'connecting') { pushPresence(); publish('s', { uid: me }); } // catch up on what we missed
+});
+window.addEventListener('pagehide', () => publish('p', { uid: me, bye: true }));
+window.addEventListener('hashchange', () => location.reload());
+
 // =====================================================================
-// 5. RENDERING
+// 4. MESSAGES
 // =====================================================================
+function applyLike(id, uid, like) {
+  const m = msgIndex.get(id);
+  if (!m) { if (!pendingLikes.has(id)) pendingLikes.set(id, new Map()); pendingLikes.get(id).set(uid, like); return; }
+  const set = new Set(m.likes); like ? set.add(uid) : set.delete(uid); m.likes = [...set];
+}
+
+function ingest(list, quiet) {
+  const wasNear = isNearBottom();
+  const added = []; let changed = false;
+  for (const m of list) {
+    const ex = msgIndex.get(m.id);
+    if (ex) { const u = new Set([...ex.likes, ...m.likes]); if (u.size !== ex.likes.length) { ex.likes = [...u]; changed = true; } continue; }
+    const pend = pendingLikes.get(m.id);
+    msgIndex.set(m.id, m); messagesCache.push(m); added.push(m);
+    if (pend) { pend.forEach((like, uid) => applyLike(m.id, uid, like)); pendingLikes.delete(m.id); }
+  }
+  if (!added.length && !changed) return;
+  messagesCache.sort((a, b) => a.timestamp - b.timestamp);
+  while (messagesCache.length > MAX_MESSAGES) { msgIndex.delete(messagesCache.shift().id); }
+  renderMessages();
+
+  const mine = added.some(m => m.uid === me);
+  const others = added.filter(m => m.uid !== me && !blocked.has(m.uid));
+  if (!initialScrolled && added.length) { scrollToBottom(false); initialScrolled = true; }
+  else if (mine || wasNear) scrollToBottom(true);
+  else if (others.length && !quiet) scrollBottomBtn.classList.remove('hidden');
+  if (others.length && !quiet) playGlassSound('receive');
+}
+
 function renderActiveUsers() {
   const now = Date.now();
-  const others = Array.from(activeUsersMap.values())
-    .filter(u => u.uid !== myUid() && (now - (u.lastSeen || 0)) < ONLINE_WINDOW_MS)
-    .sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+  const others = [...activeUsersMap.values()].filter(u => now - u.lastSeen < PRESENCE_TTL).sort((a, b) => b.lastSeen - a.lastSeen);
   const total = others.length + 1;
   onlineCountText.textContent = `${total} ${total === 1 ? 'member' : 'members'} online`;
-
-  const list = [{ uid: myUid(), username: myProfile.username, avatar: myProfile.avatar, note: myProfile.note, isMe: true }, ...others.slice(0, 20)];
+  const list = [{ uid: me, username: myProfile.username, avatar: myProfile.avatar, note: myProfile.note, isMe: true }, ...others.slice(0, 20)];
   activeUsersBar.innerHTML = '';
   list.forEach(u => {
     const item = document.createElement('div');
@@ -516,34 +490,28 @@ function renderActiveUsers() {
     item.innerHTML = `
       <div class="h-5 mb-0.5 max-w-[68px] px-2 rounded-full liquid-pill text-[9px] text-white/95 whitespace-nowrap truncate shadow-md flex items-center ${u.note ? '' : 'invisible'}">${escapeHtml(u.note || '.')}</div>
       <div class="relative">
-        <div class="ig-story-ring transition-transform group-active:scale-90">
-          <div class="w-12 h-12 rounded-full bg-slate-950/90 flex items-center justify-center text-xl border-2 border-black">${escapeHtml(u.avatar || '✨')}</div>
-        </div>
+        <div class="ig-story-ring transition-transform group-active:scale-90"><div class="w-12 h-12 rounded-full bg-slate-950/90 flex items-center justify-center text-xl border-2 border-black">${escapeHtml(u.avatar)}</div></div>
         <span class="absolute bottom-0 right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-slate-950"></span>
       </div>
       <span class="text-[10px] font-medium text-white/85 truncate w-full text-center mt-1">${u.isMe ? 'You' : escapeHtml(u.username)}</span>`;
-    item.addEventListener('click', () => {
-      if (u.isMe) openProfileModal();
-      else { messageInput.value = `@${u.username} `; messageInput.focus(); }
-    });
+    item.addEventListener('click', () => { if (u.isMe) openProfileModal(); else { messageInput.value = `@${u.username} `; messageInput.focus(); } });
     activeUsersBar.appendChild(item);
   });
 }
 
-function messageSig(m) { return `${m.text}|${(m.likes || []).join(',')}`; }
+const messageSig = m => `${m.text}|${m.likes.join(',')}`;
+const getMsg = id => msgIndex.get(id);
 
 function buildMessage(msg) {
-  const isMe = msg.uid === myUid();
-  const likes = Array.isArray(msg.likes) ? msg.likes : [];
-  const iLiked = likes.includes(myUid());
-
+  const isMe = msg.uid === me;
+  const iLiked = msg.likes.includes(me);
   const wrapper = document.createElement('div');
   wrapper.dataset.sig = messageSig(msg);
   wrapper.className = `flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`;
 
-  const avatarHtml = !isMe ? `<div class="ig-story-ring shrink-0 mb-5"><div class="w-7 h-7 rounded-full bg-slate-950 flex items-center justify-center text-xs">${escapeHtml(msg.avatar || '✨')}</div></div>` : '';
+  const avatarHtml = !isMe ? `<div class="ig-story-ring shrink-0 mb-5"><div class="w-7 h-7 rounded-full bg-slate-950 flex items-center justify-center text-xs">${escapeHtml(msg.avatar)}</div></div>` : '';
   const replyHtml = msg.replyTo ? `<div class="mb-1.5 px-2.5 py-1 rounded-xl bg-black/25 border-l-2 border-pink-400 text-[10px] text-white/80"><span class="font-semibold text-pink-200">@${escapeHtml(msg.replyTo.username)}</span>: ${escapeHtml(msg.replyTo.text)}</div>` : '';
-  const badge = likes.length ? `<button type="button" class="like-badge absolute -bottom-2.5 ${isMe ? 'left-2' : 'right-2'} px-2 py-0.5 rounded-full liquid-pill text-[10px] font-bold flex items-center gap-1 shadow-md border ${iLiked ? 'border-pink-400 text-pink-300' : 'border-white/25 text-white/90'} active:scale-90 transition-transform"><i class="fa-solid fa-heart text-pink-500 text-[9px]"></i><span>${likes.length}</span></button>` : '';
+  const badge = msg.likes.length ? `<button type="button" class="like-badge absolute -bottom-2.5 ${isMe ? 'left-2' : 'right-2'} px-2 py-0.5 rounded-full liquid-pill text-[10px] font-bold flex items-center gap-1 shadow-md border ${iLiked ? 'border-pink-400 text-pink-300' : 'border-white/25 text-white/90'} active:scale-90 transition-transform"><i class="fa-solid fa-heart text-pink-500 text-[9px]"></i><span>${msg.likes.length}</span></button>` : '';
 
   wrapper.innerHTML = `
     ${avatarHtml}
@@ -552,17 +520,16 @@ function buildMessage(msg) {
         <span class="text-[10px] font-semibold ${isMe ? 'text-pink-300' : 'text-white/70'}">${isMe ? 'You' : '@' + escapeHtml(msg.username)}</span>
         <span class="text-[9px] text-white/40">${formatTimestamp(msg.timestamp)}</span>
       </div>
-      <div class="message-bubble relative px-3.5 py-2.5 text-sm leading-relaxed text-white cursor-pointer select-none ${isMe ? 'ig-bubble-sent' : 'ig-bubble-received'} ${likes.length ? 'mb-2' : ''}">
+      <div class="message-bubble relative px-3.5 py-2.5 text-sm leading-relaxed text-white cursor-pointer select-none ${isMe ? 'ig-bubble-sent' : 'ig-bubble-received'} ${msg.likes.length ? 'mb-2' : ''}">
         ${replyHtml}
         <div class="break-words" style="overflow-wrap:anywhere">${escapeHtml(msg.text)}</div>
-        <div class="heart-burst-overlay pointer-events-none hidden absolute inset-0 flex items-center justify-center">
-          <i class="fa-solid fa-heart text-4xl text-white drop-shadow-[0_4px_12px_rgba(236,72,153,0.9)]"></i>
-        </div>
+        <div class="heart-burst-overlay pointer-events-none hidden absolute inset-0 flex items-center justify-center"><i class="fa-solid fa-heart text-4xl text-white drop-shadow-[0_4px_12px_rgba(236,72,153,0.9)]"></i></div>
         ${badge}
       </div>
       <div class="flex items-center gap-3 px-1.5 mt-0.5 opacity-70">
         <button type="button" class="heart-btn text-[10px] ${iLiked ? 'text-pink-400 font-semibold' : 'text-white/50'} flex items-center gap-1"><i class="${iLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i><span>${iLiked ? 'Liked' : 'Like'}</span></button>
-        <button type="button" class="reply-btn text-[10px] text-white/50 hover:text-white flex items-center gap-1"><i class="fa-solid fa-reply text-[9px]"></i><span>Reply</span></button>
+        <button type="button" class="reply-btn text-[10px] text-white/50 flex items-center gap-1"><i class="fa-solid fa-reply text-[9px]"></i><span>Reply</span></button>
+        ${isMe ? '' : '<button type="button" class="block-btn text-[10px] text-white/40 flex items-center gap-1"><i class="fa-solid fa-ban text-[9px]"></i><span>Block</span></button>'}
       </div>
     </div>`;
 
@@ -570,47 +537,41 @@ function buildMessage(msg) {
   let lastTap = 0;
   bubble.addEventListener('click', () => {
     const now = Date.now();
-    if (now - lastTap < 320) { triggerHeartBurst(bubble); setLike(msg.id, true); lastTap = 0; } // double-tap only LIKES
-    else lastTap = now;
+    if (now - lastTap < 320) { triggerHeartBurst(bubble); setLike(msg.id, true); lastTap = 0; } else lastTap = now;
   });
   wrapper.querySelector('.heart-btn').addEventListener('click', () => {
-    const liked = (getMsg(msg.id)?.likes || []).includes(myUid());
+    const liked = getMsg(msg.id)?.likes.includes(me);
     if (!liked) triggerHeartBurst(bubble);
     setLike(msg.id, !liked);
   });
   wrapper.querySelector('.reply-btn').addEventListener('click', () => setReply(getMsg(msg.id) || msg));
-  wrapper.querySelector('.like-badge')?.addEventListener('click', e => {
-    e.stopPropagation();
-    setLike(msg.id, !(getMsg(msg.id)?.likes || []).includes(myUid()));
+  wrapper.querySelector('.like-badge')?.addEventListener('click', e => { e.stopPropagation(); setLike(msg.id, !getMsg(msg.id)?.likes.includes(me)); });
+  wrapper.querySelector('.block-btn')?.addEventListener('click', () => {
+    blocked.add(msg.uid); store.set('instaglass_blocked', [...blocked]);
+    toast(`Blocked @${msg.username}. Their messages are hidden.`);
+    if (replyContext && replyContext.uid === msg.uid) $('cancelReplyBtn').click();
+    renderMessages(); refreshInfoModal();
   });
   return wrapper;
 }
 
-const getMsg = id => messagesCache.find(m => m.id === id);
-
 function renderMessages() {
-  loadingIndicator.classList.add('hidden');
-  messagesList.classList.remove('hidden');
-
-  if (!messagesCache.length) {
+  const visible = messagesCache.filter(m => !blocked.has(m.uid));
+  if (!visible.length) {
     messagesList.innerHTML = `<div class="text-center py-12 px-4"><div class="w-14 h-14 mx-auto mb-3 rounded-full liquid-pill flex items-center justify-center text-2xl">👋</div>
       <h3 class="text-sm font-bold text-white">Welcome to the Public Lounge!</h3>
-      <p class="text-xs text-white/60 mt-1">Send the first message. Everyone here will see it live.</p></div>`;
+      <p class="text-xs text-white/60 mt-1">Say hi. Anyone who opens this app joins the same live room, anonymously.</p></div>`;
     domMap.clear(); return;
   }
-  if (domMap.size === 0) messagesList.innerHTML = ''; // remove empty-state
-
-  const keep = new Set();
-  let ref = messagesList.firstChild;
-  for (const msg of messagesCache) {
+  if (domMap.size === 0) messagesList.innerHTML = '';
+  const keep = new Set(); let ref = messagesList.firstChild;
+  for (const msg of visible) {
     keep.add(msg.id);
     let el = domMap.get(msg.id);
-    if (el && el.dataset.sig !== messageSig(msg)) { // changed (likes) -> rebuild without replaying animation
-      const fresh = buildMessage(msg); el.replaceWith(fresh); el = fresh; domMap.set(msg.id, el);
-      if (ref && !ref.isConnected) ref = el.nextSibling;
-    } else if (!el) {
-      el = buildMessage(msg); el.classList.add('msg-enter'); domMap.set(msg.id, el);
-    }
+    if (el && el.dataset.sig !== messageSig(msg)) {
+      const fresh = buildMessage(msg); if (ref === el) ref = fresh;
+      el.replaceWith(fresh); el = fresh; domMap.set(msg.id, el);
+    } else if (!el) { el = buildMessage(msg); el.classList.add('msg-enter'); domMap.set(msg.id, el); }
     if (el === ref) ref = ref.nextSibling; else messagesList.insertBefore(el, ref);
   }
   for (const [id, el] of domMap) if (!keep.has(id)) { el.remove(); domMap.delete(id); }
@@ -619,72 +580,119 @@ function renderMessages() {
 function triggerHeartBurst(bubble) {
   const overlay = bubble.querySelector('.heart-burst-overlay'); if (!overlay) return;
   overlay.classList.remove('hidden');
-  const icon = overlay.querySelector('i');
-  icon.classList.remove('animate-heart-burst'); void icon.offsetWidth; icon.classList.add('animate-heart-burst');
-  playGlassSound('like');
-  setTimeout(() => overlay.classList.add('hidden'), 750);
+  const icon = overlay.querySelector('i'); icon.classList.remove('animate-heart-burst'); void icon.offsetWidth; icon.classList.add('animate-heart-burst');
+  playGlassSound('like'); setTimeout(() => overlay.classList.add('hidden'), 750);
 }
 
 // =====================================================================
-// 6. SENDING & LIKES
+// 5. SENDING, LIKES, REPLIES
 // =====================================================================
-async function sendPublicMessage(text) {
-  const trimmed = text.trim();
+function sendPublicMessage(text) {
+  const trimmed = cleanText(text, MAX_LEN);
   if (!trimmed) return;
   if (mode === 'connecting') { toast('Still connecting…'); return; }
+  if (looksLikePII(trimmed)) { toast('That looks like an email or phone number. Not sent, to keep you anonymous.'); return; }
   const now = Date.now();
   if (now - lastSendAt < SEND_COOLDOWN_MS) { toast('Slow down a little 😅'); return; }
-  lastSendAt = now;
 
-  playGlassSound('send');
-  messageInput.value = '';
-
-  const payload = {
-    uid: myUid(), username: myProfile.username, avatar: myProfile.avatar,
-    text: trimmed.slice(0, 350), timestamp: now, likes: [],
-    replyTo: replyContext ? { ...replyContext } : null
+  const msg = {
+    id: `${me}-${now.toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+    uid: me, username: myProfile.username, avatar: myProfile.avatar, text: trimmed, timestamp: now, likes: [],
+    replyTo: replyContext ? { id: replyContext.id, username: replyContext.username, text: replyContext.text } : null
   };
+  if (!publish('m', exportMsg(msg))) { toast('Reconnecting… try again in a moment'); return; }
+  lastSendAt = now; playGlassSound('send'); messageInput.value = '';
   replyContext = null; replyPreviewBar.classList.add('hidden');
-
-  if (mode === 'cloud') {
-    try { await addDoc(col('messages'), payload); pushPresence(); }
-    catch (err) { console.error('Send failed:', err); toast('Message failed to send'); messageInput.value = trimmed; }
-  } else {
-    const msg = { id: 'l_' + now + '_' + Math.random().toString(36).slice(2, 6), ...payload };
-    messagesCache.push(msg); renderMessages(); scrollToBottom(true);
-    channel?.postMessage({ type: 'msg', msg });
-  }
+  ingest([msg], false);
 }
 
-async function setLike(id, shouldLike) {
-  const uid = myUid();
-  if (mode === 'cloud') {
-    try { await updateDoc(docRef('messages', id), { likes: shouldLike ? arrayUnion(uid) : arrayRemove(uid) }); } // atomic, no overwrite races
-    catch (err) { console.error('Like failed:', err); }
-  } else {
-    const m = getMsg(id); if (!m) return;
-    const set = new Set(m.likes || []); shouldLike ? set.add(uid) : set.delete(uid);
-    m.likes = [...set]; renderMessages();
-    channel?.postMessage({ type: 'likes', id, likes: m.likes });
-  }
+function setLike(id, shouldLike) {
+  const m = getMsg(id); if (!m) return;
+  applyLike(id, me, shouldLike); renderMessages();
+  publish('l', { id, uid: me, like: shouldLike });
 }
+
+function setReply(msg) {
+  replyContext = { id: msg.id, uid: msg.uid, username: msg.username, text: msg.text.slice(0, 45) };
+  $('replyToName').textContent = `@${msg.username}`;
+  $('replyToSnippet').textContent = msg.text;
+  replyPreviewBar.classList.remove('hidden');
+  messageInput.focus();
+}
+$('cancelReplyBtn').addEventListener('click', () => { replyContext = null; replyPreviewBar.classList.add('hidden'); });
 
 $('chatForm').addEventListener('submit', e => { e.preventDefault(); sendPublicMessage(messageInput.value); });
-document.querySelectorAll('.quick-emoji-btn').forEach(btn => btn.addEventListener('click', () => {
-  messageInput.value += btn.dataset.quickEmoji; messageInput.focus();
-}));
+document.querySelectorAll('.quick-emoji-btn').forEach(b => b.addEventListener('click', () => { messageInput.value += b.dataset.quickEmoji; messageInput.focus(); }));
 $('instantHeartBtn').addEventListener('click', () => sendPublicMessage('❤️'));
-$('vibeDropBtn').addEventListener('click', () => sendPublicMessage(VIBE_STICKERS[Math.floor(Math.random() * VIBE_STICKERS.length)]));
+$('vibeDropBtn').addEventListener('click', () => sendPublicMessage(pick(VIBE_STICKERS)));
+
+// =====================================================================
+// 6. PROFILE & ROOM UI
+// =====================================================================
+function renderAvatarPicker() {
+  avatarGrid.innerHTML = '';
+  AVATAR_OPTIONS.forEach(emoji => {
+    const btn = document.createElement('button'); btn.type = 'button';
+    btn.className = `h-10 rounded-xl flex items-center justify-center text-xl transition-all ${emoji === myProfile.avatar ? 'bg-white/25 border-2 border-pink-400 scale-105 shadow-md' : 'liquid-glass hover:bg-white/15'}`;
+    btn.textContent = emoji;
+    btn.addEventListener('click', () => { myProfile.avatar = emoji; selectedAvatarPreview.textContent = emoji; renderAvatarPicker(); });
+    avatarGrid.appendChild(btn);
+  });
+}
+function openProfileModal() {
+  usernameInput.value = myProfile.username; statusNoteInput.value = myProfile.note;
+  selectedAvatarPreview.textContent = myProfile.avatar; $('usernameError').classList.add('hidden');
+  renderAvatarPicker(); profileModal.classList.remove('hidden');
+}
+$('openProfileBtn').addEventListener('click', openProfileModal);
+$('shuffleNameBtn').addEventListener('click', () => { usernameInput.value = randHandle(); });
+$('saveProfileBtn').addEventListener('click', () => {
+  const clean = usernameInput.value.trim().replace(/\s+/g, '_').toLowerCase();
+  if (!/^[a-z0-9_]{2,18}$/.test(clean)) { $('usernameError').classList.remove('hidden'); return; }
+  myProfile.username = clean; myProfile.note = cleanText(statusNoteInput.value, 24) || "Chilling in Lounge ✨";
+  store.set('instaglass_profile', myProfile);
+  headerMyAvatar.textContent = myProfile.avatar; profileModal.classList.add('hidden');
+  pushPresence(); renderActiveUsers(); messageInput.focus();
+});
+usernameInput.addEventListener('keydown', e => { if (e.key === 'Enter') $('saveProfileBtn').click(); });
+$('newIdentityBtn').addEventListener('click', () => {
+  store.set('instaglass_uid', randId());
+  store.set('instaglass_profile', { username: randHandle(), avatar: pick(AVATAR_OPTIONS), note: "Chilling in Lounge ✨" });
+  location.reload();
+});
+
+$('soundToggleBtn').addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  $('soundIcon').className = soundEnabled ? 'fa-solid fa-volume-high text-xs text-white' : 'fa-solid fa-volume-xmark text-xs text-white/40';
+});
+
+function refreshInfoModal() {
+  $('roomLabel').textContent = ROOM === 'lounge' ? 'Global public room' : `Private room #${ROOM}`;
+  $('displayUserId').textContent = me;
+  const b = $('clearBlockedBtn');
+  if (blocked.size) { b.classList.remove('hidden'); b.textContent = `Unblock everyone (${blocked.size})`; } else b.classList.add('hidden');
+}
+$('infoModalBtn').addEventListener('click', () => { refreshInfoModal(); $('infoModal').classList.remove('hidden'); });
+$('closeInfoModalBtn').addEventListener('click', () => $('infoModal').classList.add('hidden'));
+$('infoModal').addEventListener('click', e => { if (e.target === $('infoModal')) $('infoModal').classList.add('hidden'); });
+$('clearBlockedBtn').addEventListener('click', () => { blocked.clear(); store.set('instaglass_blocked', []); renderMessages(); refreshInfoModal(); toast('Everyone unblocked'); });
+$('copyInviteBtn').addEventListener('click', async () => {
+  const link = location.href.split('#')[0] + (ROOM === 'lounge' ? '' : '#' + ROOM);
+  try { await navigator.clipboard.writeText(link); toast('Invite link copied'); } catch { prompt('Copy this link:', link); }
+});
+$('privateRoomBtn').addEventListener('click', () => {
+  const name = 'room-' + randId().slice(0, 8);
+  location.hash = name; // hashchange reloads into the new room
+});
 
 // =====================================================================
 // 7. START
 // =====================================================================
+$('roomBadge').textContent = ROOM === 'lounge' ? 'GLOBAL' : '#' + ROOM;
 headerMyAvatar.textContent = myProfile.avatar;
 renderActiveUsers();
-if (!saved) openProfileModal();        // onboarding only on the first visit
-initBackend();
-// safety net: never leave the user on the loading screen
-setTimeout(() => { if (mode === 'connecting') { startLocalMode('Connection timed out — demo mode'); } }, 10000);
+if (!saved) openProfileModal();       // first visit: pick a nickname (random one is pre-filled)
+connectBroker(0);
 </script>
 </body>
 </html>
