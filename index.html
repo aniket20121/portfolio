@@ -496,7 +496,6 @@
       transform: scale(1.06);
     }
 
-    /* Elegant gradient overlay for nature photos */
     .fan-card-scrim {
       position: absolute;
       inset: 0;
@@ -510,7 +509,6 @@
       pointer-events: none;
     }
 
-    /* Minimal caption overlay */
     .fan-card-info {
       position: absolute;
       bottom: 0;
@@ -539,7 +537,6 @@
       text-shadow: 0 2px 14px rgba(0,0,0,0.9);
     }
 
-    /* Highlight ring for active center photo */
     .fan-card.is-center {
       border-color: rgba(255,0,79,0.85);
       box-shadow: 0 24px 55px rgba(0,0,0,0.9), 0 0 35px rgba(255,0,79,0.3);
@@ -722,11 +719,136 @@
       .tilt-chip { display: none !important; }
       #scorpion { display: none; }
     }
+
+    /* ---------- 3D avatar preview ---------- */
+    .hero-model {
+      position: relative;
+      width: min(100%, 420px);
+      height: clamp(280px, 72vw, 390px);
+      margin: 10px auto 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 24px;
+      background: radial-gradient(ellipse at 50% 65%, #ff004f27, #6750ff12 42%, transparent 72%);
+      box-shadow: inset 0 0 50px rgba(255,0,79,.06);
+    }
+    #avatar-roamer canvas { width: 100%; height: 100%; display: block; }
+    #avatar-roamer .model-label {
+      position: absolute;
+      left: 16px;
+      bottom: 14px;
+      z-index: 2;
+      color: var(--muted);
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      pointer-events: none;
+    }
+    #avatar-roamer .model-label span { color: var(--pink); }
+    #avatar-roamer .avatar-hit {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      border: 0;
+      border-radius: inherit;
+      background: transparent;
+      cursor: grab;
+      touch-action: pan-y;
+    }
+    #avatar-roamer .avatar-hit:active { cursor: grabbing; }
+    #avatar-roamer .avatar-say {
+      position: absolute;
+      z-index: 3;
+      top: 14px;
+      left: 50%;
+      transform: translate(-50%, -6px);
+      width: max-content;
+      max-width: calc(100% - 28px);
+      padding: 8px 14px;
+      border-radius: 12px;
+      background: rgba(18,18,26,.94);
+      border: 1px solid rgba(255,0,79,.45);
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      color: #fff;
+      font: 500 .72rem/1.35 "Poppins", sans-serif;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      backdrop-filter: blur(8px);
+    }
+    #avatar-roamer .avatar-say.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (min-width: 900px) {
+      .hero { width: min(1200px, 94%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .9fr); align-items: center; gap: 36px; }
+      .hero-model { grid-column: 2; grid-row: 1; width: 100%; height: min(65vh, 520px); }
+      .hero > .scene { display: none; }
+      .hero > .tilt-chip { grid-column: 1; }
+    }
+
+
+    /* ---------- Phone layout refinements ---------- */
+    @media (max-width: 600px) {
+      .container { width: min(100% - 36px, 540px); }
+      .container-wide { width: calc(100% - 24px); }
+      section { padding: 48px 0; }
+      .section-heading { margin-bottom: 26px; }
+      .eyebrow { font-size: .66rem; letter-spacing: .18em; }
+
+      .hero {
+        min-height: auto;
+        padding-block: 44px 28px;
+        gap: 4px;
+      }
+      .hero h1 { font-size: clamp(2.35rem, 10.5vw, 3.4rem); margin: 12px 0; }
+      .hero-description { font-size: .94rem; }
+      .actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+      .actions .btn { width: 100%; min-height: 48px; }
+      .hero-model { height: clamp(250px, 76vw, 340px); border-radius: 20px; }
+
+      .scene { height: 260px; --size: clamp(105px, 34vw, 140px); }
+      .floating-label { padding: 7px 10px; font-size: .62rem; }
+      .label-one { left: 1%; }
+      .label-two { right: 1%; }
+      .scene-caption { font-size: .52rem; }
+
+      .portrait-card { max-width: 340px; margin-bottom: 22px; }
+      .tab-list { gap: 7px; }
+      .tab { flex: 1 1 auto; padding: 10px 12px; font-size: .82rem; }
+      .cards-grid { gap: 14px; }
+      .service-card { padding: 22px; }
+      .work-content { padding: 18px; }
+      .work-content .btn { width: 100%; }
+
+      .fan-stage { min-height: 390px; }
+      .fan-card { width: min(72vw, 280px); height: min(112vw, 370px); }
+      .fan-controls { gap: 7px; margin-top: 18px; }
+      .fan-arrow-btn { width: 42px; height: 42px; flex: 0 0 42px; }
+      .fan-dots-track { gap: 5px; padding: 9px 10px; }
+      .fan-dot { width: 6px; height: 6px; }
+      .fan-dot.active { width: 19px; }
+      .fan-hint { flex-wrap: wrap; justify-content: center; gap: 6px; padding-inline: 8px; text-align: center; }
+      .fan-hint kbd { padding: 2px 5px; }
+
+      form { padding: 18px; }
+      .contact-links { gap: 12px; }
+      .contact-links a { font-size: .86rem; }
+      footer { padding-bottom: calc(20px + var(--nav-h) + var(--sab)); }
+      .tabbar a { font-size: .56rem; letter-spacing: 0; }
+      .tabbar a b { font-size: 1.05rem; }
+    }
+
+    @media (max-width: 360px) {
+      .container { width: calc(100% - 30px); }
+      .tabbar a { font-size: .51rem; }
+      .fan-controls { gap: 5px; }
+      .fan-arrow-btn { width: 38px; height: 38px; flex-basis: 38px; }
+      .fan-dots-track { gap: 4px; padding-inline: 8px; }
+      .fan-dot.active { width: 16px; }
+    }
   </style>
 </head>
 <body>
   <canvas id="scorpion" aria-hidden="true"></canvas>
-
   <div class="bg" aria-hidden="true">
     <div class="stars"></div>
     <div class="cube-field">
@@ -759,6 +881,13 @@
           <a class="btn btn-primary" href="#work">Explore my work <span aria-hidden="true">↗</span></a>
           <a class="btn" href="#gallery">Nature shots 📸</a>
         </div>
+      </div>
+
+      <div id="avatar-roamer" class="hero-model" aria-label="Aniket's 3D avatar">
+        <canvas id="avatar-canvas" aria-hidden="true"></canvas>
+        <div class="model-label">MY 3D AVATAR <span>✦</span></div>
+        <div class="avatar-say" role="status" aria-live="polite"></div>
+        <button class="avatar-hit" type="button" aria-label="Interact with 3D avatar"></button>
       </div>
 
       <div class="scene" id="scene" aria-hidden="true">
@@ -913,7 +1042,7 @@
       </div>
     </section>
 
-    <!-- WORK SECTION (ORIGINAL PROJECTS PRESERVED) -->
+    <!-- WORK SECTION -->
     <section id="work">
       <div class="container">
         <div class="section-heading reveal">
@@ -1196,7 +1325,6 @@
   (() => {
     "use strict";
 
-    // Replace img links with your own nature pictures anytime
     const NATURE_PHOTOS = [
       {
         tag: "Highlands",
@@ -1596,185 +1724,236 @@
   })();
   </script>
 
-  <!-- ================= SCORPION CANVAS CURSOR ================= -->
+  <!-- ================= 3D SCORPION CANVAS CURSOR ================= -->
   <script>
   (() => {
     "use strict";
 
     const canvas = document.getElementById("scorpion");
-    const ctx = canvas.getContext("2d");
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-    const coarse = matchMedia("(pointer: coarse)").matches;
-    const isPaused = () => reduce.matches || document.documentElement.dataset.motion === "off";
+    const ctx = canvas?.getContext("2d", { alpha: true });
+    if (!canvas || !ctx) return;
 
-    let w, h, dpr, time = 0, lastTime = 0, started = false;
-
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const coarsePointer = matchMedia("(pointer: coarse)");
+    const motionOff = () => reduceMotion.matches || document.documentElement.dataset.motion === "off";
+    const COUNT = 26;
+    const BODY_END = 12;
+    const SPACING = 8;
+    let width = 0, height = 0, dpr = 1, time = 0, lastTime = 0, started = false;
     const pointer = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
-
-    const COUNT = 34;
-    const BODY = 14;
-    const spacing = 9;
-    const segments = [];
-    for (let i = 0; i < COUNT; i++) segments.push({ x: pointer.x - i * spacing, y: pointer.y });
+    const segments = Array.from({ length: COUNT }, (_, i) => ({ x: pointer.x - i * SPACING, y: pointer.y }));
 
     function resize() {
-      dpr = Math.min(devicePixelRatio || 1, 2);
-      w = innerWidth;
-      h = innerHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
+      dpr = Math.min(devicePixelRatio || 1, 1.5);
+      width = innerWidth;
+      height = innerHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    addEventListener("resize", resize);
+    addEventListener("resize", resize, { passive: true });
 
     function setTarget(x, y) {
       pointer.tx = x;
       pointer.ty = y;
       if (!started) {
         started = true;
-        pointer.x = x; pointer.y = y;
-        segments.forEach((s, i) => { s.x = x - i * spacing; s.y = y; });
-        canvas.classList.add("on");
+        pointer.x = x;
+        pointer.y = y;
+        segments.forEach((segment, i) => { segment.x = x - i * SPACING; segment.y = y; });
+        if (!coarsePointer.matches && !motionOff()) canvas.classList.add("on");
       }
     }
-    addEventListener("pointermove", e => setTarget(e.clientX, e.clientY), { passive: true });
-    addEventListener("pointerdown", e => setTarget(e.clientX, e.clientY), { passive: true });
-    
-    const touchHandler = e => { const t = e.touches[0]; if (t) setTarget(t.clientX, t.clientY); };
-    addEventListener("touchstart", touchHandler, { passive: true });
-    addEventListener("touchmove", touchHandler, { passive: true });
+    addEventListener("pointermove", event => {
+      if (event.pointerType !== "touch") setTarget(event.clientX, event.clientY);
+    }, { passive: true });
+    addEventListener("pointerdown", event => {
+      if (event.pointerType !== "touch") setTarget(event.clientX, event.clientY);
+    }, { passive: true });
 
-    const pt = (x, y, a, l) => ({ x: x + Math.cos(a) * l, y: y + Math.sin(a) * l });
-
-    function angleAt(i) {
-      const prev = segments[Math.max(0, i - 1)];
-      const next = segments[Math.min(COUNT - 1, i + 1)];
-      return Math.atan2(prev.y - next.y, prev.x - next.x);
+    function angleAt(index) {
+      const ahead = segments[Math.max(0, index - 1)];
+      const behind = segments[Math.min(COUNT - 1, index + 1)];
+      return Math.atan2(ahead.y - behind.y, ahead.x - behind.x);
     }
+    const point = (x, y, angle, length) => ({ x: x + Math.cos(angle) * length, y: y + Math.sin(angle) * length });
 
-    function line(x1, y1, x2, y2, alpha = 1, width = 1) {
-      ctx.strokeStyle = `rgba(255,50,50,${alpha})`;
-      ctx.lineWidth = width;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
-
-    function dot(x, y, r, alpha = 1) {
-      ctx.fillStyle = `rgba(255,80,80,${alpha})`;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function radiusAt(i) {
-      if (i === 0) return 5;
-      if (i < 5) return [0, 8, 9.5, 8.5, 7.5][i];
-      if (i < BODY) return 7 - (i - 5) * 0.4;
-      return Math.max(1.6, 3.2 - (i - BODY) * 0.08);
-    }
-
-    function follow() {
-      pointer.x += (pointer.tx - pointer.x) * 0.25;
-      pointer.y += (pointer.ty - pointer.y) * 0.25;
-
-      segments[0].x += (pointer.x - segments[0].x) * 0.8;
-      segments[0].y += (pointer.y - segments[0].y) * 0.8;
-
+    function follow(dt) {
+      const smoothing = 1 - Math.exp(-dt / 0.035);
+      pointer.x += (pointer.tx - pointer.x) * smoothing;
+      pointer.y += (pointer.ty - pointer.y) * smoothing;
+      const head = segments[0];
+      const headEase = 1 - Math.exp(-dt / 0.022);
+      head.x += (pointer.x - head.x) * headEase;
+      head.y += (pointer.y - head.y) * headEase;
       for (let i = 1; i < COUNT; i++) {
-        const a = segments[i - 1], b = segments[i];
-        const dx = b.x - a.x, dy = b.y - a.y;
-        const dist = Math.hypot(dx, dy);
-        const target = spacing + Math.sin(time * 3 - i * 0.3) * 0.4;
-        if (dist < 0.0001) { b.x = a.x - target; b.y = a.y; }
-        else { b.x = a.x + dx / dist * target; b.y = a.y + dy / dist * target; }
+        const lead = segments[i - 1], part = segments[i];
+        let dx = part.x - lead.x, dy = part.y - lead.y;
+        const distance = Math.hypot(dx, dy) || 0.001;
+        const target = SPACING + Math.sin(time * 2.5 - i * 0.34) * 0.25;
+        part.x = lead.x + dx / distance * target;
+        part.y = lead.y + dy / distance * target;
       }
+    }
+
+    function segment(a, b, radiusA, radiusB, color, highlight = "rgba(255,190,130,.75)") {
+      const angle = Math.atan2(b.y - a.y, b.x - a.x);
+      ctx.save();
+      ctx.translate(a.x, a.y);
+      ctx.rotate(angle);
+      const grad = ctx.createLinearGradient(0, -radiusA, 0, radiusA);
+      grad.addColorStop(0, "#ffd09a");
+      grad.addColorStop(0.18, color);
+      grad.addColorStop(0.56, "#35100d");
+      grad.addColorStop(0.82, "#16090b");
+      grad.addColorStop(1, "#060609");
+      ctx.strokeStyle = "rgba(255,133,96,.86)";
+      ctx.lineWidth = 0.8;
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, -radiusA);
+      ctx.lineTo(Math.hypot(b.x-a.x, b.y-a.y), -radiusB);
+      ctx.quadraticCurveTo(Math.hypot(b.x-a.x, b.y-a.y) + 2, 0, Math.hypot(b.x-a.x, b.y-a.y), radiusB);
+      ctx.lineTo(0, radiusA);
+      ctx.quadraticCurveTo(-2, 0, 0, -radiusA);
+      ctx.fill();
+      ctx.stroke();
+      ctx.strokeStyle = highlight;
+      ctx.globalAlpha = 0.6;
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(2, -radiusA * 0.45);
+      ctx.quadraticCurveTo(4, -radiusA * 0.7, 7, -radiusB * 0.45);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function joint(x, y, radius = 2.2) {
+      const g = ctx.createRadialGradient(x - 0.8, y - 1, 0.2, x, y, radius * 1.6);
+      g.addColorStop(0, "#ffd6a4");
+      g.addColorStop(0.35, "#a74832");
+      g.addColorStop(1, "#17090b");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(255,151,112,.7)"; ctx.lineWidth = 0.7; ctx.stroke();
     }
 
     function drawLegs() {
-      for (const i of [2, 4, 6, 8]) {
-        const p = segments[i];
-        const ang = angleAt(i);
+      [3, 5, 7, 9].forEach((index, pair) => {
+        const anchor = segments[index], heading = angleAt(index);
         for (const side of [-1, 1]) {
-          const swing = Math.sin(time * 6 + i * 0.9 + (side > 0 ? 0 : Math.PI)) * 0.35;
-          const knee = pt(p.x, p.y, ang + side * (1.35 + swing), 10);
-          const foot = pt(knee.x, knee.y, ang + side * (0.55 + swing), 11);
-          line(p.x, p.y, knee.x, knee.y, 0.9, 1.4);
-          line(knee.x, knee.y, foot.x, foot.y, 1, 1.2);
-          dot(knee.x, knee.y, 1.4);
-          dot(foot.x, foot.y, 1.2);
+          const phase = time * 8 + pair * 1.45 + (side < 0 ? Math.PI : 0);
+          const stride = Math.sin(phase) * 0.42;
+          const hipA = heading + side * (0.8 + stride * 0.18);
+          const knee = point(anchor.x, anchor.y, hipA, 8 + pair * 0.25);
+          const foot = point(knee.x, knee.y, heading + side * (1.85 + stride), 13 + pair * 0.4);
+          const toe = point(foot.x, foot.y, heading + side * 1.25, 3.2);
+          segment(anchor, knee, 2.2, 1.45, "#7f3028");
+          joint(knee.x, knee.y, 1.8);
+          segment(knee, foot, 1.5, 0.9, "#a34a35");
+          joint(foot.x, foot.y, 1.2);
+          segment(foot, toe, 0.9, 0.35, "#d07956");
         }
+      });
+    }
+
+    function drawClaws() {
+      const head = segments[0], heading = angleAt(0);
+      for (const side of [-1, 1]) {
+        const shoulder = point(head.x, head.y, heading + side * 0.82, 5.5);
+        const elbow = point(shoulder.x, shoulder.y, heading + side * 0.95, 9);
+        const palm = point(elbow.x, elbow.y, heading + side * 0.52, 8);
+        segment(shoulder, elbow, 2.8, 2.2, "#a54532");
+        joint(elbow.x, elbow.y, 2.3);
+        segment(elbow, palm, 3.3, 4.1, "#b84e37");
+        ctx.save(); ctx.translate(palm.x, palm.y); ctx.rotate(heading + side * 0.52);
+        const clawGrad = ctx.createLinearGradient(0, -5, 0, 5);
+        clawGrad.addColorStop(0, "#ffd09a"); clawGrad.addColorStop(.2, "#a94734");
+        clawGrad.addColorStop(.65, "#35100d"); clawGrad.addColorStop(1, "#11090b");
+        ctx.fillStyle = clawGrad; ctx.strokeStyle = "#e57c58"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(1, 0, 6, 4.6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        const open = 0.22 + (Math.sin(time * 2.2) + 1) * 0.06;
+        [-1, 1].forEach(fingerSide => {
+          ctx.beginPath(); ctx.moveTo(5, fingerSide * 2.2);
+          ctx.quadraticCurveTo(11, fingerSide * (3.2 + open * 5), 15, fingerSide * (1.5 + open * 7));
+          ctx.quadraticCurveTo(10, fingerSide * 0.2, 5, fingerSide * -0.3);
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+        });
+        ctx.restore();
       }
     }
 
     function drawBody() {
       for (let i = COUNT - 1; i >= 0; i--) {
-        const p = segments[i];
-        const r = radiusAt(i);
-        const isTail = i >= BODY;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(angleAt(i));
-        ctx.fillStyle = isTail ? "rgba(60,0,0,0.9)" : "rgba(35,0,0,0.92)";
-        ctx.strokeStyle = `rgba(255,65,65,${0.45 + 0.55 * (1 - i / COUNT)})`;
-        ctx.lineWidth = isTail ? 1.3 : 1.6;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, spacing * 0.65, r, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
+        const p = segments[i], angle = angleAt(i);
+        if (i < BODY_END) {
+          const abdomenRadius = i < 3 ? 6.7 + i * 0.45 : 6.8 - (i - 3) * 0.34;
+          const length = i < 3 ? 7.8 : 7.1;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(angle);
+          const shell = ctx.createLinearGradient(0, -abdomenRadius, 0, abdomenRadius);
+          shell.addColorStop(0, "#ffc48b"); shell.addColorStop(.12, "#9e3c2d");
+          shell.addColorStop(.46, "#4a1714"); shell.addColorStop(.78, "#210c10"); shell.addColorStop(1, "#08070a");
+          ctx.fillStyle = shell; ctx.strokeStyle = "rgba(255,143,103,.86)"; ctx.lineWidth = 0.9;
+          ctx.beginPath(); ctx.ellipse(0, 0, length, abdomenRadius, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+          ctx.strokeStyle = "rgba(255,207,158,.58)"; ctx.lineWidth = .75;
+          ctx.beginPath(); ctx.ellipse(-1, -abdomenRadius * .2, length * .62, abdomenRadius * .36, -.08, Math.PI, Math.PI * 1.88); ctx.stroke();
+          ctx.restore();
+        }
       }
     }
 
     function drawHead() {
-      const head = segments[0];
-      const ang = angleAt(0);
-
-      for (const side of [-1, 1]) {
-        const e = pt(head.x, head.y, ang + side * 0.7, 3);
-        dot(e.x, e.y, 1.2);
-      }
-
-      const snap = 0.25 + (Math.sin(time * 4) + 1) * 0.12;
-      for (const side of [-1, 1]) {
-        const base = pt(head.x, head.y, ang + side * 0.6, 6);
-        const elbow = pt(base.x, base.y, ang + side * 0.55, 11);
-        const wrist = pt(elbow.x, elbow.y, ang + side * 0.1, 9);
-        line(head.x, head.y, base.x, base.y, 1, 1.6);
-        line(base.x, base.y, elbow.x, elbow.y, 1, 1.6);
-        line(elbow.x, elbow.y, wrist.x, wrist.y, 1, 1.6);
-        const jaw1 = pt(wrist.x, wrist.y, ang + side * (0.1 - snap), 7);
-        const jaw2 = pt(wrist.x, wrist.y, ang + side * (0.1 + snap), 7);
-        line(wrist.x, wrist.y, jaw1.x, jaw1.y, 1, 1.5);
-        line(wrist.x, wrist.y, jaw2.x, jaw2.y, 1, 1.5);
-        dot(jaw1.x, jaw1.y, 1.4);
-        dot(jaw2.x, jaw2.y, 1.4);
-      }
+      const head = segments[0], heading = angleAt(0);
+      ctx.save(); ctx.translate(head.x, head.y); ctx.rotate(heading);
+      const shell = ctx.createRadialGradient(-2, -3, 1, 0, 0, 8);
+      shell.addColorStop(0, "#ffd5a1"); shell.addColorStop(.22, "#b94b35"); shell.addColorStop(.7, "#431411"); shell.addColorStop(1, "#10090b");
+      ctx.fillStyle = shell; ctx.strokeStyle = "#ff9d6e"; ctx.lineWidth = 1.1;
+      ctx.beginPath(); ctx.ellipse(0, 0, 7.2, 6.2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#fff0c4";
+      [-1, 1].forEach(side => { ctx.beginPath(); ctx.arc(4, side * 2.6, .8, 0, Math.PI * 2); ctx.fill(); });
+      ctx.restore();
+      drawClaws();
     }
 
     function drawStinger() {
-      const tail = segments[COUNT - 1];
-      const ta = angleAt(COUNT - 1) + Math.PI;
-      const wag = Math.sin(time * 2.2) * 0.25;
-      const a1 = ta + 0.5 + wag, a2 = a1 + 0.9, a3 = a2 + 0.9, a4 = a3 + 0.5;
-      const p1 = pt(tail.x, tail.y, a1, 11);
-      const p2 = pt(p1.x, p1.y, a2, 11);
-      const p3 = pt(p2.x, p2.y, a3, 10);
-      const p4 = pt(p3.x, p3.y, a4, 8);
-      line(tail.x, tail.y, p1.x, p1.y, 1, 2.2);
-      line(p1.x, p1.y, p2.x, p2.y, 1, 2);
-      line(p2.x, p2.y, p3.x, p3.y, 1, 1.8);
-      line(p3.x, p3.y, p4.x, p4.y, 1, 1.2);
-      dot(p3.x, p3.y, 3);
-      dot(p4.x, p4.y, 1.4);
+      const anchorIndex = BODY_END - 1;
+      const anchor = segments[anchorIndex];
+      const heading = angleAt(anchorIndex);
+      const wag = Math.sin(time * 2.1) * 0.09;
+      const bends = [-2.72, -2.18, -1.58, -.98, -.48];
+      const lengths = [12, 12, 11, 10, 9];
+      const radii = [5.1, 4.5, 3.8, 3.1, 2.4];
+      let start = anchor;
+      bends.forEach((bend, index) => {
+        const end = point(start.x, start.y, heading + bend + wag * (index / bends.length), lengths[index]);
+        segment(start, end, radii[index], radii[index] * .78, "#8c3027", "rgba(255,196,145,.9)");
+        joint(start.x, start.y, 2.1 - index * .16);
+        start = end;
+      });
+
+      const tip = point(start.x, start.y, heading - .12 + wag, 11);
+      const barbSide = point(start.x, start.y, heading + .95 + wag, 4.2);
+      const sting = ctx.createLinearGradient(start.x, start.y, tip.x, tip.y);
+      sting.addColorStop(0, "#ffc991"); sting.addColorStop(.35, "#d74c32"); sting.addColorStop(1, "#260b10");
+      ctx.fillStyle = sting;
+      ctx.strokeStyle = "#ffad78";
+      ctx.lineWidth = .8;
+      ctx.beginPath();
+      ctx.moveTo(start.x - Math.cos(heading) * 2, start.y - Math.sin(heading) * 2);
+      ctx.quadraticCurveTo(barbSide.x, barbSide.y, tip.x, tip.y);
+      ctx.quadraticCurveTo(barbSide.x - Math.cos(heading) * 2, barbSide.y - Math.sin(heading) * 2, start.x, start.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
     }
 
     function drawScorpion() {
       ctx.save();
-      ctx.shadowColor = "#ff1111";
-      ctx.shadowBlur = coarse ? 6 : 10;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
       drawLegs();
       drawStinger();
       drawBody();
@@ -1784,27 +1963,248 @@
 
     function animate(now) {
       requestAnimationFrame(animate);
-      if (isPaused() || document.hidden) { lastTime = now; return; }
-
-      const dt = Math.min((now - lastTime) / 1000 || 0.016, 0.04);
+      if (motionOff() || document.hidden || coarsePointer.matches || !started) {
+        lastTime = now;
+        if (motionOff() || coarsePointer.matches) canvas.classList.remove("on");
+        return;
+      }
+      canvas.classList.add("on");
+      const dt = Math.min(Math.max((now - (lastTime || now)) / 1000, 0.001), 0.04);
       lastTime = now;
       time += dt;
-
-      follow();
-      ctx.clearRect(0, 0, w, h);
-
-      const g = ctx.createRadialGradient(pointer.x, pointer.y, 1, pointer.x, pointer.y, 110);
-      g.addColorStop(0, "rgba(255,0,0,0.14)");
-      g.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g;
-      ctx.fillRect(pointer.x - 110, pointer.y - 110, 220, 220);
-
+      follow(dt);
+      ctx.clearRect(0, 0, width, height);
+      const halo = ctx.createRadialGradient(pointer.x, pointer.y, 1, pointer.x, pointer.y, 76);
+      halo.addColorStop(0, "rgba(255,76,35,.10)");
+      halo.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = halo;
+      ctx.fillRect(pointer.x - 76, pointer.y - 76, 152, 152);
       drawScorpion();
     }
 
     resize();
     requestAnimationFrame(animate);
   })();
+  </script>
+
+  <!-- 3D companion loaded from the supplied GLB model -->
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+  </script>
+  <script type="module">
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  const host = document.getElementById('avatar-roamer');
+  const canvas = document.getElementById('avatar-canvas');
+  const hit = host?.querySelector('.avatar-hit');
+  const bubble = host?.querySelector('.avatar-say');
+  if (host && canvas && hit && bubble) {
+    const S = Math.sin, ab = Math.abs, clamp = (v, a, b) => Math.min(b, Math.max(a, v)), ease = x => x * x * (3 - 2 * x);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 40);
+    camera.position.set(0, 1.5, 6.7);
+    camera.lookAt(0, 1.12, 0);
+    scene.add(new THREE.HemisphereLight(0xfff5ea, 0x29223d, 2.1));
+    const key = new THREE.DirectionalLight(0xffffff, 3.2); key.position.set(3, 6, 5); scene.add(key);
+    const pink = new THREE.DirectionalLight(0xff4f87, 2.1); pink.position.set(-4, 3, -3); scene.add(pink);
+    const cyan = new THREE.DirectionalLight(0x67e8f9, 1.3); cyan.position.set(4, 1, -2); scene.add(cyan);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
+    const avatar = new THREE.Group(); scene.add(avatar);
+    // soft contact shadow (shrinks when the avatar jumps)
+    const sc = document.createElement('canvas'); sc.width = sc.height = 64;
+    const sx = sc.getContext('2d'), gr = sx.createRadialGradient(32, 32, 2, 32, 32, 30);
+    gr.addColorStop(0, 'rgba(0,0,0,.55)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    sx.fillStyle = gr; sx.fillRect(0, 0, 64, 64);
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
+    shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.004; shadow.scale.set(0.85, 0.5, 1); avatar.add(shadow);
+
+    function say(msg, dur = 2200) {
+      bubble.textContent = msg; bubble.classList.add('show');
+      clearTimeout(bubble.timer); bubble.timer = setTimeout(() => bubble.classList.remove('show'), dur);
+    }
+
+    /* ---------- 20 random actions: [id, speech, seconds, pose(u, A), ignoreCursor] ----------
+       joints: hips spine head shL shR elL elR lgL lgR  (.x pitch, .y turn, .z roll)
+       shoulder z: L negative / R positive = arm out sideways; x negative = arm forward
+       extras: mouth, br (brows), shut (eyes closed), gaze (eyes sideways), hips.py / hips.px (body offset) */
+    const acts = [
+      ['wave', 'Hi there! 👋', 3, (u, A) => { A('shR.z', 1.7); A('elR.z', 1.4 + .45 * S(u * 10)); A('head.z', -.12); A('head.y', .2); A('spine.y', -.12); A('hips.z', .04); A('mouth', .25); }],
+      ['dance', 'Dance break! 🕺', 4.5, (u, A) => { const b = S(u * 7), s = S(u * 3.5); A('hips.py', ab(b) * .05 - .02); A('hips.y', s * .35); A('hips.z', b * .1); A('spine.z', -b * .08); A('spine.y', -s * .25); A('head.z', b * .1); A('head.x', ab(b) * .1); A('shL.z', -.7 - S(u * 7 + 1) * .5); A('shR.z', .7 + S(u * 7 + 1) * .5); A('elL.z', -1); A('elR.z', 1); A('lgL.x', -.25 * ab(s)); A('lgR.x', -.25 * ab(Math.cos(u * 3.5))); A('mouth', .3); }],
+      ['walk', 'Just taking a stroll…', 4, (u, A) => { const p = u * 5.5, s = S(p); A('lgL.x', s * .55); A('lgR.x', -s * .55); A('shL.x', -s * .5); A('shR.x', s * .5); A('elL.x', -.3 - .3 * ab(s)); A('elR.x', -.2); A('hips.py', ab(Math.cos(p)) * .03); A('hips.y', s * .12); A('spine.y', -s * .18); A('spine.x', .05); A('head.y', -s * .05); }],
+      ['sing', 'La la laaa 🎵', 4, (u, A) => { const m = ab(S(u * 8)), s = S(u * 2); A('mouth', m * 1.1); A('shR.x', -1.2); A('shR.z', -.3); A('elR.x', -1.5); A('shL.z', -.6 - ab(s) * .5); A('elL.z', -.4); A('head.x', -.12 + s * .08); A('head.z', s * .1); A('hips.z', s * .05); A('br', .5); }],
+      ['cheer', 'Yesss! 🙌', 3, (u, A) => { const j = ab(S(u * 6)); A('shL.z', -2.7 + .15 * S(u * 12)); A('shR.z', 2.7 - .15 * S(u * 12)); A('hips.py', j * .1); A('lgL.x', -.2 * j); A('lgR.x', -.2 * j); A('head.x', -.2); A('mouth', .6); A('br', 1); }],
+      ['sleep', 'Zzz… tiny nap 😴', 5, (u, A) => { A('shut', 1); A('head.x', .5 + .04 * S(u * 1.6)); A('head.z', .12); A('spine.x', .14); A('hips.py', -.012); }, true],
+      ['spin', 'Wheee! 🌀', 2.4, (u, A, P, d) => { P.spin = ease(clamp((u - .2) / (d - .4), 0, 1)) * Math.PI * 2; A('shL.z', -1.1); A('shR.z', 1.1); A('hips.py', .02); A('mouth', .4); A('br', .6); }],
+      ['stretch', 'Stretching… yawn 🥱', 4.5, (u, A) => { A('shL.z', -2.8); A('shR.z', 2.8); A('spine.x', -.18); A('head.x', -.35); A('mouth', 1.2); A('shut', .8); }, true],
+      ['think', 'Hmm, let me think…', 4.5, (u, A) => { A('shR.x', -1.1); A('shR.z', -.4); A('elR.x', -1.9); A('elR.z', -.4); A('head.z', .14); A('head.y', -.2); A('head.x', -.12); A('br', .6); A('hips.z', .04); A('gaze', -.7); }, true],
+      ['shrug', 'Who knows? 🤷', 2.6, (u, A) => { A('shL.z', -.55); A('shR.z', .55); A('elL.z', -1.3); A('elR.z', 1.3); A('head.z', .12); A('br', 1); A('hips.py', .006 * S(u * 5)); }],
+      ['clap', 'Clap clap! 👏', 3.5, (u, A) => { const s = S(u * 14); A('shL.x', -.9); A('shR.x', -.9); A('elL.x', -1.4); A('elR.x', -1.4); A('shL.z', .5 + .18 * s); A('shR.z', -.5 - .18 * s); A('hips.py', ab(S(u * 7)) * .015); A('mouth', .5); A('br', .5); }],
+      ['look', 'Looking around… 👀', 4.5, (u, A) => { const s = S(u * 1.5); A('head.y', s * .7); A('spine.y', s * .15); A('head.x', -.05 + S(u * 3) * .05); A('gaze', S(u * 1.5 + .6) * .9); }, true],
+      ['flex', 'Flexing! 💪', 3.4, (u, A) => { A('shL.z', -1.55); A('shR.z', 1.55); A('elL.z', -1.9); A('elR.z', 1.9); A('hips.z', S(u * 6) * .03); A('head.x', -.1); A('br', .8); A('mouth', .4); }],
+      ['sass', 'Hmm hm hm 😎', 3.5, (u, A) => { const s = S(u * 2.2); A('shL.z', -.55); A('shR.z', .55); A('elL.z', .9); A('elR.z', -1.1); A('hips.z', .1 * s); A('hips.px', .03 * s); A('spine.z', -.06 * s); A('head.z', -.1 * s + .06); A('head.y', .2 * S(u * 1.1)); A('br', .4); A('mouth', .2); }],
+      ['salute', 'Yes sir! 🫡', 2.8, (u, A) => { A('shR.z', 1.8); A('shR.x', -.15); A('elR.z', 2.2); A('head.x', -.05); A('spine.x', .03); A('br', .4); }],
+      ['namaste', 'Namaste 🙏', 3.6, (u, A) => { A('shL.x', -.95); A('shR.x', -.95); A('elL.x', -1.5); A('elR.x', -1.5); A('shL.z', .55); A('shR.z', -.55); A('spine.x', .15 + .1 * S(u * 1.7)); A('head.x', .18 + .12 * S(u * 1.7)); A('shut', .2); A('mouth', .1); }, true],
+      ['jump', 'Boing! ⬆️', 3.3, (u, A) => { const p = (u % 1.1) / 1.1, cr = p < .3 ? S(p / .3 * Math.PI) : 0, air = p > .3 && p < .85 ? S((p - .3) / .55 * Math.PI) : 0; A('hips.py', air * .2 - cr * .05); A('spine.x', cr * .25); A('lgL.x', -.4 * cr); A('lgR.x', -.4 * cr); A('shL.z', -.2 - 2.1 * air); A('shR.z', .2 + 2.1 * air); A('shL.x', cr * .8); A('shR.x', cr * .8); A('mouth', .5 * air); A('br', air); }],
+      ['box', 'Shadow boxing 🥊', 4, (u, A) => { const p = u * 5, a = Math.max(0, S(p)), b = Math.max(0, S(p + Math.PI)); A('shR.x', -.4 - 1.1 * a); A('elR.x', -1.8 + 1.7 * a); A('shL.x', -.4 - 1.1 * b); A('elL.x', -1.8 + 1.7 * b); A('shL.z', .2); A('shR.z', -.2); A('hips.y', .35 * (a - b)); A('spine.y', -.3 * (a - b)); A('hips.py', ab(S(p)) * .02 - .01); A('lgL.x', .2 * b); A('lgR.x', -.2 * a); A('br', -.5); A('head.x', .08); }],
+      ['scratch', 'Where’s that bug? 🐛', 3.6, (u, A) => { A('shR.z', 2.35); A('elR.z', 1.9 + .2 * S(u * 14)); A('head.z', .18); A('head.y', .1); A('br', .6); A('hips.z', .03); A('shut', .2); }],
+      ['type', 'Coding… ⌨️', 4.5, (u, A) => { A('shL.x', -.85); A('shR.x', -.85); A('elL.x', -1.35 + .12 * S(u * 18)); A('elR.x', -1.35 + .12 * S(u * 18 + 2)); A('shL.z', .25); A('shR.z', -.25); A('head.x', .18); A('spine.x', .08); A('br', .2); }]
+    ];
+
+    /* ---------- state ---------- */
+    const keys = ['hips.px', 'hips.py', 'mouth', 'br', 'shut', 'gaze'];
+    ['hips', 'spine', 'head', 'shL', 'shR', 'elL', 'elR', 'lgL', 'lgR'].forEach(j => 'xyz'.split('').forEach(a => keys.push(j + '.' + a)));
+    const c = {}; keys.forEach(k => c[k] = 0);
+    let rig = null, cur = null, nextAt = Infinity, lastTouch = 0, lastPtr = 0;
+    let tx = 0, ty = 0, gx = 0, gy = 0, hgx = 0, hgy = 0, blinkT = -1, nextBlink = 1500;
+    let prev = { hy: 0, px: 0, py: 0 };
+    const recent = [];
+    function start(a, text) { cur = { f: a[3], nl: a[4], d: a[2], s: performance.now() }; say(text || a[1], a[2] * 1000); }
+    function play(n, t) { const a = acts.find(x => x[0] === n); if (a) start(a, t); }
+    function randomAction() {
+      let i; do { i = Math.floor(Math.random() * acts.length); } while (recent.includes(i));
+      recent.push(i); if (recent.length > 6) recent.shift(); start(acts[i]);
+    }
+    function resize() {
+      const r = host.getBoundingClientRect(); if (!r.width || !r.height) return;
+      renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); renderer.render(scene, camera);
+    }
+    new ResizeObserver(resize).observe(host); resize();
+
+    /* ---------- build a procedural skeleton from the static GLB ---------- */
+    new GLTFLoader().load('./assets/preview.glb', (gltf) => {
+      const model = gltf.scene || gltf.scenes?.[0];
+      if (!model) throw new Error('No scene found inside preview.glb');
+      const fl = model.getObjectByName('ENV_preview_floor'); if (fl?.parent) fl.parent.remove(fl);
+      const root = model.getObjectByName('RIG_avatar_root') || model;
+      model.updateMatrixWorld(true);
+      const mk = (p, w) => { const g = new THREE.Group(), pw = p.userData.w || [0, 0, 0]; g.position.set(w[0] - pw[0], w[1] - pw[1], w[2] - pw[2]); g.userData.w = w; p.add(g); return g; };
+      const hips = mk(root, [0, .72, 0]), spine = mk(hips, [0, .78, 0]), head = mk(spine, [0, 1.5, 0]);
+      const G = { hips, spine, head };
+      for (const s of ['L', 'R']) {
+        const up = root.getObjectByName('MESH_sleeve_upper_' + s), el = root.getObjectByName('MESH_elbow_' + s);
+        G['lg' + s] = mk(hips, [s === 'L' ? -.145 : .145, .72, 0]);
+        if (!up || !el) continue;
+        G['sh' + s] = mk(spine, [up.position.x, up.position.y + up.scale.y * .8, up.position.z]);
+        G['el' + s] = mk(G['sh' + s], [el.position.x, el.position.y, el.position.z]);
+      }
+      const sec = [], q = [], meshes = [];
+      root.traverse(o => { if (o.isMesh && o.name && !o.name.startsWith('ENV_')) meshes.push(o); });
+      let mouth = null;
+      for (const m of meshes) {
+        const n = m.name, s = (n.match(/_(L|R)(?:_|\d|\.|$)/) || [])[1];
+        let p = spine;
+        if (/^MESH_(denim|sneaker)|^DETAIL_(lace|outer_seam)/.test(n)) p = G['lg' + s] || spine;
+        else if (/^MESH_(sleeve_upper|elbow)/.test(n)) p = G['sh' + s] || spine;
+        else if (/^MESH_(sleeve_forearm|cuff|hand|finger)/.test(n)) p = G['el' + s] || spine;
+        else if (/^MESH_gold_hoop/.test(n)) { p = mk(head, [m.position.x, m.position.y + .045, m.position.z]); sec.push({ g: p, f: 1.4, a: 0, v: 0 }); }
+        else if (/^MESH_fringe/.test(n)) { p = mk(head, [m.position.x, m.position.y + m.scale.y * .8, m.position.z]); sec.push({ g: p, f: .7, a: 0, v: 0 }); }
+        else if (/^MESH_smile/.test(n)) { const v = new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3()); root.worldToLocal(v); p = mouth = mk(head, [v.x, v.y, v.z]); }
+        else if (/^(MESH|DETAIL)_(face|hair|ear|eye|iris|pupil|brow|freckle|nose|nostril|temple)/.test(n)) p = head;
+        q.push([p, m]);
+      }
+      model.updateMatrixWorld(true);
+      for (const [p, m] of q) p.attach(m);
+      const eyes = [], brows = [];
+      for (const m of meshes) {
+        const n = m.name;
+        if (/^MESH_(eye_white|iris|pupil)|^DETAIL_eye_glint/.test(n)) eyes.push({ m, px: m.position.x, py: m.position.y, sy: m.scale.y, g: /white/.test(n) ? 0 : 1 });
+        else if (/^MESH_brow/.test(n)) brows.push({ m, y: m.position.y });
+      }
+      model.updateMatrixWorld(true);
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3()), center = bounds.getCenter(new THREE.Vector3());
+      const scale = 2.2 / Math.max(size.x, size.y, size.z, 1);
+      model.scale.setScalar(scale);
+      model.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+      avatar.add(model);
+      rig = { G, hp: hips.position.clone(), eyes, brows, mouth, sec };
+      nextAt = performance.now() + 1500;
+      renderer.render(scene, camera);
+    }, undefined, (error) => {
+      console.error('Could not load assets/preview.glb', error);
+      bubble.textContent = 'The avatar could not load. Keep preview.glb in the assets folder and run the site with a local web server.';
+      bubble.classList.add('show');
+    });
+
+    /* ---------- animation loop ---------- */
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      if (document.hidden) return;
+      const dt = Math.min(clock.getDelta(), .05) || .016, t = clock.elapsedTime, now = performance.now();
+      if (!rig) return;
+      const mv = !reduced.matches && document.documentElement.dataset.motion !== 'off';
+      const P = {}; let w = 0, lookW = 1;
+      if (mv) {
+        if (!cur && now >= nextAt) randomAction();
+        // idle layer: breathing, weight shift, tiny head drift
+        const br = S(t * 1.7), sw = S(t * .45);
+        P['hips.py'] = br * .004; P['spine.x'] = br * .014; P['shL.z'] = -.045 - br * .01; P['shR.z'] = .045 + br * .01;
+        P['hips.px'] = sw * .025; P['hips.z'] = sw * .03; P['spine.z'] = -sw * .02;
+        P['head.z'] = sw * .01 + S(t * .8) * .015; P['head.y'] = S(t * .6) * .04; P['head.x'] = S(t * .5) * .02;
+        P['elL.x'] = -.05 + S(t * 1.1) * .03; P['mouth'] = .03;
+        if (cur) {
+          const u = (now - cur.s) / 1000;
+          if (u >= cur.d) { cur = null; nextAt = now + 2500 + Math.random() * 3500; }
+          else { w = ease(clamp(Math.min(u, cur.d - u) / .45, 0, 1)); cur.f(u, (k, v) => { P[k] = (P[k] || 0) + v * w; }, P, cur.d); lookW = cur.nl ? 1 - w : 1; }
+        }
+        // gaze: follow the cursor, wander when idle
+        if (now - lastPtr > 5000) { tx = S(t * .37) * .6; ty = S(t * .23) * .15; }
+        gx += (tx - gx) * Math.min(1, dt * 6); gy += (ty - gy) * Math.min(1, dt * 6);
+        hgx += (tx - hgx) * Math.min(1, dt * 2.5); hgy += (ty - hgy) * Math.min(1, dt * 2.5);
+        P['head.y'] += hgx * .5 * lookW; P['head.x'] += hgy * .28 * lookW; P['spine.y'] = (P['spine.y'] || 0) + hgx * .1 * lookW;
+        // blinking
+        if (now > nextBlink) { blinkT = 0; nextBlink = now + (Math.random() < .2 ? 260 : 2200 + Math.random() * 3500); }
+        if (blinkT >= 0) { blinkT += dt; if (blinkT > .16) blinkT = -1; }
+      }
+      const a = Math.min(1, dt * 13);
+      for (const k of keys) c[k] += ((P[k] || 0) - c[k]) * a;
+      for (const j in rig.G) rig.G[j].rotation.set(c[j + '.x'], c[j + '.y'], c[j + '.z']);
+      rig.G.hips.position.set(rig.hp.x + c['hips.px'], rig.hp.y + c['hips.py'], rig.hp.z);
+      avatar.rotation.y = P.spin || 0;
+      // face
+      const shut = clamp((blinkT >= 0 ? S(blinkT / .16 * Math.PI) : 0) + c.shut, 0, 1);
+      const ex = lookW * gx * .9 + c.gaze, ey = lookW * gy * .7;
+      for (const e of rig.eyes) {
+        e.m.scale.y = e.sy * (1 - shut * .92);
+        if (e.g) { e.m.position.x = e.px + ex * .0125; e.m.position.y = e.py - ey * .008; }
+      }
+      for (const b of rig.brows) b.m.position.y = b.y + c.br * .016;
+      if (rig.mouth) { rig.mouth.scale.y = 1 + clamp(c.mouth, -.3, 1.4) * 1.1; rig.mouth.scale.x = 1 + c.mouth * .06; }
+      // hair & earrings follow through (spring physics)
+      const hy = c['head.y'], px = c['hips.px'], py = c['hips.py'];
+      const vy = (hy - prev.hy) / dt, vx = (px - prev.px) / dt, vb = (py - prev.py) / dt;
+      prev = { hy, px, py };
+      const drive = clamp(-(vy * .07 + vx * .5), -.5, .5), lift = clamp(-vb * .08, -.4, .4);
+      for (const s of rig.sec) { const acc = (drive * s.f - s.a) * 70 - s.v * 8; s.v += acc * dt; s.a += s.v * dt; s.g.rotation.z = s.a; s.g.rotation.x = lift * s.f * .5; }
+      const sh = Math.max(.5, 1 - py * 1.8);
+      shadow.scale.set(.85 * sh, .5 * sh, 1);
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    window.addEventListener('pointermove', (e) => {
+      lastPtr = performance.now();
+      const r = host.getBoundingClientRect();
+      tx = clamp((e.clientX - (r.left + r.width / 2)) / (innerWidth * .45), -1, 1);
+      ty = clamp((e.clientY - (r.top + r.height * .25)) / (innerHeight * .45), -1, 1);
+    }, { passive: true });
+    hit.addEventListener('pointerdown', () => {
+      const n = performance.now();
+      if (n - lastTouch < 900) { play('spin', 'Okay, okay! 😄'); return; }
+      lastTouch = n;
+      play(['jump', 'wave', 'cheer', 'namaste'][Math.floor(Math.random() * 4)], 'Hey, don’t touch me! 😄');
+    });
+    window.addEventListener('resize', resize);
+  }
   </script>
 </body>
 </html>
