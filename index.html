@@ -1,3 +1,6 @@
+Scorpion 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,16 +109,19 @@
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 100;
+      z-index: 9999;
       pointer-events: none;
       opacity: 0;
-      transition: opacity .5s;
+      transition: opacity .35s ease;
     }
     #scorpion.on { opacity: 1; }
     @media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-      html:not([data-motion="off"]) body,
-      html:not([data-motion="off"]) a,
-      html:not([data-motion="off"]) button { cursor: none; }
+      html:not([data-motion="off"]).scorpion-ready body,
+      html:not([data-motion="off"]).scorpion-ready a,
+      html:not([data-motion="off"]).scorpion-ready button,
+      html:not([data-motion="off"]).scorpion-ready [role="button"],
+      html:not([data-motion="off"]).scorpion-ready input,
+      html:not([data-motion="off"]).scorpion-ready textarea { cursor: none !important; }
     }
 
     /* ---------- Living background ---------- */
@@ -2002,7 +2008,7 @@
   })();
   </script>
 
-  <!-- ================= 3D SCORPION CANVAS CURSOR ================= -->
+  <!-- ================= ENHANCED & BUG-FIXED 3D SCORPION CURSOR ================= -->
   <script>
   (() => {
     "use strict";
@@ -2014,69 +2020,205 @@
     const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
     const coarsePointer = matchMedia("(pointer: coarse)");
     const motionOff = () => reduceMotion.matches || document.documentElement.dataset.motion === "off";
-    const COUNT = 26;
-    const BODY_END = 12;
-    const SPACING = 8;
-    let width = 0, height = 0, dpr = 1, time = 0, lastTime = 0, started = false;
-    const pointer = { x: innerWidth / 2, y: innerHeight / 2, tx: innerWidth / 2, ty: innerHeight / 2 };
-    const segments = Array.from({ length: COUNT }, (_, i) => ({ x: pointer.x - i * SPACING, y: pointer.y }));
+
+    // Fixed segment count: 12 body segments (removed 14 unused ghost segments)
+    const BODY_COUNT = 12;
+    const SPACING = 7.8;
+
+    let width = 0, height = 0, dpr = 1;
+    let time = 0, walkPhase = 0, lastTime = 0;
+    let started = false, visible = true;
+    let isHoveringInteractive = false;
+    let strikeProgress = 0; // 0 = idle, >0 = striking on click
+    let hoverBlend = 0;     // Smoothly interpolates alert stance on links/buttons
+    let currentSpeed = 0;   // Tracks velocity so legs only walk when moving
+
+    const pointer = {
+      x: innerWidth / 2,
+      y: innerHeight / 2,
+      tx: innerWidth / 2,
+      ty: innerHeight / 2
+    };
+
+    const segments = Array.from({ length: BODY_COUNT }, (_, i) => ({
+      x: pointer.x - (i + 1) * SPACING,
+      y: pointer.y,
+      angle: 0
+    }));
+
+    const sparks = [];
 
     function resize() {
-      dpr = Math.min(devicePixelRatio || 1, 1.5);
-      width = innerWidth;
-      height = innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    addEventListener("resize", resize, { passive: true });
+    window.addEventListener("resize", resize, { passive: true });
 
-    function setTarget(x, y) {
+    //Shortest angular difference to prevent 360-degree snapping bug
+    function angleDiff(a, b) {
+      let d = ((b - a + Math.PI) % (Math.PI * 2)) - Math.PI;
+      return d < -Math.PI ? d + Math.PI * 2 : d;
+    }
+
+    function lerpAngle(a, b, t) {
+      return a + angleDiff(a, b) * t;
+    }
+
+    const point = (x, y, angle, length) => ({
+      x: x + Math.cos(angle) * length,
+      y: y + Math.sin(angle) * length
+    });
+
+    function checkInteractive(target) {
+      if (!target || typeof target.closest !== "function") return false;
+      return Boolean(
+        target.closest("a, button, input, textarea, select, label, [role='button'], [role='tab'], .fan-card, .avatar-hit")
+      );
+    }
+
+    function setTarget(x, y, targetEl) {
       pointer.tx = x;
       pointer.ty = y;
+      visible = true;
+      if (targetEl !== undefined) {
+        isHoveringInteractive = checkInteractive(targetEl);
+      }
+
       if (!started) {
         started = true;
         pointer.x = x;
         pointer.y = y;
-        segments.forEach((segment, i) => { segment.x = x - i * SPACING; segment.y = y; });
-        if (!coarsePointer.matches && !motionOff()) canvas.classList.add("on");
+        segments.forEach((seg, i) => {
+          seg.x = x - (i + 1) * SPACING;
+          seg.y = y;
+          seg.angle = 0;
+        });
+        if (!coarsePointer.matches && !motionOff()) {
+          canvas.classList.add("on");
+          document.documentElement.classList.add("scorpion-ready");
+        }
       }
     }
-    addEventListener("pointermove", event => {
-      if (event.pointerType !== "touch") setTarget(event.clientX, event.clientY);
-    }, { passive: true });
-    addEventListener("pointerdown", event => {
-      if (event.pointerType !== "touch") setTarget(event.clientX, event.clientY);
+
+    window.addEventListener("pointermove", e => {
+      if (e.pointerType !== "touch") setTarget(e.clientX, e.clientY, e.target);
     }, { passive: true });
 
-    function angleAt(index) {
-      const ahead = segments[Math.max(0, index - 1)];
-      const behind = segments[Math.min(COUNT - 1, index + 1)];
-      return Math.atan2(ahead.y - behind.y, ahead.x - behind.x);
-    }
-    const point = (x, y, angle, length) => ({ x: x + Math.cos(angle) * length, y: y + Math.sin(angle) * length });
+    window.addEventListener("pointerdown", e => {
+      if (e.pointerType === "touch") return;
+      setTarget(e.clientX, e.clientY, e.target);
+      // Trigger claw snap + stinger strike animation
+      strikeProgress = 1.0;
+
+      // Spawnvenom/ember sparks at cursor tip
+      for (let i = 0; i < 8; i++) {
+        const ang = (Math.PI * 2 * i) / 8 + (Math.random() - 0.5) * 0.5;
+        const spd = 45 + Math.random() * 85;
+        sparks.push({
+          x: e.clientX,
+          y: e.clientY,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          life: 1,
+          color: i % 2 === 0 ? "#05d5fa" : "#ff2a6d"
+        });
+      }
+    }, { passive: true });
+
+    document.addEventListener("mouseleave", () => {
+      visible = false;
+      canvas.classList.remove("on");
+    });
+
+    document.addEventListener("mouseenter", () => {
+      if (started && !coarsePointer.matches && !motionOff()) {
+        visible = true;
+        canvas.classList.add("on");
+      }
+    });
 
     function follow(dt) {
-      const smoothing = 1 - Math.exp(-dt / 0.035);
+      const prevX = pointer.x;
+      const prevY = pointer.y;
+
+      const smoothing = 1 - Math.exp(-dt / 0.028);
       pointer.x += (pointer.tx - pointer.x) * smoothing;
       pointer.y += (pointer.ty - pointer.y) * smoothing;
+
+      // Calculate cursor velocity for realistic gait cycle
+      const instSpeed = Math.hypot(pointer.x - prevX, pointer.y - prevY) / Math.max(dt, 0.001);
+      currentSpeed += (instSpeed - currentSpeed) * Math.min(1, dt * 12);
+
+      // Advance leg walk phase strictly when moving, plus subtle idle breathing
+      const normalizedWalk = Math.min(currentSpeed / 160, 2.6);
+      walkPhase += dt * (normalizedWalk * 12 + 0.45);
+
+      hoverBlend += ((isHoveringInteractive ? 1 : 0) - hoverBlend) * Math.min(1, dt * 10);
+      if (strikeProgress > 0) {
+        strikeProgress = Math.max(0, strikeProgress - dt * 3.4);
+      }
+
+      // Head stays slightly behind exact cursor tip so pincers frame the target
       const head = segments[0];
-      const headEase = 1 - Math.exp(-dt / 0.022);
-      head.x += (pointer.x - head.x) * headEase;
-      head.y += (pointer.y - head.y) * headEase;
-      for (let i = 1; i < COUNT; i++) {
-        const lead = segments[i - 1], part = segments[i];
-        let dx = part.x - lead.x, dy = part.y - lead.y;
-        const distance = Math.hypot(dx, dy) || 0.001;
-        const target = SPACING + Math.sin(time * 2.5 - i * 0.34) * 0.25;
-        part.x = lead.x + dx / distance * target;
-        part.y = lead.y + dy / distance * target;
+      const dxHead = pointer.tx - head.x;
+      const dyHead = pointer.ty - head.y;
+      const distToPointer = Math.hypot(dxHead, dyHead);
+
+      if (distToPointer > 1.5) {
+        const desiredAngle = Math.atan2(dyHead, dxHead);
+        head.angle = lerpAngle(head.angle, desiredAngle, Math.min(1, dt * 18));
+      }
+
+      const headOffset = 10 - strikeProgress * 5;
+      const targetHeadX = pointer.x - Math.cos(head.angle) * headOffset;
+      const targetHeadY = pointer.y - Math.sin(head.angle) * headOffset;
+
+      const headEase = 1 - Math.exp(-dt / 0.02);
+      head.x += (targetHeadX - head.x) * headEase;
+      head.y += (targetHeadY - head.y) * headEase;
+
+      // Inverse Kinematics chain with spine angular constraint (prevents kinking)
+      for (let i = 1; i < BODY_COUNT; i++) {
+        const lead = segments[i - 1];
+        const part = segments[i];
+        const dx = lead.x - part.x;
+        const dy = lead.y - part.y;
+        const rawAngle = Math.atan2(dy, dx);
+
+        // Constrain bend angle relative to the parent segment
+        let diff = angleDiff(lead.angle, rawAngle);
+        const maxBend = 0.46;
+        if (Math.abs(diff) > maxBend) {
+          diff = Math.sign(diff) * maxBend;
+        }
+        part.angle = lead.angle + diff;
+
+        const targetSpacing = SPACING + Math.sin(time * 3 - i * 0.4) * 0.2;
+        part.x = lead.x - Math.cos(part.angle) * targetSpacing;
+        part.y = lead.y - Math.sin(part.angle) * targetSpacing;
+      }
+
+      // Update click sparks
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const sp = sparks[i];
+        sp.x += sp.vx * dt;
+        sp.y += sp.vy * dt;
+        sp.vx *= 0.92;
+        sp.vy *= 0.92;
+        sp.life -= dt * 2.8;
+        if (sp.life <= 0) sparks.splice(i, 1);
       }
     }
 
-    function segment(a, b, radiusA, radiusB, color, highlight = "rgba(255,190,130,.75)") {
+    function drawLimbSegment(a, b, radiusA, radiusB, color, highlight = "rgba(255,190,130,.75)") {
+      const dist = Math.hypot(b.x - a.x, b.y - a.y);
+      if (dist < 0.1) return;
       const angle = Math.atan2(b.y - a.y, b.x - a.x);
       ctx.save();
       ctx.translate(a.x, a.y);
@@ -2092,132 +2234,219 @@
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.moveTo(0, -radiusA);
-      ctx.lineTo(Math.hypot(b.x-a.x, b.y-a.y), -radiusB);
-      ctx.quadraticCurveTo(Math.hypot(b.x-a.x, b.y-a.y) + 2, 0, Math.hypot(b.x-a.x, b.y-a.y), radiusB);
+      ctx.lineTo(dist, -radiusB);
+      ctx.quadraticCurveTo(dist + 2, 0, dist, radiusB);
       ctx.lineTo(0, radiusA);
       ctx.quadraticCurveTo(-2, 0, 0, -radiusA);
       ctx.fill();
       ctx.stroke();
+
       ctx.strokeStyle = highlight;
-      ctx.globalAlpha = 0.6;
+      ctx.globalAlpha = 0.55;
       ctx.lineWidth = 0.7;
       ctx.beginPath();
       ctx.moveTo(2, -radiusA * 0.45);
-      ctx.quadraticCurveTo(4, -radiusA * 0.7, 7, -radiusB * 0.45);
+      ctx.quadraticCurveTo(dist * 0.5, -radiusA * 0.65, Math.max(2, dist - 2), -radiusB * 0.45);
       ctx.stroke();
       ctx.restore();
     }
 
-    function joint(x, y, radius = 2.2) {
+    function drawJoint(x, y, radius = 2.2) {
       const g = ctx.createRadialGradient(x - 0.8, y - 1, 0.2, x, y, radius * 1.6);
       g.addColorStop(0, "#ffd6a4");
       g.addColorStop(0.35, "#a74832");
       g.addColorStop(1, "#17090b");
       ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = "rgba(255,151,112,.7)"; ctx.lineWidth = 0.7; ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,151,112,.7)";
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
     }
 
     function drawLegs() {
-      [3, 5, 7, 9].forEach((index, pair) => {
-        const anchor = segments[index], heading = angleAt(index);
+      const moveFactor = Math.min(currentSpeed / 90, 1);
+      [2, 4, 6, 8].forEach((index, pair) => {
+        const anchor = segments[index];
+        const heading = anchor.angle;
         for (const side of [-1, 1]) {
-          const phase = time * 8 + pair * 1.45 + (side < 0 ? Math.PI : 0);
-          const stride = Math.sin(phase) * 0.42;
-          const hipA = heading + side * (0.8 + stride * 0.18);
-          const knee = point(anchor.x, anchor.y, hipA, 8 + pair * 0.25);
-          const foot = point(knee.x, knee.y, heading + side * (1.85 + stride), 13 + pair * 0.4);
-          const toe = point(foot.x, foot.y, heading + side * 1.25, 3.2);
-          segment(anchor, knee, 2.2, 1.45, "#7f3028");
-          joint(knee.x, knee.y, 1.8);
-          segment(knee, foot, 1.5, 0.9, "#a34a35");
-          joint(foot.x, foot.y, 1.2);
-          segment(foot, toe, 0.9, 0.35, "#d07956");
+          // Alternating tetrapod arachnid gait
+          const phase = walkPhase + pair * 1.55 + (side < 0 ? Math.PI : 0);
+          const stride = Math.sin(phase) * (0.45 * moveFactor + 0.03 * Math.sin(time * 2 + pair));
+          const lift = Math.max(0, Math.cos(phase)) * 2.2 * moveFactor;
+
+          const hipAngle = heading + side * (0.85 + stride * 0.22);
+          const knee = point(anchor.x, anchor.y, hipAngle, 8.5 + pair * 0.35 - lift * 0.3);
+          const foot = point(knee.x, knee.y, heading + side * (1.82 + stride * 0.9), 13.2 + pair * 0.45 + lift * 0.5);
+          const toe = point(foot.x, foot.y, heading + side * 1.3, 3.4);
+
+          drawLimbSegment(anchor, knee, 2.2, 1.45, "#7f3028");
+          drawJoint(knee.x, knee.y, 1.8);
+          drawLimbSegment(knee, foot, 1.5, 0.9, "#a34a35");
+          drawJoint(foot.x, foot.y, 1.2);
+          drawLimbSegment(foot, toe, 0.9, 0.35, "#d07956");
         }
       });
     }
 
     function drawClaws() {
-      const head = segments[0], heading = angleAt(0);
+      const head = segments[0];
+      const heading = head.angle;
+      const strikeReach = Math.sin(strikeProgress * Math.PI);
+
       for (const side of [-1, 1]) {
-        const shoulder = point(head.x, head.y, heading + side * 0.82, 5.5);
-        const elbow = point(shoulder.x, shoulder.y, heading + side * 0.95, 9);
-        const palm = point(elbow.x, elbow.y, heading + side * 0.52, 8);
-        segment(shoulder, elbow, 2.8, 2.2, "#a54532");
-        joint(elbow.x, elbow.y, 2.3);
-        segment(elbow, palm, 3.3, 4.1, "#b84e37");
-        ctx.save(); ctx.translate(palm.x, palm.y); ctx.rotate(heading + side * 0.52);
+        const spread = 0.78 + hoverBlend * 0.14 - strikeReach * 0.28;
+        const shoulder = point(head.x, head.y, heading + side * spread, 5.8);
+        const elbow = point(shoulder.x, shoulder.y, heading + side * (0.88 - strikeReach * 0.32), 9.2 + strikeReach * 3.2);
+        const palm = point(elbow.x, elbow.y, heading + side * (0.42 - strikeReach * 0.22), 8.2 + strikeReach * 2.5);
+
+        drawLimbSegment(shoulder, elbow, 2.8, 2.2, "#a54532");
+        drawJoint(elbow.x, elbow.y, 2.3);
+        drawLimbSegment(elbow, palm, 3.3, 4.1, "#b84e37");
+
+        ctx.save();
+        ctx.translate(palm.x, palm.y);
+        ctx.rotate(heading + side * (0.42 - strikeReach * 0.25));
+
         const clawGrad = ctx.createLinearGradient(0, -5, 0, 5);
-        clawGrad.addColorStop(0, "#ffd09a"); clawGrad.addColorStop(.2, "#a94734");
-        clawGrad.addColorStop(.65, "#35100d"); clawGrad.addColorStop(1, "#11090b");
-        ctx.fillStyle = clawGrad; ctx.strokeStyle = "#e57c58"; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.ellipse(1, 0, 6, 4.6, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        const open = 0.22 + (Math.sin(time * 2.2) + 1) * 0.06;
+        clawGrad.addColorStop(0, "#ffd09a");
+        clawGrad.addColorStop(0.2, "#a94734");
+        clawGrad.addColorStop(0.65, "#35100d");
+        clawGrad.addColorStop(1, "#11090b");
+        ctx.fillStyle = clawGrad;
+        ctx.strokeStyle = hoverBlend > 0.3 ? "#ff8c6b" : "#e57c58";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.ellipse(1, 0, 6, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Pincers open wider on interactive elements and snap shut on click
+        const baseOpen = 0.2 + (Math.sin(time * 2.5) + 1) * 0.05 + hoverBlend * 0.24;
+        const open = Math.max(0.02, baseOpen * (1 - strikeReach * 0.95));
+
         [-1, 1].forEach(fingerSide => {
-          ctx.beginPath(); ctx.moveTo(5, fingerSide * 2.2);
-          ctx.quadraticCurveTo(11, fingerSide * (3.2 + open * 5), 15, fingerSide * (1.5 + open * 7));
-          ctx.quadraticCurveTo(10, fingerSide * 0.2, 5, fingerSide * -0.3);
-          ctx.closePath(); ctx.fill(); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(5, fingerSide * 2.1);
+          ctx.quadraticCurveTo(11.5, fingerSide * (3.1 + open * 5.2), 15.5, fingerSide * (1.2 + open * 6.8));
+          ctx.quadraticCurveTo(10.5, fingerSide * 0.2, 5, fingerSide * -0.3);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
         });
         ctx.restore();
       }
     }
 
     function drawBody() {
-      for (let i = COUNT - 1; i >= 0; i--) {
-        const p = segments[i], angle = angleAt(i);
-        if (i < BODY_END) {
-          const abdomenRadius = i < 3 ? 6.7 + i * 0.45 : 6.8 - (i - 3) * 0.34;
-          const length = i < 3 ? 7.8 : 7.1;
-          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(angle);
-          const shell = ctx.createLinearGradient(0, -abdomenRadius, 0, abdomenRadius);
-          shell.addColorStop(0, "#ffc48b"); shell.addColorStop(.12, "#9e3c2d");
-          shell.addColorStop(.46, "#4a1714"); shell.addColorStop(.78, "#210c10"); shell.addColorStop(1, "#08070a");
-          ctx.fillStyle = shell; ctx.strokeStyle = "rgba(255,143,103,.86)"; ctx.lineWidth = 0.9;
-          ctx.beginPath(); ctx.ellipse(0, 0, length, abdomenRadius, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-          ctx.strokeStyle = "rgba(255,207,158,.58)"; ctx.lineWidth = .75;
-          ctx.beginPath(); ctx.ellipse(-1, -abdomenRadius * .2, length * .62, abdomenRadius * .36, -.08, Math.PI, Math.PI * 1.88); ctx.stroke();
-          ctx.restore();
-        }
+      for (let i = BODY_COUNT - 1; i >= 0; i--) {
+        const p = segments[i];
+        const angle = p.angle;
+        const abdomenRadius = i < 3 ? 6.6 + i * 0.45 : Math.max(2.6, 6.8 - (i - 3) * 0.42);
+        const length = i < 3 ? 7.6 : 6.9;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(angle);
+
+        const shell = ctx.createLinearGradient(0, -abdomenRadius, 0, abdomenRadius);
+        shell.addColorStop(0, "#ffc48b");
+        shell.addColorStop(0.14, "#9e3c2d");
+        shell.addColorStop(0.48, "#4a1714");
+        shell.addColorStop(0.8, "#210c10");
+        shell.addColorStop(1, "#08070a");
+
+        ctx.fillStyle = shell;
+        ctx.strokeStyle = "rgba(255,143,103,.86)";
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, length, abdomenRadius, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(255,207,158,.55)";
+        ctx.lineWidth = 0.75;
+        ctx.beginPath();
+        ctx.ellipse(-1, -abdomenRadius * 0.2, length * 0.62, abdomenRadius * 0.36, -0.08, Math.PI, Math.PI * 1.88);
+        ctx.stroke();
+        ctx.restore();
       }
     }
 
     function drawHead() {
-      const head = segments[0], heading = angleAt(0);
-      ctx.save(); ctx.translate(head.x, head.y); ctx.rotate(heading);
-      const shell = ctx.createRadialGradient(-2, -3, 1, 0, 0, 8);
-      shell.addColorStop(0, "#ffd5a1"); shell.addColorStop(.22, "#b94b35"); shell.addColorStop(.7, "#431411"); shell.addColorStop(1, "#10090b");
-      ctx.fillStyle = shell; ctx.strokeStyle = "#ff9d6e"; ctx.lineWidth = 1.1;
-      ctx.beginPath(); ctx.ellipse(0, 0, 7.2, 6.2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = "#fff0c4";
-      [-1, 1].forEach(side => { ctx.beginPath(); ctx.arc(4, side * 2.6, .8, 0, Math.PI * 2); ctx.fill(); });
+      const head = segments[0];
+      const heading = head.angle;
+      ctx.save();
+      ctx.translate(head.x, head.y);
+      ctx.rotate(heading);
+
+      const shell = ctx.createRadialGradient(-2, -3, 1, 0, 0, 8.5);
+      shell.addColorStop(0, "#ffd5a1");
+      shell.addColorStop(0.22, "#b94b35");
+      shell.addColorStop(0.7, "#431411");
+      shell.addColorStop(1, "#10090b");
+
+      ctx.fillStyle = shell;
+      ctx.strokeStyle = "#ff9d6e";
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 7.4, 6.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Glowing eyes (shift to cyan when hovering interactive elements)
+      ctx.fillStyle = hoverBlend > 0.5 ? "#05d5fa" : "#fff0c4";
+      [-1, 1].forEach(side => {
+        ctx.beginPath();
+        ctx.arc(4.2, side * 2.5, 0.95, 0, Math.PI * 2);
+        ctx.fill();
+      });
       ctx.restore();
+
       drawClaws();
     }
 
     function drawStinger() {
-      const anchorIndex = BODY_END - 1;
-      const anchor = segments[anchorIndex];
-      const heading = angleAt(anchorIndex);
-      const wag = Math.sin(time * 2.1) * 0.09;
-      const bends = [-2.72, -2.18, -1.58, -.98, -.48];
-      const lengths = [12, 12, 11, 10, 9];
-      const radii = [5.1, 4.5, 3.8, 3.1, 2.4];
-      let start = anchor;
+      const anchor = segments[BODY_COUNT - 1];
+      const heading = anchor.angle;
+      const wag = Math.sin(time * 2.4) * 0.08;
+      const strikeWhip = Math.sin(strikeProgress * Math.PI);
+
+      // Tail curls forward over the back when striking or hovering links
+      const alertCurl = hoverBlend * 0.28 + strikeWhip * 1.45;
+      const bends = [
+        -2.75 + alertCurl * 0.45,
+        -2.20 + alertCurl * 0.65,
+        -1.58 + alertCurl * 0.85,
+        -0.96 + alertCurl * 1.05,
+        -0.44 + alertCurl * 1.25
+      ];
+      const lengths = [11.5, 11.5, 10.8, 10, 9.2];
+      const radii = [4.9, 4.3, 3.7, 3.0, 2.3];
+
+      let start = { x: anchor.x, y: anchor.y };
       bends.forEach((bend, index) => {
-        const end = point(start.x, start.y, heading + bend + wag * (index / bends.length), lengths[index]);
-        segment(start, end, radii[index], radii[index] * .78, "#8c3027", "rgba(255,196,145,.9)");
-        joint(start.x, start.y, 2.1 - index * .16);
+        const segAngle = heading + bend + wag * ((index + 1) / bends.length);
+        const end = point(start.x, start.y, segAngle, lengths[index] + strikeWhip * 2.4);
+        drawLimbSegment(start, end, radii[index], radii[index] * 0.78, "#8c3027", "rgba(255,196,145,.9)");
+        drawJoint(start.x, start.y, 2.1 - index * 0.16);
         start = end;
       });
 
-      const tip = point(start.x, start.y, heading - .12 + wag, 11);
-      const barbSide = point(start.x, start.y, heading + .95 + wag, 4.2);
+      const stingAngle = heading - 0.08 + wag + alertCurl * 1.35;
+      const tip = point(start.x, start.y, stingAngle, 11.5 + strikeWhip * 3);
+      const barbSide = point(start.x, start.y, stingAngle + 0.92, 4.2);
+
       const sting = ctx.createLinearGradient(start.x, start.y, tip.x, tip.y);
-      sting.addColorStop(0, "#ffc991"); sting.addColorStop(.35, "#d74c32"); sting.addColorStop(1, "#260b10");
+      sting.addColorStop(0, "#ffc991");
+      sting.addColorStop(0.35, strikeWhip > 0.2 ? "#ff2a6d" : "#d74c32");
+      sting.addColorStop(1, "#260b10");
+
       ctx.fillStyle = sting;
-      ctx.strokeStyle = "#ffad78";
-      ctx.lineWidth = .8;
+      ctx.strokeStyle = strikeWhip > 0.2 || hoverBlend > 0.5 ? "#05d5fa" : "#ffad78";
+      ctx.lineWidth = 0.85;
       ctx.beginPath();
       ctx.moveTo(start.x - Math.cos(heading) * 2, start.y - Math.sin(heading) * 2);
       ctx.quadraticCurveTo(barbSide.x, barbSide.y, tip.x, tip.y);
@@ -2225,38 +2454,88 @@
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
+
+      // Glowing venom drop at stinger tip when hovering or striking
+      if (hoverBlend > 0.1 || strikeWhip > 0.1) {
+        ctx.save();
+        ctx.fillStyle = strikeWhip > 0.2 ? "#ff2a6d" : "#05d5fa";
+        ctx.globalAlpha = Math.min(1, hoverBlend * 0.85 + strikeWhip);
+        ctx.beginPath();
+        ctx.arc(tip.x, tip.y, 1.8 + strikeWhip * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawTargetReticle() {
+      // Precision cursor dot at exact pointer coordinates so clicking small UI controls is effortless
+      ctx.save();
+      const r = 2.5 + hoverBlend * 2.5 - strikeProgress * 1.2;
+      ctx.fillStyle = hoverBlend > 0.5 ? "#05d5fa" : "#ff2a6d";
+      ctx.beginPath();
+      ctx.arc(pointer.tx, pointer.ty, Math.max(1.5, r), 0, Math.PI * 2);
+      ctx.fill();
+
+      if (hoverBlend > 0.05 || strikeProgress > 0.05) {
+        ctx.strokeStyle = hoverBlend > 0.5 ? "rgba(5, 213, 250, 0.65)" : "rgba(255, 42, 109, 0.65)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(pointer.tx, pointer.ty, 7 + hoverBlend * 5 + strikeProgress * 8, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Render click sparks
+      sparks.forEach(sp => {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, sp.life);
+        ctx.fillStyle = sp.color;
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, 1.8 * sp.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
     }
 
     function drawScorpion() {
       ctx.save();
       ctx.globalCompositeOperation = "source-over";
-      ctx.shadowColor = "transparent";
-      ctx.shadowBlur = 0;
+      drawTargetReticle();
       drawLegs();
-      drawStinger();
       drawBody();
       drawHead();
+      // Draw stinger last so it arches cleanly over the carapace in 3D space
+      drawStinger();
       ctx.restore();
     }
 
     function animate(now) {
       requestAnimationFrame(animate);
-      if (motionOff() || document.hidden || coarsePointer.matches || !started) {
+      if (motionOff() || document.hidden || coarsePointer.matches || !started || !visible) {
         lastTime = now;
-        if (motionOff() || coarsePointer.matches) canvas.classList.remove("on");
+        if (motionOff() || coarsePointer.matches) {
+          canvas.classList.remove("on");
+          document.documentElement.classList.remove("scorpion-ready");
+        }
         return;
       }
+
       canvas.classList.add("on");
+      document.documentElement.classList.add("scorpion-ready");
+
       const dt = Math.min(Math.max((now - (lastTime || now)) / 1000, 0.001), 0.04);
       lastTime = now;
       time += dt;
+
       follow(dt);
       ctx.clearRect(0, 0, width, height);
-      const halo = ctx.createRadialGradient(pointer.x, pointer.y, 1, pointer.x, pointer.y, 76);
-      halo.addColorStop(0, "rgba(255,76,35,.10)");
-      halo.addColorStop(1, "rgba(0,0,0,0)");
+
+      const halo = ctx.createRadialGradient(pointer.x, pointer.y, 1, pointer.x, pointer.y, 82);
+      halo.addColorStop(0, hoverBlend > 0.5 ? "rgba(5, 213, 250, 0.12)" : "rgba(255, 76, 35, 0.11)");
+      halo.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = halo;
-      ctx.fillRect(pointer.x - 76, pointer.y - 76, 152, 152);
+      ctx.fillRect(pointer.x - 82, pointer.y - 82, 164, 164);
+
       drawScorpion();
     }
 
