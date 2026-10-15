@@ -43,16 +43,28 @@
       min-height: 100svh;
     }
 
+    /* Background 3D Earth Canvas */
+    #earth-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      pointer-events: none; /* Never blocks mobile scrolling or touches */
+      opacity: 0.72;
+      transition: opacity .8s ease;
+    }
+
     body::before {
       content: "";
       position: fixed;
       inset: -20%;
-      z-index: -2;
+      z-index: -3;
       pointer-events: none;
       background:
-        radial-gradient(circle at 18% 15%, rgba(255,42,109,.24), transparent 38%),
-        radial-gradient(circle at 82% 28%, rgba(5,213,250,.18), transparent 40%),
-        radial-gradient(circle at 50% 78%, rgba(157,78,221,.22), transparent 45%);
+        radial-gradient(circle at 18% 15%, rgba(255,42,109,.18), transparent 38%),
+        radial-gradient(circle at 82% 28%, rgba(5,213,250,.14), transparent 40%),
+        radial-gradient(circle at 50% 78%, rgba(157,78,221,.16), transparent 45%);
       filter: blur(55px);
       animation: ambient-shift 18s ease-in-out infinite alternate;
     }
@@ -78,7 +90,7 @@
     .accent { color: var(--pink); }
     .section-heading { margin-bottom: 40px; }
 
-    /* ---------- Scorpion cursor ---------- */
+    /* Cursor */
     #scorpion {
       position: fixed;
       left: 0; top: 0;
@@ -99,21 +111,10 @@
       html:not([data-motion="off"]).scorpion-ready textarea { cursor: none !important; }
     }
 
-    /* ---------- Living background ---------- */
+    /* Living background cubes */
     .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
-    .stars {
-      position: absolute; inset: -50% 0;
-      background-image:
-        radial-gradient(1px 1px at 25px 45px, #ffffffaa, transparent),
-        radial-gradient(1.5px 1.5px at 160px 90px, #ffb3d1aa, transparent),
-        radial-gradient(1px 1px at 300px 200px, #b3f0f4aa, transparent),
-        radial-gradient(2px 2px at 90px 310px, #ffffff88, transparent);
-      background-size: 420px 420px;
-      animation: drift 100s linear infinite;
-    }
-    @keyframes drift { to { transform: translateY(420px); } }
     .cube-field { position: absolute; inset: 0; perspective: 900px; }
-    .bg-cube { position: absolute; animation: floaty var(--dur,14s) ease-in-out infinite alternate; opacity: .75; }
+    .bg-cube { position: absolute; animation: floaty var(--dur,14s) ease-in-out infinite alternate; opacity: .45; }
     .mini-cube { width: var(--s,34px); aspect-ratio: 1; position: relative; transform-style: preserve-3d; animation: spin-cube var(--spin,22s) linear infinite; }
     .mini-cube i { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(5,213,250,.12)); border: 1px solid rgba(255,255,255,.28); backdrop-filter: blur(4px); }
     .mini-cube i:nth-child(2) { transform: rotateY(90deg) translateZ(calc(var(--s,34px)/2)); }
@@ -122,11 +123,11 @@
     @keyframes floaty { from { transform: translateY(0); } to { transform: translateY(-55px); } }
     @keyframes spin-cube { from { transform: rotateX(0) rotateY(0); } to { transform: rotateX(360deg) rotateY(360deg); } }
 
-    /* ---------- Scroll reveal ---------- */
+    /* Scroll reveal */
     .js .reveal { opacity: 0; transform: translateY(26px); transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1); }
     .js .reveal.in { opacity: 1; transform: none; }
 
-    /* ========== LIQUID GLASS ENGINE ========== */
+    /* Liquid Glass Engine */
     .panel, .site-header, .tabbar, .btn, .icon-btn, .tab, .fan-arrow-btn, .fan-dots-track, .floating-label, .hero-model {
       background: var(--glass-bg);
       backdrop-filter: blur(28px) saturate(190%);
@@ -166,7 +167,7 @@
     .tilt:active { transform: perspective(1000px) scale(.985); }
     @keyframes conic-spin { to { --conic-angle: 360deg; } }
 
-    /* ---------- Header ---------- */
+    /* Header */
     .site-header { position: sticky; top: calc(12px + var(--sat)); z-index: 50; width: min(1140px, 92%); margin: 12px auto 0; border-radius: 999px; padding: 0 22px; transition: transform .3s ease, box-shadow .3s ease; }
     .site-header:hover { box-shadow: 0 18px 45px rgba(0,0,0,.65), 0 0 25px rgba(5,213,250,.16), inset 0 1.5px 1px rgba(255,255,255,.55); }
     .topbar { min-height: 58px; display: flex; align-items: center; justify-content: space-between; }
@@ -176,7 +177,7 @@
     .icon-btn:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.45); box-shadow: 0 10px 24px rgba(0,0,0,.4), 0 0 18px rgba(5,213,250,.25); }
     .icon-btn[aria-pressed="true"] { border-color: var(--pink); background: rgba(255,42,109,.22); }
 
-    /* ---------- Hero ---------- */
+    /* Hero */
     .hero { min-height: calc(100svh - 80px - var(--sat)); display: flex; flex-direction: column; justify-content: center; gap: 10px; padding-block: 36px 30px; }
     .hero h1 { font-size: clamp(2.6rem, 11vw, 4.4rem); line-height: 1.06; letter-spacing: -.05em; margin: 14px 0; }
     .gradient-text { background: linear-gradient(100deg, #fff 0%, #ff7eb3 30%, #67e8f9 65%, #fff 100%); background-size: 220% auto; background-clip: text; -webkit-background-clip: text; color: transparent; animation: hue-slide 7s linear infinite; }
@@ -196,7 +197,7 @@
     .ripple { position: absolute; border-radius: 50%; background: radial-gradient(circle, #ffffff88, #ffffff22 40%, transparent 70%); transform: scale(0); animation: ripple .55s ease-out forwards; pointer-events: none; }
     @keyframes ripple { to { transform: scale(1); opacity: 0; } }
 
-    /* ---------- Hero cube (fallback) ---------- */
+    /* Hero cube (desktop scene fallback) */
     .scene { --size: clamp(115px, 38vw, 165px); --half: calc(var(--size)/2); --sx: 0deg; --sy: 0deg; position: relative; height: 330px; display: grid; place-items: center; perspective: 800px; margin-top: 10px; transform: rotateY(var(--sx)) rotateX(var(--sy)); transition: transform .25s ease-out; }
     .scene::before { content: ""; position: absolute; width: 82%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #ff004f26, #6750ff14 45%, transparent 70%); }
     .cube { width: var(--size); height: var(--size); position: relative; transform-style: preserve-3d; animation: rotate-cube 20s linear infinite; }
@@ -220,7 +221,7 @@
     .tilt-chip { display: none; margin: 14px auto 0; border: 1px solid rgba(255,255,255,.25); background: rgba(255,42,109,.16); backdrop-filter: blur(14px); color: #ffb3c8; border-radius: 30px; padding: 10px 18px; font-size: .78rem; }
     .tilt-chip.show { display: inline-block; }
 
-    /* ---------- About ---------- */
+    /* About */
     .about-grid { display: grid; gap: 36px; align-items: center; }
     @media (min-width: 900px) { .about-grid { grid-template-columns: 380px 1fr; gap: 56px; } }
     .portrait-card { padding: 16px; width: 100%; max-width: 380px; margin-inline: auto; }
@@ -239,7 +240,7 @@
     .tab-panel li:hover { transform: translateX(6px); background: rgba(255,255,255,.07); border-left-color: var(--pink); }
     .tab-panel strong { display: block; color: white; font-weight: 600; margin-bottom: 2px; }
 
-    /* ---------- Services & Work ---------- */
+    /* Services & Work */
     .cards-grid { display: grid; gap: 22px; grid-template-columns: 1fr; }
     @media (min-width: 720px) { .cards-grid { grid-template-columns: repeat(3, 1fr); } }
     .service-card { padding: 30px 26px; display: flex; flex-direction: column; justify-content: space-between; }
@@ -261,7 +262,7 @@
     .tag { color: var(--cyan); font-size: .65rem; font-weight: 600; text-transform: uppercase; letter-spacing: .15em; }
     .center { text-align: center; margin-top: 36px; }
 
-    /* ========== 3D FAN SLIDER ========== */
+    /* Fan Slider */
     .fan-section-wrapper { position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; user-select: none; }
     .fan-stage { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 480px; perspective: 1200px; margin-top: 10px; }
     @media (min-width: 640px) { .fan-stage { min-height: 530px; } }
@@ -288,7 +289,7 @@
     .fan-hint { font-size: .74rem; color: var(--muted); margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; opacity: .85; }
     .fan-hint kbd { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 6px; padding: 2px 7px; font-size: .68rem; color: #fff; }
 
-    /* ---------- Contact ---------- */
+    /* Contact */
     .contact-grid { display: grid; gap: 32px; align-items: start; }
     @media (min-width: 900px) { .contact-grid { grid-template-columns: 1fr 1.15fr; gap: 48px; } }
     .contact-links { display: grid; gap: 14px; margin: 24px 0; }
@@ -302,7 +303,7 @@
     .form-note, .form-status { color: var(--muted); font-size: .74rem; margin-top: 14px; position: relative; z-index: 4; }
     footer { border-top: 1px solid rgba(255,255,255,.1); padding: 32px 0 calc(36px + var(--nav-h) + var(--sab)); text-align: center; color: var(--muted); font-size: .8rem; }
 
-    /* ---------- Bottom dock ---------- */
+    /* Bottom dock */
     .tabbar { position: fixed; left: 50%; bottom: calc(14px + var(--sab)); transform: translateX(-50%); width: min(560px, 92%); z-index: 60; display: flex; height: var(--nav-h); padding: 6px; border-radius: 999px; transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease; }
     body.kb .tabbar { transform: translate(-50%, 150%); }
     .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); font-size: .62rem; font-weight: 500; letter-spacing: .03em; border-radius: 999px; position: relative; overflow: hidden; transition: color .25s ease, transform .25s ease, background .25s ease; }
@@ -328,7 +329,7 @@
       #scorpion { display: none; }
     }
 
-    /* ---------- 3D avatar ---------- */
+    /* 3D avatar */
     .hero-model { position: relative; width: min(100%, 420px); height: clamp(280px, 72vw, 390px); margin: 10px auto 0; overflow: hidden; border-radius: 30px; }
     #avatar-roamer canvas { width: 100%; height: 100%; display: block; position: relative; z-index: 1; }
     #avatar-roamer .model-label { position: absolute; left: 18px; bottom: 16px; z-index: 4; color: var(--muted); font-size: .68rem; font-weight: 600; letter-spacing: .18em; pointer-events: none; }
@@ -337,6 +338,7 @@
     #avatar-roamer .avatar-hit:active { cursor: grabbing; }
     #avatar-roamer .avatar-say { position: absolute; z-index: 4; top: 16px; left: 50%; transform: translate(-50%, -6px); width: max-content; max-width: calc(100% - 28px); padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.38); box-shadow: 0 12px 30px rgba(0,0,0,.5), inset 0 1px 1px rgba(255,255,255,.6); color: #fff; font: 500 .74rem/1.35 "Poppins", sans-serif; text-align: center; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; backdrop-filter: blur(16px); }
     #avatar-roamer .avatar-say.show { opacity: 1; transform: translate(-50%, 0); }
+
     @media (min-width: 900px) {
       .hero { width: min(1140px, 92%); display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); align-items: center; gap: 44px; }
       .hero-model { grid-column: 2; grid-row: 1; width: 100%; height: min(65vh, 520px); }
@@ -344,7 +346,7 @@
       .hero > .tilt-chip { grid-column: 1; }
     }
 
-    /* ---------- Mobile ---------- */
+    /* Mobile adjustments */
     @media (max-width: 899px) {
       .hero > .scene { display: none !important; }
       .hero { min-height: auto; padding-top: 24px; gap: 20px; }
@@ -355,6 +357,7 @@
         box-shadow: 0 10px 24px rgba(0,0,0,.45) !important;
       }
       body::before { animation: none; filter: blur(35px); }
+      #earth-bg { opacity: 0.62; } /* Slightly softened for mobile readability */
       #scorpion { display: block; }
       .fan-stage { min-height: 380px; }
       .fan-card { width: clamp(180px, 50vw, 240px); height: clamp(260px, 68vw, 340px); }
@@ -365,6 +368,9 @@
   </style>
 </head>
 <body>
+  <!-- Background Earth WebGL Canvas -->
+  <canvas id="earth-bg" aria-hidden="true"></canvas>
+
   <svg width="0" height="0" style="position:absolute; pointer-events:none;" aria-hidden="true">
     <defs>
       <filter id="apple-liquid-refract" x="-10%" y="-10%" width="120%" height="120%">
@@ -376,7 +382,6 @@
 
   <canvas id="scorpion" aria-hidden="true"></canvas>
   <div class="bg" aria-hidden="true">
-    <div class="stars"></div>
     <div class="cube-field">
       <div class="bg-cube" style="left:8%;  top:14%; --s:40px; --dur:13s; --spin:26s;"><div class="mini-cube"><i></i><i></i><i></i></div></div>
       <div class="bg-cube" style="left:84%; top:34%; --s:28px; --dur:16s; --spin:19s;"><div class="mini-cube"><i></i><i></i><i></i></div></div>
@@ -1040,7 +1045,7 @@
   })();
   </script>
 
-  <!-- ================= SMOOTH SCORPION CURSOR (desktop + mobile) ================= -->
+  <!-- ================= SMOOTH SCORPION CURSOR ================= -->
   <script>
   (() => {
     "use strict";
@@ -1053,13 +1058,11 @@
     const isTouch = matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
     const motionOff = () => reduceMotion.matches || document.documentElement.dataset.motion === "off";
 
-    /* Quality profile: mobile uses flat fills, lower DPR and a slightly smaller body
-       so every frame stays cheap and the scorpion glides at a steady 60fps. */
     const FANCY = !isTouch;
     const BODY_COUNT = 12;
     const SCALE = isTouch ? 0.86 : 1;
     const SPACING = 7.8 * SCALE;
-    const FOLLOW_TAU = isTouch ? 0.085 : 0.03;   // lower = tighter to the cursor
+    const FOLLOW_TAU = isTouch ? 0.085 : 0.03;
     const MAX_DT = 1 / 30;
 
     let width = 0, height = 0, dpr = 1;
@@ -1119,15 +1122,12 @@
       }
     }
 
-    /* Mouse / pen */
     window.addEventListener("pointermove", e => { if (e.pointerType !== "touch") setTarget(e.clientX, e.clientY, e.target); }, { passive: true });
     window.addEventListener("pointerdown", e => {
       if (e.pointerType === "touch") return;
       setTarget(e.clientX, e.clientY, e.target); burst(e.clientX, e.clientY);
     }, { passive: true });
 
-    /* Touch: touch events keep firing while the page scrolls (pointer events get cancelled),
-       so the scorpion keeps following the finger smoothly during scroll. */
     const onTouch = (e, tap) => {
       if (motionOff() || !e.touches.length) return;
       const t = e.touches[0];
@@ -1144,14 +1144,12 @@
       if (started && !isTouch && !motionOff()) { visible = true; canvas.classList.add("on"); }
     });
 
-    /* Touch devices have no hover cursor: park the scorpion low-right until the first touch. */
     if (isTouch && !motionOff()) {
       started = true;
       place(Math.max(72, innerWidth - 90), Math.max(110, innerHeight - 160));
       canvas.classList.add("on");
     }
 
-    /* ---------- simulation ---------- */
     function follow(dt) {
       const px = pointer.x, py = pointer.y;
       const k = 1 - Math.exp(-dt / FOLLOW_TAU);
@@ -1160,10 +1158,7 @@
 
       const moved = Math.hypot(pointer.x - px, pointer.y - py);
       speed += (moved / Math.max(dt, 0.001) - speed) * Math.min(1, dt * 10);
-
-      /* Leg phase is driven by distance travelled → feet never "skate" or jitter. */
       walkPhase += moved * 0.3 + dt * 0.35;
-
       hoverBlend += ((hovering ? 1 : 0) - hoverBlend) * Math.min(1, dt * 10);
       if (strike > 0) strike = Math.max(0, strike - dt * 3.2);
       idleFor += dt;
@@ -1202,7 +1197,6 @@
       }
     }
 
-    /* ---------- drawing ---------- */
     function limb(a, b, ra, rb, color, hi) {
       const dist = Math.hypot(b.x - a.x, b.y - a.y);
       if (dist < 0.1) return;
@@ -1389,8 +1383,6 @@
     }
 
     function drawReticle() {
-      /* Desktop: dot sits exactly on the real mouse position so clicks stay precise.
-         Mobile: dot follows the smoothed position so it doesn't jitter against the finger. */
       const rx = isTouch ? pointer.x : pointer.tx, ry = isTouch ? pointer.y : pointer.ty;
       ctx.save();
       ctx.fillStyle = hoverBlend > 0.5 ? "#05d5fa" : "#ff2a6d";
@@ -1445,10 +1437,210 @@
   })();
   </script>
 
-  <!-- ================= 3D AVATAR (preview.glb) ================= -->
+  <!-- ================= THREE.JS MODULE SETUP ================= -->
   <script type="importmap">
     {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
   </script>
+
+  <!-- ================= 3D EARTH BACKGROUND (MOBILE TUNED) ================= -->
+  <script type="module">
+  import * as THREE from 'three';
+
+  (() => {
+    const canvas = document.getElementById('earth-bg');
+    if (!canvas) return;
+
+    const IMG = 'https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/';
+    const GEO = 'https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@v5.1.2/geojson/ne_110m_admin_0_countries.geojson';
+
+    const isMobile = () => window.innerWidth < 768;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
+    // Position camera & subtle offset for mobile vs desktop
+    const updateCamLayout = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      if (isMobile()) {
+        camera.position.set(0, -0.25, 4.4);
+      } else {
+        camera.position.set(0.65, 0, 3.8);
+      }
+    };
+    updateCamLayout();
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile() ? 1.4 : 1.75));
+
+    const earth = new THREE.Group();
+    scene.add(earth);
+
+    const sunDir = new THREE.Vector3(5, 1.5, 4).normalize();
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+    const tex = f => new Promise((res, rej) => loader.load(IMG + f, t => { t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4); res(t); }, undefined, rej));
+
+    function ll(lat, lon, r) {
+      const la = lat * Math.PI / 180, p = (lon + 180) * Math.PI / 180;
+      return new THREE.Vector3(-r * Math.cos(la) * Math.cos(p), r * Math.sin(la), r * Math.cos(la) * Math.sin(p));
+    }
+
+    // Stars Field
+    {
+      const starCount = isMobile() ? 1800 : 3500;
+      const a = new Float32Array(starCount * 3);
+      for (let i = 0; i < a.length; i += 3) {
+        const r = 70 + Math.random() * 40;
+        const t = Math.random() * 6.283;
+        const p = Math.acos(2 * Math.random() - 1);
+        a[i] = r * Math.sin(p) * Math.cos(t);
+        a[i + 1] = r * Math.cos(p);
+        a[i + 2] = r * Math.sin(p) * Math.sin(t);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(a, 3));
+      scene.add(new THREE.Points(g, new THREE.PointsMaterial({ size: isMobile() ? 0.35 : 0.28, color: 0xffffff, transparent: true, opacity: 0.7 })));
+    }
+
+    // Procedural Clouds Texture
+    function hash(x, y, z) {
+      let h = x * 374761393 + y * 668265263 + z * 1274126177;
+      h = (h ^ (h >> 13)) * 1274126177;
+      return ((h ^ (h >> 16)) >>> 0) / 4294967295;
+    }
+    function n3(x, y, z) {
+      const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+      const s = t => t * t * (3 - 2 * t);
+      const u = s(x - xi), v = s(y - yi), w = s(z - zi);
+      const l = (a, b, t) => a + (b - a) * t;
+      return l(l(l(hash(xi, yi, zi), hash(xi + 1, yi, zi), u), l(hash(xi, yi + 1, zi), hash(xi + 1, yi + 1, zi), u), v),
+        l(l(hash(xi, yi, zi + 1), hash(xi + 1, yi, zi + 1), u), l(hash(xi, yi + 1, zi + 1), hash(xi + 1, yi + 1, zi + 1), u), v), w);
+    }
+    function cloudTex() {
+      const W = isMobile() ? 512 : 1024, H = isMobile() ? 256 : 512;
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const x = c.getContext('2d'), d = x.createImageData(W, H);
+      for (let j = 0; j < H; j++) {
+        const la = (.5 - j / H) * Math.PI;
+        for (let i = 0; i < W; i++) {
+          const lo = i / W * 6.283;
+          const px = Math.cos(la) * Math.cos(lo) * 3.5, py = Math.sin(la) * 3.5, pz = Math.cos(la) * Math.sin(lo) * 3.5;
+          let a = .5, f = 1, s = 0;
+          for (let k = 0; k < 4; k++) { s += a * n3(px * f + 50, py * f + 50, pz * f + 50); f *= 2; a *= .5; }
+          const k = (j * W + i) * 4;
+          d.data[k] = d.data[k + 1] = d.data[k + 2] = 255;
+          d.data[k + 3] = Math.max(0, Math.min(1, (s - .48) * 4)) * 210;
+        }
+      }
+      x.putImageData(d, 0, 0);
+      return new THREE.CanvasTexture(c);
+    }
+
+    (async () => {
+      const [day, night, water] = await Promise.all([
+        tex('earth-blue-marble.jpg'),
+        tex('earth-night.jpg'),
+        tex('earth-water.png')
+      ]);
+
+      const segments = isMobile() ? 64 : 96;
+      const globe = new THREE.Mesh(new THREE.SphereGeometry(1, segments, segments), new THREE.ShaderMaterial({
+        uniforms: { day: { value: day }, night: { value: night }, water: { value: water }, sun: { value: sunDir } },
+        vertexShader: `
+          varying vec2 vUv; varying vec3 vN; varying vec3 vP;
+          void main(){
+            vUv = uv;
+            vN = normalize(mat3(modelMatrix) * normal);
+            vP = (modelMatrix * vec4(position, 1.)).xyz;
+            gl_Position = projectionMatrix * viewMatrix * vec4(vP, 1.);
+          }`,
+        fragmentShader: `
+          uniform sampler2D day, night, water; uniform vec3 sun;
+          varying vec2 vUv; varying vec3 vN; varying vec3 vP;
+          void main(){
+            vec3 N = normalize(vN);
+            float d = dot(N, sun);
+            vec3 dc = texture2D(day, vUv).rgb;
+            vec3 nc = texture2D(night, vUv).rgb;
+            float m = smoothstep(-.12, .18, d);
+            vec3 col = dc * (.08 + 1.05 * max(d, 0.)) * m + dc * .04 * (1. - m) + nc * 1.3 * (1. - m);
+            vec3 V = normalize(cameraPosition - vP);
+            vec3 R = reflect(-sun, N);
+            float sp = pow(max(dot(R, V), 0.), 42.) * texture2D(water, vUv).r * .65 * m;
+            col += vec3(1., .95, .85) * sp;
+            float f = pow(1. - max(dot(N, V), 0.), 3.);
+            col += vec3(.2, .55, 1.) * f * .45 * smoothstep(-.3, .4, d);
+            col = pow(col, vec3(.95));
+            gl_FragColor = vec4(col, 1.);
+          }`
+      }));
+      earth.add(globe);
+
+      const clouds = new THREE.Mesh(
+        new THREE.SphereGeometry(1.012, segments, segments),
+        new THREE.MeshLambertMaterial({ map: cloudTex(), transparent: true, opacity: 0.65, depthWrite: false })
+      );
+      earth.add(clouds);
+      earth.userData.clouds = clouds;
+
+      scene.add(new THREE.DirectionalLight(0xffffff, 1.1).translateX(5).translateY(1.5).translateZ(4));
+      scene.add(new THREE.AmbientLight(0x112233, 0.28));
+
+      // Atmosphere Halo
+      scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.18, 48, 48), new THREE.ShaderMaterial({
+        transparent: true, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false,
+        vertexShader: `varying vec3 n; void main(){ n = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+        fragmentShader: `varying vec3 n; void main(){ float i = pow(max(.68 - dot(n, vec3(0, 0, 1.)), 0.), 3.); gl_FragColor = vec4(.2, .55, 1., 1.) * i * 1.5; }`
+      })));
+
+      // Country Geojson Borders
+      try {
+        const g = await (await fetch(GEO)).json(), pts = [];
+        for (const f of g.features) {
+          const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+          for (const poly of polys) {
+            for (const r of poly) {
+              for (let i = 0; i < r.length - 1; i++) {
+                const a = ll(r[i][1], r[i][0], 1.0015), b = ll(r[i + 1][1], r[i + 1][0], 1.0015);
+                pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+              }
+            }
+          }
+        }
+        const bg = new THREE.BufferGeometry();
+        bg.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+        const lines = new THREE.LineSegments(bg, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 }));
+        earth.add(lines);
+      } catch (err) {
+        console.warn('Border GeoJSON failed to load silently', err);
+      }
+
+      // Tilt Earth slightly on axis
+      earth.rotation.z = 0.22;
+      earth.rotation.x = 0.12;
+    })().catch(err => console.error('Earth texture initialization failed', err));
+
+    window.addEventListener('resize', () => {
+      updateCamLayout();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }, { passive: true });
+
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+      if (document.hidden || reduced.matches || document.documentElement.dataset.motion === 'off') return;
+      earth.rotation.y += 0.001;
+      if (earth.userData.clouds) earth.userData.clouds.rotation.y += 0.0003;
+      renderer.render(scene, camera);
+    }
+    renderLoop();
+  })();
+  </script>
+
+  <!-- ================= 3D AVATAR (preview.glb) ================= -->
   <script type="module">
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -1584,7 +1776,6 @@
       bubble.classList.add('show');
     });
 
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
