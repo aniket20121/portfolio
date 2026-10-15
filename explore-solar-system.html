@@ -2,115 +2,226 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Solar System</title>
 <style>
-  html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:system-ui,sans-serif;color:#fff}
-  canvas{display:block;cursor:grab} canvas:active{cursor:grabbing}
-  .glass{background:rgba(10,14,25,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:12px}
-  #ui{position:fixed;top:12px;left:12px;padding:10px 14px;font-size:13px;line-height:1.8;min-width:170px}
-  #ui label{display:block;cursor:pointer;user-select:none}
-  #ui input[type=range]{width:100%}
-  #bar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:8px;max-width:96vw;overflow-x:auto}
-  #bar button{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:6px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
-  #bar button:hover{background:rgba(255,255,255,.2)} #bar button.on{background:#3b82f6;border-color:#3b82f6}
-  #info{position:fixed;top:12px;right:12px;width:250px;padding:14px 16px;font-size:13px;display:none}
-  #info h2{margin:0 0 8px;font-size:20px} #info p{margin:8px 0 0;opacity:.8;line-height:1.45}
-  #info div{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.07)}
-  #info span{opacity:.6}
-  #labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-  .l{position:absolute;left:0;top:0;font-size:12px;text-shadow:0 0 4px #000,0 0 8px #000;white-space:nowrap;will-change:transform}
-  .b{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer}
-  .b:hover{background:rgba(255,255,255,.2)} .b.on{background:#3b82f6;border-color:#3b82f6}
-  #ui details summary{display:none}
-  #ui .settings-grid{display:block}
-  #ui .settings-grid label{display:block}
-  #ui .ui-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
-  #ui input[type=range],#sb input[type=range]{accent-color:#60a5fa;min-height:24px}
-  #sb{position:fixed;left:12px;bottom:74px;padding:10px 12px;width:190px;font-size:12px;line-height:1.7}
-  #sbTools{display:none;margin-top:6px} #sbTools label{display:block} #sbTools input[type=range]{width:100%} #sb .row{display:flex;gap:4px;margin:4px 0}
-  #cam{position:fixed;right:12px;bottom:74px;width:200px;display:none;padding:6px;font-size:11px;line-height:1.4}
-  #cam video{width:200px;height:150px;object-fit:cover;transform:scaleX(-1);border-radius:8px;display:block;background:#000}
-  #cam canvas{position:absolute;left:6px;top:6px}
-  #hs{padding:4px 5px 1px;opacity:.9;min-height:16px}
-  #hs:before{content:"";display:inline-block;width:7px;height:7px;margin:0 6px 1px 0;border-radius:50%;background:#94a3b8}
-  #hs[data-state="tracking"]:before{background:#4ade80;box-shadow:0 0 8px #4ade80}
-  #hs[data-state="lost"]:before{background:#fbbf24;box-shadow:0 0 8px #fbbf24}
-  #handCursor{position:fixed;left:0;top:0;display:none;z-index:7;pointer-events:none;transform:translate(-50%,-50%);width:22px;height:22px;border:2px solid #7dd3fc;border-radius:50%;box-shadow:0 0 12px rgba(56,189,248,.7);color:#fff;text-align:center;font-size:17px;line-height:18px;text-shadow:0 0 5px #000}
-  #handCursor.pinching{border-color:#4ade80;box-shadow:0 0 14px rgba(74,222,128,.9)}
-  #toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:10px;background:rgba(0,0,0,.75);font-size:13px;opacity:0;transition:opacity .4s;pointer-events:none;z-index:6}
-  #hud{position:fixed;top:12px;left:50%;transform:translateX(-50%);padding:8px 16px;font-size:13px;display:none;white-space:nowrap;z-index:4}
-  #touch{position:fixed;left:12px;right:12px;bottom:74px;justify-content:space-between;align-items:flex-end;display:none;pointer-events:none;z-index:5}
-  #touch .tp{display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:auto} #touch .tp div{display:flex;gap:6px}
-  #touch .tp.r{flex-direction:row;flex-wrap:wrap;width:124px;justify-content:flex-end}
-  #touch button{min-width:54px;height:54px;border-radius:14px;border:1px solid rgba(255,255,255,.2);background:rgba(10,14,25,.6);color:#fff;font-size:13px;touch-action:none}
-  #load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;transition:opacity .8s;z-index:9}
-  @media (max-width:700px), (max-height:600px) and (orientation:landscape){
-    html,body{height:100%;height:100dvh}
-    canvas{touch-action:none}
-    #ui{top:max(8px,env(safe-area-inset-top));left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));min-width:0;width:auto;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:11px;line-height:1.45;z-index:8}
-    #ui details{min-width:0}
-    #ui details summary{display:block;list-style:none;min-height:40px;display:flex;align-items:center;padding:0 7px;cursor:pointer;white-space:nowrap}
-    #ui details summary::-webkit-details-marker{display:none}
-    #ui .settings-grid{display:none}
-    #ui details[open] .settings-grid{display:block;position:absolute;top:calc(100% + 6px);left:8px;width:min(88vw,320px);max-height:48dvh;overflow:auto;padding:10px 12px;background:rgba(10,14,25,.94);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:12px;box-shadow:0 12px 40px #0009}
-    #ui .settings-grid label{display:flex;align-items:center;gap:5px;min-height:30px}
-    #ui .settings-grid input[type=range]{flex:1;min-width:80px;width:auto}
-    #ui .settings-grid small{display:block;margin-top:5px;opacity:.7}
-    #ui .ui-actions{margin:0;gap:4px;flex-wrap:nowrap}
-    #ui .ui-actions .b{min-height:40px;padding:6px 9px;white-space:nowrap}
-    #info{top:max(62px,calc(env(safe-area-inset-top) + 54px));right:max(8px,env(safe-area-inset-right));left:auto;width:min(54vw,230px);max-height:34dvh;overflow:auto;padding:10px 12px;font-size:11px}
-    #info h2{font-size:17px;margin-bottom:5px}
-    #info p{line-height:1.35}
-    #bar{left:6px;right:6px;bottom:max(6px,env(safe-area-inset-bottom));transform:none;max-width:none;width:auto;gap:5px;padding:5px;scrollbar-width:none;z-index:8}
-    #bar::-webkit-scrollbar{display:none}
-    #bar button{min-height:42px;padding:7px 10px;font-size:12px}
-    #sb{left:max(8px,env(safe-area-inset-left));bottom:calc(62px + env(safe-area-inset-bottom));width:min(48vw,195px);max-height:36dvh;overflow:auto;padding:8px;font-size:11px;line-height:1.5;z-index:6}
-    #sb .row{flex-wrap:wrap}
-    #sb .b{min-height:38px}
-    #cam{right:max(8px,env(safe-area-inset-right));bottom:calc(62px + env(safe-area-inset-bottom));width:min(40vw,160px);padding:5px;z-index:6}
-    #cam video{width:100%;height:auto;aspect-ratio:4/3}
-    #cam canvas{width:calc(100% - 10px);height:auto;aspect-ratio:4/3;left:5px;top:5px}
-    #hs{font-size:10px;line-height:1.25}
-    #touch{left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));bottom:calc(64px + env(safe-area-inset-bottom));z-index:7}
-    #touch button{min-width:46px;height:46px;border-radius:13px;font-size:12px}
-    #touch .tp{gap:4px}
-    #touch .tp div{gap:4px}
-    #touch .tp.r{width:108px;gap:4px}
-    #hud{top:max(58px,calc(env(safe-area-inset-top) + 48px));left:50%;max-width:calc(100vw - 16px);white-space:normal;text-align:center;padding:6px 10px;font-size:11px;z-index:6}
-    #toast{bottom:calc(68px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px);text-align:center;font-size:12px}
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: #000;
+    overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    color: #fff;
   }
+  canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+  canvas:active { cursor: grabbing; }
+
+  /* Glassmorphism base */
+  .glass {
+    background: rgba(13, 17, 28, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    transform: translateZ(0);
+  }
+
+  /* Floating Menu Button */
+  #menuBtn {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    z-index: 20;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff;
+    transition: background 0.2s, transform 0.1s;
+  }
+  #menuBtn:active { transform: scale(0.96); }
+
+  /* Slide-out Control Drawer */
+  #uiDrawer {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    width: min(320px, calc(100vw - 24px));
+    max-height: calc(100dvh - 90px);
+    overflow-y: auto;
+    z-index: 25;
+    padding: 14px 16px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  #uiDrawer.open { display: flex; animation: fadeIn 0.2s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .drawer-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; font-weight: 600; }
+  .close-btn { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 0 4px; opacity: 0.7; }
+  .close-btn:hover { opacity: 1; }
+
+  .group-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-top: 4px; }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .settings-grid label { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+  .slider-row { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+  .slider-row input[type=range] { width: 100%; accent-color: #3b82f6; height: 6px; cursor: pointer; }
+  .ui-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* Reusable button styles */
+  .b {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .b:hover { background: rgba(255, 255, 255, 0.18); }
+  .b.on { background: #3b82f6; border-color: #3b82f6; }
+
+  /* Bottom Planet Navigation Bar */
+  #bar {
+    position: fixed;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    padding: 6px 8px;
+    max-width: calc(100vw - 20px);
+    overflow-x: auto;
+    z-index: 10;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  #bar::-webkit-scrollbar { display: none; }
+  #bar button {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  #bar button.on { background: #3b82f6; border-color: #3b82f6; }
+
+  /* Planet Info Popout */
+  #info {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    width: min(280px, calc(100vw - 24px));
+    max-height: 48dvh;
+    overflow-y: auto;
+    padding: 12px 14px;
+    font-size: 12px;
+    display: none;
+    z-index: 15;
+  }
+  #info h2 { margin: 0 0 6px; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+  #info p { margin: 6px 0 0; opacity: 0.8; line-height: 1.4; }
+  #info div { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+  #info span { opacity: 0.6; }
+
+  /* Sandbox Drawer Section */
+  #sbTools { display: none; margin-top: 6px; }
+  #sbTools label { display: block; font-size: 11px; margin-top: 4px; }
+  #sbTools input[type=range] { width: 100%; }
+  #sbTools .row { display: flex; gap: 4px; margin: 4px 0; }
+
+  /* 3D Labels */
+  #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+  .l { position: absolute; left: 0; top: 0; font-size: 11px; text-shadow: 0 0 4px #000, 0 0 8px #000; white-space: nowrap; will-change: transform; }
+
+  /* Hand Tracker & Flight HUD */
+  #cam { position: fixed; right: 12px; bottom: 74px; width: 170px; display: none; padding: 6px; font-size: 10px; z-index: 12; }
+  #cam video { width: 100%; height: auto; aspect-ratio: 4/3; transform: scaleX(-1); border-radius: 8px; display: block; background: #000; }
+  #cam canvas { position: absolute; left: 6px; top: 6px; width: calc(100% - 12px); height: auto; }
+  #hs { padding: 4px 0; opacity: 0.9; }
+  #handCursor { position: fixed; left: 0; top: 0; display: none; z-index: 30; pointer-events: none; transform: translate(-50%,-50%); width: 20px; height: 20px; border: 2px solid #7dd3fc; border-radius: 50%; color: #fff; text-align: center; font-size: 14px; line-height: 16px; }
+  #toast { position: fixed; bottom: 74px; left: 50%; transform: translateX(-50%); padding: 8px 16px; border-radius: 10px; background: rgba(0,0,0,0.8); font-size: 12px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 40; text-align: center; max-width: 90vw; }
+  #hud { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 6px 14px; font-size: 12px; display: none; z-index: 20; text-align: center; }
+  #touch { position: fixed; left: 12px; right: 12px; bottom: 72px; justify-content: space-between; align-items: flex-end; display: none; pointer-events: none; z-index: 18; }
+  #touch .tp { display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: auto; }
+  #touch .tp div { display: flex; gap: 6px; }
+  #touch .tp.r { flex-direction: row; flex-wrap: wrap; width: 110px; justify-content: flex-end; }
+  #touch button { min-width: 50px; height: 50px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(13,17,28,0.7); color: #fff; font-size: 12px; touch-action: none; }
+  #load { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; transition: opacity 0.6s; z-index: 100; font-size: 14px; }
 </style>
 </head>
 <body>
 <div id="labels"></div>
-<div id="ui" class="glass">
-  <details id="settings" open>
-    <summary>⚙ Controls</summary>
-    <div class="settings-grid">
-      <label><input type="checkbox" id="orb" checked> Orbits</label>
-      <label><input type="checkbox" id="lab" checked> Names</label>
-      <label><input type="checkbox" id="ast" checked> Asteroid belt</label>
-      <label><input type="checkbox" id="pau"> Pause</label>
-      <label><input type="checkbox" id="glow" checked> Sun glow</label>
-      <label>Speed <input type="range" id="spd" min="0" max="5" step="0.05" value="1"></label>
-      <label>Planet size <input type="range" id="siz" min="1" max="4.5" step="0.1" value="3"></label>
-      <small>Drag to orbit · pinch to zoom · tap a planet</small>
-    </div>
-  </details>
-  <div class="ui-actions"><button class="b" id="hand" aria-label="Toggle hand control">✋ Hands</button><button class="b" id="flyBtn">🚀 Fly</button></div>
-</div>
-<div id="sb" class="glass">
-  <button class="b" id="sbToggle">⚛ Gravity sandbox</button>
+
+<!-- Floating Controls Toggle -->
+<button id="menuBtn" class="glass">⚙ Controls</button>
+
+<!-- Slide-out Drawer Panel -->
+<div id="uiDrawer" class="glass">
+  <div class="drawer-header">
+    <span>Simulation Controls</span>
+    <button class="close-btn" id="closeDrawer">✕</button>
+  </div>
+
+  <div class="group-title">Display & Speed</div>
+  <div class="settings-grid">
+    <label><input type="checkbox" id="orb" checked> Orbits</label>
+    <label><input type="checkbox" id="lab" checked> Names</label>
+    <label><input type="checkbox" id="ast" checked> Asteroids</label>
+    <label><input type="checkbox" id="pau"> Pause</label>
+    <label><input type="checkbox" id="glow" checked> Glow</label>
+  </div>
+
+  <div class="slider-row">
+    <label>Speed <span id="spdV" style="opacity:.6">1.0×</span></label>
+    <input type="range" id="spd" min="0" max="5" step="0.05" value="1">
+  </div>
+  <div class="slider-row">
+    <label>Planet Scale <span id="sizV" style="opacity:.6">3.0×</span></label>
+    <input type="range" id="siz" min="1" max="4.5" step="0.1" value="3">
+  </div>
+
+  <div class="group-title">Modes & Tools</div>
+  <div class="ui-actions">
+    <button class="b" id="flyBtn">🚀 Fly Mode</button>
+    <button class="b" id="hand">✋ Hand Tracking</button>
+    <button class="b" id="sbToggle">⚛ Sandbox</button>
+  </div>
+
+  <!-- Sandbox sub-tools -->
   <div id="sbTools">
-    <div class="row"><button class="b on" data-t="ast">Asteroid</button><button class="b" data-t="pla">Planet</button><button class="b" data-t="sta">Star</button></div>
-    <label>Sun mass × <b id="sunv">1.00</b><input type="range" id="sunX" min=".3" max="3" step=".05" value="1"></label>
-    <label>Jupiter mass × <b id="jupv">1</b><input type="range" id="jupX" min="1" max="300" step="1" value="1"></label>
-    <label><input type="checkbox" id="addm" checked> Launch mode (off = move camera)</label>
-    <button class="b" id="sbReset">Reset system</button><br>
-    <small style="opacity:.6">Drag on the scene: direction + speed. Click = drop.</small>
+    <div class="group-title">Spawn Object</div>
+    <div class="row">
+      <button class="b on" data-t="ast">Asteroid</button>
+      <button class="b" data-t="pla">Planet</button>
+      <button class="b" data-t="sta">Star</button>
+    </div>
+    <label>Sun Mass × <b id="sunv">1.00</b><input type="range" id="sunX" min=".3" max="3" step=".05" value="1"></label>
+    <label>Jupiter Mass × <b id="jupv">1</b><input type="range" id="jupX" min="1" max="300" step="1" value="1"></label>
+    <label><input type="checkbox" id="addm" checked> Tap & drag scene to launch</label>
+    <button class="b" id="sbReset" style="width:100%;margin-top:6px;">Reset Sandbox</button>
   </div>
 </div>
+
 <div id="cam" class="glass"><video id="vid" playsinline muted></video><canvas id="hc" width="200" height="150"></canvas><div id="hs"></div></div>
 <div id="handCursor">+</div>
 <div id="toast"></div>
@@ -119,7 +230,8 @@
 <div class="tp r"><button data-k="KeyW">Thrust</button><button data-k="KeyS">Back</button><button data-k="Space">Brake</button><button data-k="ShiftLeft">Boost</button></div></div>
 <div id="info" class="glass"></div>
 <div id="bar" class="glass"></div>
-<div id="load"><div style="text-align:center">Building the Solar System…<div style="width:240px;height:4px;background:#222;border-radius:3px;margin:12px auto 0"><div id="lbar" style="height:100%;width:0;background:#3b82f6;border-radius:3px;transition:width .2s"></div></div><div id="lt" style="font-size:12px;opacity:.6;margin-top:8px"></div></div></div>
+<div id="load"><div style="text-align:center">Building the Solar System…<div style="width:220px;height:4px;background:#222;border-radius:3px;margin:12px auto 0"><div id="lbar" style="height:100%;width:0;background:#3b82f6;border-radius:3px;transition:width .2s"></div></div><div id="lt" style="font-size:12px;opacity:.6;margin-top:8px"></div></div></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
@@ -128,8 +240,20 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 <script>
-// ---------- Data (sizes & distances are compressed for viewing) ----------
-// r: radius (Earth=1), d: orbit distance, T: orbital period (years), rot: rotation period (hours, negative = retrograde), tilt: axial tilt (deg)
+const $ = id => document.getElementById(id);
+
+// Prevent browser pinch-to-zoom on iOS/Android
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
+// Drawer toggles
+const uiDrawer = $('uiDrawer');
+$('menuBtn').onclick = () => uiDrawer.classList.toggle('open');
+$('closeDrawer').onclick = () => uiDrawer.classList.remove('open');
+$('spd').oninput = e => $('spdV').textContent = (+e.target.value).toFixed(2) + '×';
+$('siz').oninput = e => $('sizV').textContent = (+e.target.value).toFixed(1) + '×';
+
+// ---------- Data ----------
 const PLANETS=[
  {n:'Mercury',r:.38,d:22,T:.241,rot:1407,tilt:.03,pal:[[80,76,72],[140,134,128],[195,188,178]],sc:4,ban:0,
   i:{Diameter:'4,879 km',Distance:'57.9 M km',Year:'88 days',Day:'59 days',Moons:'0'},t:'The smallest planet, with extreme temperature swings from −180°C to 430°C.'},
@@ -155,7 +279,6 @@ const PLANETS=[
  {n:'Pluto',r:.2,d:235,T:248,rot:-153,tilt:122,pal:[[105,85,70],[185,160,135],[230,215,195]],sc:5,dwarf:1,
   i:{Diameter:'2,377 km',Distance:'5.9 B km',Year:'248 years',Day:'6.4 days',Moons:'5'},t:'A dwarf planet in the Kuiper Belt, with a heart-shaped glacier.'}
 ];
-// [eccentricity, inclination°, longitude of perihelion°, mass (in Suns)]
 const ORB={Mercury:[.206,7,77,1.66e-7],Venus:[.007,3.4,131,2.45e-6],Earth:[.017,0,103,3e-6],Mars:[.093,1.85,336,3.2e-7],
  Jupiter:[.048,1.3,14,9.55e-4],Saturn:[.056,2.5,93,2.86e-4],Uranus:[.046,.8,173,4.37e-5],Neptune:[.009,1.8,48,5.15e-5],Pluto:[.249,17.2,224,6.6e-9]};
 const SUN={n:'Sun',r:10,i:{Diameter:'1,392,700 km',Type:'G-type star',Age:'4.6 B years',Surface:'5,500 °C',Core:'15 M °C'},t:'Our star holds 99.86% of the mass of the entire solar system.'};
@@ -163,19 +286,17 @@ const SUN={n:'Sun',r:10,i:{Diameter:'1,392,700 km',Type:'G-type star',Age:'4.6 B
 // ---------- Renderer ----------
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,6000);
-const mobileLayout=matchMedia('(max-width:700px), (max-height:600px) and (orientation:landscape)').matches;
 const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,mobileLayout?1.5:2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2)); // Crisp retina rendering
 document.body.appendChild(renderer.domElement);
-renderer.domElement.style.touchAction='none';
+
 let composer=null;
 if(THREE.EffectComposer&&THREE.UnrealBloomPass){try{composer=new THREE.EffectComposer(renderer);composer.addPass(new THREE.RenderPass(scene,camera));
   composer.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),.75,.55,.85))}catch(e){composer=null}}
-const $=id=>document.getElementById(id);
-if(mobileLayout)$('settings').open=false;
-let psc=3; // planet size exaggeration
+let psc=3;
 
-// ---------- Noise + procedural surfaces ----------
+// ---------- Procedural Textures ----------
 function hash(x,y,z){let h=x*374761393+y*668265263+z*1274126177;h=(h^(h>>13))*1274126177;return((h^(h>>16))>>>0)/4294967295}
 function n3(x,y,z){const xi=Math.floor(x),yi=Math.floor(y),zi=Math.floor(z),s=t=>t*t*(3-2*t),u=s(x-xi),v=s(y-yi),w=s(z-zi),l=(a,b,t)=>a+(b-a)*t;
  return l(l(l(hash(xi,yi,zi),hash(xi+1,yi,zi),u),l(hash(xi,yi+1,zi),hash(xi+1,yi+1,zi),u),v),l(l(hash(xi,yi,zi+1),hash(xi+1,yi,zi+1),u),l(hash(xi,yi+1,zi+1),hash(xi+1,yi+1,zi+1),u),v),w)}
@@ -204,9 +325,8 @@ let starMaterial=null;
 {const N=9000,a=new Float32Array(N*3),cl=new Float32Array(N*3),sizes=new Float32Array(N),phases=new Float32Array(N);
  for(let i=0;i<N;i++){const r=2500+Math.random()*1000,t=Math.random()*6.2832,p=Math.acos(2*Math.random()-1);
   a[i*3]=r*Math.sin(p)*Math.cos(t);a[i*3+1]=r*Math.cos(p);a[i*3+2]=r*Math.sin(p)*Math.sin(t);
-  const b=.45+Math.pow(Math.random(),2)*.55,w=Math.random();
-  // Most stars are warm white; a smaller group gets a subtle blue or amber tint.
-  const temp=Math.random();cl[i*3]=b*(temp<.18?.72:1);cl[i*3+1]=b*(temp>.88?.72:.94);cl[i*3+2]=b*(temp<.18?1:temp>.88?.48:.84);
+  const b=.45+Math.pow(Math.random(),2)*.55,temp=Math.random();
+  cl[i*3]=b*(temp<.18?.72:1);cl[i*3+1]=b*(temp>.88?.72:.94);cl[i*3+2]=b*(temp<.18?1:temp>.88?.48:.84);
   sizes[i]=.9+Math.pow(Math.random(),3)*4.5;phases[i]=Math.random()*Math.PI*2}
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(a,3));g.setAttribute('color',new THREE.BufferAttribute(cl,3));
  g.setAttribute('aSize',new THREE.BufferAttribute(sizes,1));g.setAttribute('aPhase',new THREE.BufferAttribute(phases,1));
@@ -227,11 +347,11 @@ scene.add(sunMesh);
  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),blending:THREE.AdditiveBlending,depthWrite:false}));s.scale.set(75,75,1);const s2=new THREE.Sprite(s.material.clone());s2.material.opacity=.3;s2.scale.set(170,170,1);sunMesh.add(s,s2)}
 scene.add(new THREE.PointLight(0xfff2dd,1.7,0,0),new THREE.AmbientLight(0x2a3040,.35));
 
-// ---------- Kepler orbit (sun at one focus) ----------
+// ---------- Orbits & Bodies ----------
 const tp=new THREE.Vector3(),tl=new THREE.Vector3();
 function kep(a,e,M,eul,out){let E=M;for(let i=0;i<6;i++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));
   return out.set(a*(Math.cos(E)-e),0,a*Math.sqrt(1-e*e)*Math.sin(E)).applyEuler(eul)}
-// ---------- Bodies ----------
+
 const bodies=[],pickables=[],labels=[];
 function addLabel(text,obj,r){const el=document.createElement('div');el.className='l';el.textContent=text;$('labels').appendChild(el);labels.push({el,obj,r})}
 const sunBody={name:'Sun',data:SUN,group:sunMesh,r:SUN.r};bodies.push(sunBody);
@@ -241,7 +361,7 @@ const TB='https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images
 let loadHidden=false;const hideLoad=()=>{if(loadHidden)return;loadHidden=true;$('load').style.opacity=0;setTimeout(()=>{const l=$('load');l&&l.remove()},900)};
 const lm=new THREE.LoadingManager();lm.onProgress=(u,i,n)=>{$('lbar').style.width=(i/n*100)+'%';$('lt').textContent=`Loading textures ${i}/${n}`};lm.onLoad=hideLoad;setTimeout(hideLoad,15000);
 const texLoader=new THREE.TextureLoader(lm);texLoader.setCrossOrigin('anonymous');const maxA=renderer.capabilities.getMaxAnisotropy();
-const T=(url,ok)=>texLoader.load(url,t=>{t.anisotropy=maxA;ok(t)},undefined,()=>{}); // on failure the generated texture stays
+const T=(url,ok)=>texLoader.load(url,t=>{t.anisotropy=maxA;ok(t)},undefined,()=>{});
 const TX={Mercury:['mercurymap.jpg','mercurybump.jpg'],Venus:['venusmap.jpg','venusbump.jpg'],Mars:['marsmap1k.jpg','marsbump1k.jpg'],Jupiter:['jupitermap.jpg'],Saturn:['saturnmap.jpg'],Uranus:['uranusmap.jpg'],Neptune:['neptunemap.jpg'],Pluto:['plutomap1k.jpg','plutobump1k.jpg']};
 let earthClouds=null;
 function earthMat(E){return new THREE.ShaderMaterial({uniforms:{day:{value:E.day},night:{value:E.night},spec:{value:E.spec},sunPos:{value:sunMesh.position}},
@@ -253,6 +373,7 @@ function earthMat(E){return new THREE.ShaderMaterial({uniforms:{day:{value:E.day
     vec3 R=reflect(-L,N);col+=vec3(1.,.95,.85)*pow(max(dot(R,V),0.),50.)*texture2D(spec,vUv).r*.6*m;
     gl_FragColor=vec4(col,1.);}`})}
 T(TB+'galaxy_starfield.png',t=>scene.add(new THREE.Mesh(new THREE.SphereGeometry(4600,48,48),new THREE.MeshBasicMaterial({map:t,side:THREE.BackSide,depthWrite:false,color:0x888888}))));
+
 PLANETS.forEach((P,idx)=>{
   const group=new THREE.Group(),tilt=new THREE.Group();group.add(tilt);tilt.rotation.z=P.tilt*Math.PI/180;
   const mat=new THREE.MeshStandardMaterial({map:P.tex?surface({pal:[[10,40,100],[20,90,170],[45,130,60],[175,155,105],[245,245,245]],sc:2.5,oct:6},3):surface(P,idx*13+1),roughness:.9,metalness:0});
@@ -275,31 +396,32 @@ PLANETS.forEach((P,idx)=>{
     if(M.n==='Moon'){T(TB+'moonmap1k.jpg',t=>{mm.map=t;mm.needsUpdate=true});T(TB+'moonbump1k.jpg',t=>{mm.bumpMap=t;mm.bumpScale=.3;mm.needsUpdate=true})}
     const m=new THREE.Mesh(new THREE.SphereGeometry(M.r,32,32),mm);group.add(m);
     body.moons.push({m,d:M.d+P.r*.4,omega:6.2832/(M.P*.45),ang:Math.random()*6.2832});addLabel(M.n,m,M.r)});
-  // orbit line
   const pts=[];for(let i=0;i<=256;i++)pts.push(kep(P.d,O[0],i/256*6.2832,eul,new THREE.Vector3()));
   const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x6a7f9f,transparent:true,opacity:.45}));line.userData.orbit=1;scene.add(line);
   scene.add(group);bodies.push(body);addLabel(P.n,group,P.r)});
 
-// ---------- Asteroid belt ----------
+// ---------- Asteroids ----------
 const belt=(()=>{const N=7000,a=new Float32Array(N*3);for(let i=0;i<N;i++){const r=64+Math.random()*16+Math.random()*4,t=Math.random()*6.2832;a[i*3]=Math.cos(t)*r;a[i*3+1]=(Math.random()-.5)*3;a[i*3+2]=Math.sin(t)*r}
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(a,3));const p=new THREE.Points(g,new THREE.PointsMaterial({color:0xa89c8c,size:.45}));scene.add(p);return p})();
 
-// ---------- UI ----------
+// ---------- UI Buttons & Focus ----------
 const bar=$('bar'),info=$('info');let focused=null,tDist=360,lineup=false,force=0,gTh=.6,gPh=1.15;
 function btn(text,fn){const b=document.createElement('button');b.textContent=text;b.onclick=fn;bar.appendChild(b);return b}
 const btns=[btn('Overview',()=>overview()),btn('Lineup',()=>lineupView())];bodies.forEach(b=>btns.push(btn(b.name,()=>focus(b))));
 const setOn=i=>btns.forEach((x,k)=>x.classList.toggle('on',k===i));
 const fit=()=>290/(0.466*Math.min(innerWidth/innerHeight,1.8));
+
 function overview(){if(fly.on){stopFly();return}focused=null;lineup=false;tDist=fit();gTh=.6;gPh=1.15;force=1;info.style.display='none';setOn(0)}
 function lineupView(){focused=null;lineup=true;tDist=fit()*.9;gTh=0;gPh=1.4;force=1;info.style.display='none';setOn(1)}
 function focus(b){if(fly.on){warpTo(b);return}focused=b;lineup=false;force=0;setOn(bodies.indexOf(b)+2);
   tDist=Math.max(b.r*(b.d?psc:1)*4.2,b.name==='Sun'?50:8);const d=b.data;
-  info.innerHTML=`<h2>${b.name}</h2>`+Object.entries(d.i).map(([k,v])=>`<div><span>${k}</span>${v}</div>`).join('')+`<p>${d.t}</p>`;info.style.display='block'}
+  info.innerHTML=`<h2>${b.name}<button class="close-btn" onclick="$('info').style.display='none'">✕</button></h2>`+Object.entries(d.i).map(([k,v])=>`<div><span>${k}</span>${v}</div>`).join('')+`<p>${d.t}</p>`;info.style.display='block'}
 
-// ---------- Camera controls ----------
+// ---------- Camera & Touch Controls (No Browser Page Zoom) ----------
 let th=.6,ph=1.15,dist=900;const target=new THREE.Vector3();
 let drag=false,lx=0,ly=0,moved=0,pd=0,pinchStart=0,pinchBase=0,wasMulti=false;const el=renderer.domElement,activePointers=new Map();
 const pointerGap=()=>{const a=[...activePointers.values()];return a.length<2?0:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};
+
 el.addEventListener('pointerdown',e=>{
   if(fly.on)return;
   activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});try{el.setPointerCapture(e.pointerId)}catch{}
@@ -327,6 +449,7 @@ addEventListener('pointermove',e=>{
   force=0;th-=dx*.006;ph=Math.max(.05,Math.min(3.09,ph-dy*.006));lx=e.clientX;ly=e.clientY;
 });
 el.addEventListener('wheel',e=>{const mn=focused?focused.r*(focused.d?psc:1)*1.6:4;tDist=Math.max(mn,Math.min(1500,tDist*(1+e.deltaY*.0012)));e.preventDefault()},{passive:false});
+
 const ray=new THREE.Raycaster(),mv=new THREE.Vector2();
 function pick(e){mv.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mv,camera);
   const h=ray.intersectObjects(pickables)[0];if(h)focus(h.object.userData.body)}
@@ -334,7 +457,7 @@ function pickAt(x,y){mv.set(x*2-1,-y*2+1);ray.setFromCamera(mv,camera);
   const h=ray.intersectObjects(pickables)[0];if(h){const b=h.object.userData.body;focus(b);say('Focused on '+b.name);return true}return false}
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);if(composer)composer.setSize(innerWidth,innerHeight)});
 
-// ---------- Gravity sandbox (N-body) ----------
+// ---------- Gravity Sandbox ----------
 const GM=2806,sb={on:false,add:true,type:'ast',sunX:1,jupX:1},nb=[],tmpA=new THREE.Vector3();let st=null,fr=0,tt=0;
 const KIND={ast:{m:1e-9,r:.6,col:0xbbb0a0,n:'An asteroid'},pla:{m:1e-3,r:2.5,col:0x58a6ff,n:'A planet'},sta:{m:.5,r:6,col:0xffd27a,n:'A star'}};
 const say=t=>{$('toast').textContent=t;$('toast').style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>$('toast').style.opacity=0,3500)};
@@ -349,12 +472,10 @@ function enterSB(){if(fly.on){say('Exit flight first (Esc)');return}overview();g
     nb.push({o:b.group,pos:p,vel:v,m:b.mass,base:b.mass,kind:'pl',r:b.r,b,acc:new THREE.Vector3(),tr:mkTrail(0x7a8aa8)});mom.addScaledVector(v,b.mass)}
   sunN.vel.copy(mom).multiplyScalar(-1);
   $('sbToggle').classList.add('on');$('sbTools').style.display='block';renderer.domElement.style.cursor='crosshair';
-  say('Sandbox on — drag on the scene to launch a body')}
+  say('Sandbox on — drag scene to launch');uiDrawer.classList.remove('open')}
 function exitSB(){sb.on=false;for(const n of nb){if(n.tr){scene.remove(n.tr.l);n.tr.l.geometry.dispose()}if(!n.b&&n.kind!=='sun')scene.remove(n.o);if(n.b)n.o.visible=true}
   nb.length=0;sunMesh.position.set(0,0,0);$('sunX').value=1;$('jupX').value=1;
-  $('sbToggle').classList.remove('on');$('sbTools').style.display='none';renderer.domElement.style.cursor='';st=null;aim.visible=false}
-$('sbToggle').onclick=()=>sb.on?exitSB():enterSB();$('sbReset').onclick=()=>{exitSB();enterSB()};
-$('addm').onchange=e=>{sb.add=e.target.checked;renderer.domElement.style.cursor=sb.add?'crosshair':''};
+  $('sbToggle').classList.remove('on');$('sbTools').style.display='none';renderer.domElement.style.cursor='';st=null;aim.visible=false}$('sbToggle').onclick=()=>sb.on?exitSB():enterSB();$('sbReset').onclick=()=>{exitSB();enterSB()};$('addm').onchange=e=>{sb.add=e.target.checked;renderer.domElement.style.cursor=sb.add?'crosshair':''};
 document.querySelectorAll('#sbTools [data-t]').forEach(b=>b.onclick=()=>{sb.type=b.dataset.t;document.querySelectorAll('#sbTools [data-t]').forEach(x=>x.classList.toggle('on',x===b))});
 function accel(){for(const a of nb)a.acc.set(0,0,0);
   for(let i=0;i<nb.length;i++)for(let j=i+1;j<nb.length;j++){const a=nb[i],b=nb[j];tmpA.subVectors(b.pos,a.pos);const d2=tmpA.lengthSq()+1,k=GM/(d2*Math.sqrt(d2));
@@ -369,7 +490,7 @@ function collide(){for(let i=nb.length-1;i>=0;i--){const a=nb[i];if(a.kind==='su
 function runSB(t){sb.sunX=+$('sunX').value;sb.jupX=+$('jupX').value;$('sunv').textContent=sb.sunX.toFixed(2);$('jupv').textContent=sb.jupX;
   const n=Math.max(1,Math.ceil(t/.012));for(let i=0;i<n;i++)stepNB(t/n);collide();
   if((fr++&1)===0)for(const a of nb)if(a.tr)pushTrail(a.tr,a.pos)}
-// launch with drag on the ecliptic plane
+
 const plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),aim=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),new THREE.LineBasicMaterial({color:0xffffff}));
 aim.visible=false;aim.frustumCulled=false;scene.add(aim);
 function planePt(e){mv.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mv,camera);return ray.ray.intersectPlane(plane,new THREE.Vector3())}
@@ -381,36 +502,34 @@ function sbUp(e){const p=planePt(e)||st,K=KIND[sb.type];aim.visible=false;
   mesh.position.copy(st);scene.add(mesh);
   nb.push({o:mesh,pos:mesh.position,vel:p.clone().sub(st).multiplyScalar(.08),m:K.m,base:K.m,kind:sb.type,r:K.r,acc:new THREE.Vector3(),tr:mkTrail(K.col)});st=null}
 
-// ---------- Hand control (MediaPipe Hands) ----------
+// ---------- Hand Controls ----------
 let hands=null,handOn=false,hp=null,handLoopId=0,handLoopToken=0,handBusy=false,lastHandSeenAt=0;
 const vid=$('vid'),hx=$('hc').getContext('2d'),MP='https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/';
-const loadJS=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.crossOrigin='anonymous';e.onload=ok;e.onerror=()=>no(new Error('Could not load the hand-tracking model. Check your connection and try again.'));document.head.appendChild(e)});
+const loadJS=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.crossOrigin='anonymous';e.onload=ok;e.onerror=()=>no(new Error('Could not load hand model.'));document.head.appendChild(e)});
 const handClamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 async function startHands(){
-  $('cam').style.display='block';$('hs').textContent='Starting camera…';$('hand').disabled=true;
+  $('cam').style.display='block';$('hs').textContent='Starting camera…';$('hand').disabled=true;uiDrawer.classList.remove('open');
   try{
-    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('Camera access needs HTTPS or localhost. Open this page from a secure site or local server.');
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('Camera requires HTTPS.');
     if(!window.Hands)await loadJS(MP+'hands.js');
     if(!hands){hands=new Hands({locateFile:f=>MP+f});hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:.65,minTrackingConfidence:.6});hands.onResults(onHands)}
     const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:'user',width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}}});
-    vid.srcObject=stream;await vid.play();handOn=true;handLoopToken++;$('hand').classList.add('on');$('hs').textContent='One hand: move to orbit • Two hands: move apart/together to zoom';
+    vid.srcObject=stream;await vid.play();handOn=true;handLoopToken++;$('hand').classList.add('on');$('hs').textContent='Tracking active';
     const token=handLoopToken;
     const loop=async()=>{if(!handOn||token!==handLoopToken)return;handLoopId=requestAnimationFrame(loop);if(handBusy||vid.readyState<2)return;handBusy=true;
-      try{await hands.send({image:vid})}catch(err){console.warn('Hand tracking frame failed:',err);$('hs').textContent='Tracking hiccup — recovering…'}finally{handBusy=false}};
+      try{await hands.send({image:vid})}catch(err){console.warn(err)}finally{handBusy=false}};
     handLoopId=requestAnimationFrame(loop);
-  }catch(e){stopHands();say('Hand control unavailable: '+(e.message||e));$('cam').style.display='block';$('hs').textContent=(e.message||'Could not start the camera. Check camera permission and try again.');}
+  }catch(e){stopHands();say('Hand control: '+(e.message||e));}
   finally{$('hand').disabled=false}
 }
 function stopHands(){handOn=false;handLoopToken++;cancelAnimationFrame(handLoopId);handLoopId=0;hp=null;lastHandSeenAt=0;hx.clearRect(0,0,200,150);
-  if(vid.srcObject)vid.srcObject.getTracks().forEach(t=>t.stop());vid.srcObject=null;vid.pause();$('cam').style.display='none';$('handCursor').style.display='none';$('hand').classList.remove('on');$('hs').textContent='';$('hs').dataset.state='idle';}
-$('hand').onclick=()=>handOn?stopHands():startHands();
+  if(vid.srcObject)vid.srcObject.getTracks().forEach(t=>t.stop());vid.srcObject=null;vid.pause();$('cam').style.display='none';$('handCursor').style.display='none';$('hand').classList.remove('on');$('hs').textContent='';}$('hand').onclick=()=>handOn?stopHands():startHands();
 function onHands(r){
   if(!handOn)return;
   hx.clearRect(0,0,200,150);
   const detected=(r.multiHandLandmarks||[]).map(l=>{
     const d=(a,b)=>Math.hypot(l[a].x-l[b].x,l[a].y-l[b].y),palm=Math.max(.035,d(0,9));
     const pinching=d(4,8)/palm<.32;
-    // Center from the stable palm base; mirror it to match the selfie preview.
     const x=1-(l[0].x+l[5].x+l[9].x+l[13].x+l[17].x)/5,y=(l[0].y+l[5].y+l[9].y+l[13].y+l[17].y)/5;
     hx.strokeStyle=pinching?'rgba(74,222,128,.9)':'rgba(125,211,252,.8)';hx.lineWidth=1.5;
     if(window.HAND_CONNECTIONS)for(const [a,b] of HAND_CONNECTIONS){hx.beginPath();hx.moveTo((1-l[a].x)*200,l[a].y*150);hx.lineTo((1-l[b].x)*200,l[b].y*150);hx.stroke()}
@@ -419,36 +538,26 @@ function onHands(r){
   });
   const count=detected.length;
   if(count===1){
-    const p=detected[0],a=.36,cursor=$('handCursor');lastHandSeenAt=performance.now();$('hs').dataset.state='tracking';
-    cursor.style.display='block';cursor.style.left=(p.px*innerWidth)+'px';cursor.style.top=(p.py*innerHeight)+'px';cursor.classList.toggle('pinching',p.pinching);
-    if(!hp||hp.k!==1){
-      if(p.pinching)pickAt(p.px,p.py);
-      hp={k:1,x:p.x,y:p.y,pinching:p.pinching};
-    }else{
+    const p=detected[0],a=.36,cursor=$('handCursor');lastHandSeenAt=performance.now();
+    cursor.style.display='block';cursor.style.left=(p.px*innerWidth)+'px';cursor.style.top=(p.py*innerHeight)+'px';
+    if(!hp||hp.k!==1){if(p.pinching)pickAt(p.px,p.py);hp={k:1,x:p.x,y:p.y,pinching:p.pinching};}
+    else{
       if(p.pinching&&!hp.pinching)pickAt(p.px,p.py);
       const x=hp.x+(p.x-hp.x)*a,y=hp.y+(p.y-hp.y)*a,dx=x-hp.x,dy=y-hp.y;
       if(Math.abs(dx)+Math.abs(dy)>.0025){force=0;th-=dx*4.2;ph=handClamp(ph-dy*3.2,.05,3.09)}
       hp={k:1,x,y,pinching:p.pinching};
     }
-    $('hs').textContent=p.pinching?'Pinch to select the object under +':'Hand tracked • move to orbit';
   }else if(count>=2){
     const a=detected[0],b=detected[1],d=Math.max(.04,Math.hypot(a.x-b.x,a.y-b.y));
-    lastHandSeenAt=performance.now();$('hs').dataset.state='tracking';$('handCursor').style.display='none';
+    lastHandSeenAt=performance.now();$('handCursor').style.display='none';
     if(!hp||hp.k!==2)hp={k:2,d,base:tDist};
     else{hp.d+=(d-hp.d)*.3;const min=focused?Math.max(2,focused.r*(focused.d?psc:1)*1.6):4;tDist=handClamp(hp.base*hp.d/d,min,1500)}
-    $('hs').textContent='Two hands: spread to zoom in • bring together to zoom out';
-  }else{
-    hp=null;$('handCursor').style.display='none';
-    const recentlySeen=performance.now()-lastHandSeenAt<700;
-    $('hs').dataset.state=recentlySeen?'lost':'idle';$('hs').textContent=recentlySeen?'Hand briefly lost • controls paused':'No hand detected • show one or two hands';
-  }
+  }else{hp=null;$('handCursor').style.display='none';}
 }
-document.addEventListener('visibilitychange',()=>{if(handOn&&document.hidden){handLoopToken++;cancelAnimationFrame(handLoopId);handLoopId=0;hp=null}
-  else if(handOn&&!document.hidden&&handLoopId===0){handLoopToken++;const token=handLoopToken;const loop=async()=>{if(!handOn||token!==handLoopToken)return;handLoopId=requestAnimationFrame(loop);if(handBusy||vid.readyState<2)return;handBusy=true;try{await hands.send({image:vid})}catch(e){console.warn('Hand tracking resume failed:',e)}finally{handBusy=false}};handLoopId=requestAnimationFrame(loop)}});
 
-// ---------- Spaceship ----------
+// ---------- Spaceship Flight ----------
 const fly={on:false,landed:null,n:new THREE.Vector3(),vel:new THREE.Vector3()},keys={},ship=new THREE.Group();
-const zero=new THREE.Vector3(),fwd=new THREE.Vector3(),upv=new THREE.Vector3(),tmp=new THREE.Vector3(),tmp2=new THREE.Vector3(),des=new THREE.Vector3(),look=new THREE.Vector3();let hudN=0;
+const zero=new THREE.Vector3(),fwd=new THREE.Vector3(),upv=new THREE.Vector3(),tmp=new THREE.Vector3(),tmp2=new THREE.Vector3(),look=new THREE.Vector3();let hudN=0;
 {const hull=new THREE.MeshStandardMaterial({color:0xdfe5ee,metalness:.6,roughness:.35}),blue=new THREE.MeshStandardMaterial({color:0x3b82f6,metalness:.5,roughness:.4});
  const nose=new THREE.Mesh(new THREE.ConeGeometry(.16,.55,16),hull);nose.rotation.x=Math.PI/2;nose.position.z=.62;
  const body=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,.7,16),hull);body.rotation.x=Math.PI/2;
@@ -458,21 +567,19 @@ const zero=new THREE.Vector3(),fwd=new THREE.Vector3(),upv=new THREE.Vector3(),t
  ship.add(nose,body,wing,fin,glow);ship.userData.glow=glow;ship.scale.setScalar(1.2);ship.visible=false;scene.add(ship)}
 function warpTo(b){const R=b.r*(b.d?psc:1);fly.landed=null;ship.position.copy(b.group.position).add(tmp.set(0,R*.5,R*3+8));
   fly.vel.copy(b.v||zero);ship.up.set(0,1,0);ship.lookAt(b.group.position);say('Warped to '+b.name)}
-function startFly(){if(sb.on){say('Exit the gravity sandbox first');return}
+function startFly(){if(sb.on){say('Exit sandbox first');return}
   fly.on=true;focused=null;lineup=false;info.style.display='none';setOn(-1);ship.visible=true;warpTo(bodies.find(b=>b.name==='Earth'));
-  $('flyBtn').classList.add('on');$('flyBtn').textContent='✕ Exit flight';$('flyBtn').setAttribute('aria-pressed','true');$('settings').open=false;$('hud').style.display='block';$('sb').style.display='none';
-  if(matchMedia('(pointer:coarse)').matches)$('touch').style.display='flex';
-  say('W/S thrust • A/D turn • ↑↓ pitch • Q/E roll • Shift boost • Space brake • Esc exit • planet buttons = warp')}
+  $('flyBtn').classList.add('on');$('flyBtn').textContent='✕ Exit flight';$('hud').style.display='block';uiDrawer.classList.remove('open');
+  if(matchMedia('(pointer:coarse)').matches)$('touch').style.display='flex';}
 function stopFly(){fly.on=false;ship.visible=false;for(const k in keys)keys[k]=false;camera.up.set(0,1,0);
   target.copy(ship.position);dist=camera.position.distanceTo(ship.position);
-  $('flyBtn').classList.remove('on');$('flyBtn').textContent='🚀 Fly';$('flyBtn').setAttribute('aria-pressed','false');$('hud').style.display='none';$('touch').style.display='none';$('sb').style.display='';overview()}
-$('flyBtn').onclick=()=>fly.on?stopFly():startFly();
+  $('flyBtn').classList.remove('on');$('flyBtn').textContent='🚀 Fly Mode';$('hud').style.display='none';$('touch').style.display='none';overview()}$('flyBtn').onclick=()=>fly.on?stopFly():startFly();
 addEventListener('keydown',e=>{if(!fly.on)return;if(e.code==='Escape'){stopFly();return}keys[e.code]=true;
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault()});
 addEventListener('keyup',e=>{keys[e.code]=false});
 document.querySelectorAll('#touch [data-k]').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{keys[k]=true;try{b.setPointerCapture(e.pointerId)}catch{}e.preventDefault()});
   ['pointerup','pointercancel','lostpointercapture'].forEach(t=>b.addEventListener(t,()=>keys[k]=false))});
-addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
+
 function flyStep(dt){
   const k=c=>keys[c]?1:0,boost=(keys.ShiftLeft||keys.ShiftRight)?4:1;
   ship.rotateY(((k('KeyA')||k('ArrowLeft'))-(k('KeyD')||k('ArrowRight')))*1.6*dt);
@@ -489,24 +596,22 @@ function flyStep(dt){
       if(sp>1e-4)fly.vel.addScaledVector(tmp,-Math.min(sp,60*dt)/sp)}
     if(fly.vel.length()>300)fly.vel.setLength(300);
     ship.position.addScaledVector(fly.vel,dt);
-    if(ship.position.length()>2500){ship.position.setLength(2500);fly.vel.set(0,0,0);say('Edge of the map — turning back')}
+    if(ship.position.length()>2500){ship.position.setLength(2500);fly.vel.set(0,0,0);say('Edge of the solar system')}
     if(near){const R=near.r*(near.d?psc:1)+.15,d=ship.position.distanceTo(near.group.position);
       if(d<R){tmp.copy(ship.position).sub(near.group.position).normalize();const sp=tmp2.copy(fly.vel).sub(near.v||zero).length();
-        if(near.name==='Sun'){say('The ship melted in the Sun! Respawning at Earth…');warpTo(bodies.find(b=>b.name==='Earth'))}
+        if(near.name==='Sun'){say('Ship melted in the Sun! Respawning…');warpTo(bodies.find(b=>b.name==='Earth'))}
         else if(sp<6){fly.landed=near;fly.n.copy(tmp);fly.vel.copy(near.v||zero);
-          ship.quaternion.premultiply(new THREE.Quaternion().setFromUnitVectors(upv,tmp));say(`Landed on ${near.name}! Press W to take off`)}
-        else{ship.position.copy(near.group.position).addScaledVector(tmp,R);fly.vel.copy(near.v||zero).addScaledVector(tmp,3);say('Too fast! Brake (Space) to under 6 u/s to land')}}}
+          ship.quaternion.premultiply(new THREE.Quaternion().setFromUnitVectors(upv,tmp));say(`Landed on ${near.name}!`)}
+        else{ship.position.copy(near.group.position).addScaledVector(tmp,R);fly.vel.copy(near.v||zero).addScaledVector(tmp,3);say('Brake (Space) to under 6 u/s to land')}}}
   }
   ship.userData.glow.scale.set(1,.3+Math.max(0,thr)*boost*.7,1);
-  fwd.set(0,0,1).applyQuaternion(ship.quaternion);upv.set(0,1,0).applyQuaternion(ship.quaternion);
   camera.position.copy(ship.position).addScaledVector(fwd,-5).addScaledVector(upv,1.6);camera.up.copy(upv);
   camera.lookAt(look.copy(ship.position).addScaledVector(fwd,12));
   if(!(hudN++%5)){const rel=tmp2.copy(fly.vel).sub(near&&near.v||zero).length();
-    $('hud').textContent=fly.landed?`🛬 Landed on ${fly.landed.name} — press W to take off`:
-      `🚀 ${fly.vel.length().toFixed(1)} u/s  •  ${near.name} ${Math.max(0,nd).toFixed(1)} u away  •  relative ${rel.toFixed(1)} u/s${nd<25&&rel>=6?'  ⚠ slow below 6 to land':''}`}
+    $('hud').textContent=fly.landed?`🛬 Landed on ${fly.landed.name}`:`🚀 ${fly.vel.length().toFixed(1)} u/s • ${near.name} ${Math.max(0,nd).toFixed(1)} u`}
 }
 
-// ---------- Loop ----------
+// ---------- Main Loop ----------
 const clock=new THREE.Clock(),v=new THREE.Vector3(),sv=new THREE.Vector3(),goal=new THREE.Vector3();
 function animate(){
   requestAnimationFrame(animate);
@@ -530,7 +635,6 @@ function animate(){
   camera.position.set(target.x+dist*Math.sin(ph)*Math.sin(th),target.y+dist*Math.cos(ph),target.z+dist*Math.sin(ph)*Math.cos(th));
   camera.lookAt(target);
   }
-  // names
   const show=$('lab').checked;
   for(const L of labels){let on=show;
     if(on){L.obj.getWorldPosition(v);L.obj.getWorldScale(sv);v.y+=L.r*sv.x*1.25;v.project(camera);on=v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
